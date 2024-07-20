@@ -224,7 +224,9 @@ const Gallery: React.FC<Gallery> = ({ imageSrc, setShowAllPhotos, showAllPhotos 
                                 <div
                                     key={index}
                                     className="w-full h-[80vw] md:w-[60vw] relative md:h-[45vw]"
-                                    ref={el => imageRefs.current[index] = el}
+                                    ref={el => {
+                                        imageRefs.current[index] = el;
+                                    }}
                                 >
                                     <Image
                                         src={photo}
