@@ -1,11 +1,9 @@
 "use client";
 
 import Logo from "../navbar/Logo";
-import { useRouter } from "next/navigation";
+import Link from 'next/link';
 
 const Footer: React.FC = ({}) => {
-  const router = useRouter();
-
   return (
     <footer className='bg-[#F7F7F7] border-t border'>
       <div className='mx-auto w-full max-w-screen-xl p-4 py-6 lg:py-8'>
@@ -72,37 +70,37 @@ const Footer: React.FC = ({}) => {
           <div className='flex gap-4'>
             <span className='text-sm text-gray-500 sm:text-center '>
               © 2024{" "}
-              <a
-                onClick={() => router.push("/")}
+              <Link
+                href="/"
                 className='cursor-pointer hover:underline'
               >
                 ShutterGuide
-              </a>
+              </Link>
               . All Rights Reserved.
             </span>
             <div className='text-sm text-gray-500 sm:text-center '>
-              <a
-                onClick={() => router.push("/")}
+              <Link
+                href="/"
                 className='cursor-pointer hover:underline'
               >
                 Terms
-              </a>
+              </Link>
             </div>
             <div className='text-sm text-gray-500 sm:text-center '>
-              <a
-                onClick={() => router.push("/")}
+              <Link
+                href="/"
                 className='cursor-pointer hover:underline'
               >
                 Sitemap
-              </a>
+              </Link>
             </div>
             <div className='text-sm text-gray-500 sm:text-center'>
-              <a
-                onClick={() => router.push("/")}
+              <Link
+                href="/"
                 className='cursor-pointer hover:underline'
               >
                 $ USD
-              </a>
+              </Link>
             </div>
           </div>
           <div className='flex mt-4 sm:justify-center sm:mt-0'>

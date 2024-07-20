@@ -1,13 +1,12 @@
 "use client";
 import { SafeUser } from "@/app/types";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 interface ProfileClientProps {
   currentUser?: SafeUser;
 }
-const ProfileClient: React.FC<ProfileClientProps> = ({ currentUser }) => {
-  const router = useRouter();
 
+const ProfileClient: React.FC<ProfileClientProps> = ({ currentUser }) => {
   return (
     currentUser && (
       <div className='flex py-8 md:py-16 px-4 items-center h-auto flex-wrap mx-auto'>
@@ -54,12 +53,12 @@ const ProfileClient: React.FC<ProfileClientProps> = ({ currentUser }) => {
             </p>
 
             <div className='pt-12 pb-8'>
-              <button
+              <Link
                 className='bg-theme hover:bg-hover text-white font-bold py-2 px-4 rounded-full'
-                onClick={() => router.push("/favorites")}
+                href="/favorites"
               >
                 My Favourites
-              </button>
+              </Link>
             </div>
           </div>
         </div>

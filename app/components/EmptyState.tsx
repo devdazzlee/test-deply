@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import Heading from "./Heading";
 import Button from "./Button";
+import Link from "next/link";
 
 interface EmptyState {
   title?: string;
@@ -31,11 +32,12 @@ const EmptyState: React.FC<EmptyState> = ({
       <Heading center title={title} subtitle={subtitle} />
       <div className='w-48 mt-4'>
         {showReset && (
-          <Button
-            outline
-            label='Remove all filters'
-            onClick={() => router.push("/")}
-          />
+          <Link href='/'>
+            <Button
+              outline
+              label='Remove all filters'
+            />
+          </Link>
         )}
       </div>
     </div>
