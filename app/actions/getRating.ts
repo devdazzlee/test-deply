@@ -4,9 +4,7 @@ interface IParams {
   listingId?: string;
 }
 
-export default async function getRatings(
-  params: IParams
-) {
+export default async function getRatings(params: IParams) {
   try {
     const { listingId } = params;
 
@@ -23,11 +21,11 @@ export default async function getRatings(
         numberOfRatings: true,
         comments: {
           select: {
-            rating: true,
+            rating: true
           },
           where: {
             rating: {
-              not: null,
+              not: null
             }
           }
         }
@@ -45,7 +43,7 @@ export default async function getRatings(
       title: listing.title,
       averageRating: listing.averageRating,
       numberOfRatings: listing.numberOfRatings,
-      ratings: ratings,
+      ratings: ratings
     };
   } catch (error: any) {
     throw new Error(error.message);

@@ -5,9 +5,7 @@ interface IParams {
   userId?: string;
 }
 
-export default async function getComments(
-  params: IParams
-) {
+export default async function getComments(params: IParams) {
   try {
     const { listingId, userId } = params;
 
@@ -28,25 +26,23 @@ export default async function getComments(
         listing: true
       },
       orderBy: {
-        createdAt: 'desc'
+        createdAt: "desc"
       }
     });
 
-    const safeComments = comments.map(
-      (comment) => ({
-        ...comment,
-        createdAt: comment.createdAt.toISOString(),
-        user: {
-          ...comment.user,
-          createdAt: comment.user.createdAt.toISOString(),
-          updatedAt: comment.user.updatedAt.toISOString(),
-        },
-        listing: {
-          ...comment.listing,
-          createdAt: comment.listing.createdAt.toISOString(),
-        },
-      })
-    );
+    const safeComments = comments.map(comment => ({
+      ...comment,
+      createdAt: comment.createdAt.toISOString(),
+      user: {
+        ...comment.user,
+        createdAt: comment.user.createdAt.toISOString(),
+        updatedAt: comment.user.updatedAt.toISOString()
+      },
+      listing: {
+        ...comment.listing,
+        createdAt: comment.listing.createdAt.toISOString()
+      }
+    }));
 
     return safeComments;
   } catch (error: any) {
