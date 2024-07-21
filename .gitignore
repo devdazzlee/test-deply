@@ -19,6 +19,7 @@
 # misc
 .DS_Store
 *.pem
+userignore
 
 # debug
 npm-debug.log*
