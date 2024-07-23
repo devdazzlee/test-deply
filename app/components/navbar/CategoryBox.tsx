@@ -1,9 +1,11 @@
 "use client";
 
-import { useRouter, useSearchParams } from "next/navigation";
-import React, { useCallback } from "react";
+import React from "react";
 import { IconType } from "react-icons";
 import qs from "query-string";
+
+import { useSearchParams } from "next/navigation";
+import Link from "next/link";
 
 interface CategoryBoxProps {
   icon: IconType;
@@ -16,58 +18,46 @@ const CategoryBox: React.FC<CategoryBoxProps> = ({
   label,
   selected
 }) => {
-  const router = useRouter();
   const params = useSearchParams();
 
-  const handleClick = useCallback(() => {
-    let currentQuery = {};
+  let query = qs.parse(params?.toString() ?? "");
 
-    if (params) {
-      currentQuery = qs.parse(params.toString());
-    }
+  // If this category filter is the active one, clicking
+  // it should remove it instead.
+  if (query['category'] === label) {
+    delete query['category'];
+  }
+  else {
+    query['category'] = label;
+  }
 
-    const updatedQuery: any = {
-      ...currentQuery,
-      category: label
-    };
-
-    if (params?.get("category") == label) {
-      delete updatedQuery.category;
-    }
-
-    const url = qs.stringifyUrl(
-      {
-        url: "/",
-        query: updatedQuery
-      },
-      { skipNull: true }
-    );
-
-    router.push(url);
-  }, [label, params, router]);
+  const url = qs.stringifyUrl({
+    url: '/',
+    query
+  }, { skipNull: true });
 
   return (
-    <div
-      onClick={handleClick}
+    <Link
+      href={url}
       className={`
-            flex 
-            flex-col 
-            items-center 
-            justify-center 
-            gap-2 
-            p-3 
-            border-b-2 
-            hover:text-neutral-800 
+            flex
+            flex-col
+            items-center
+            justify-center
+            gap-2
+            p-3
+            border-b-2
+            hover:text-neutral-800
             text-nowrap
-            transition 
-            cursor-pointer 
+            transition
+            cursor-pointer
             ${selected ? "border-b-neutral-800" : "border-transparent"}
             ${selected ? "text-neutral-800" : "text-neutral-500"}
         `}
     >
       <Icon size={26} />
       <div className='font-medium text-sm'>{label}</div>
-    </div>
+    </Link>
   );
 };
 

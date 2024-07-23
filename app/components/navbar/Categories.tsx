@@ -1,6 +1,5 @@
 "use client";
 
-import { TbBeach, TbMountain, TbPool } from "react-icons/tb";
 import Container from "../Container";
 import {
   GiHuntingHorn,
@@ -31,7 +30,7 @@ import { LiaUserAstronautSolid } from "react-icons/lia";
 import { FaPersonMilitaryPointing } from "react-icons/fa6";
 import { SiPowerautomate } from "react-icons/si";
 import { BsFileImage } from "react-icons/bs";
-import { Suspense } from "react";
+import { Suspense, useRef } from "react";
 
 import CategoryBox from "./CategoryBox";
 import { usePathname, useSearchParams } from "next/navigation";
@@ -168,11 +167,13 @@ const Categories = () => {
 
   const isMainPage = pathname == "/";
 
+  const scrollerRef = useRef<HTMLDivElement>(null);
+
   if (!isMainPage) {
     return null;
   }
   const scroll = (width: any) => {
-    const container = document.getElementById("categoriesContainer");
+    let container = scrollerRef.current;
     if (container) {
       container.scrollBy({
         left: width, // Adjust this value as needed
@@ -207,15 +208,15 @@ const Categories = () => {
             </svg>
           </button>
           <div
-            id='categoriesContainer'
+            ref={scrollerRef}
             className='pt-4 flex flex-row shadow-y-md items-center justify-between overflow-x-auto no-scrollbar'
           >
             {categories.map(item => (
               <CategoryBox
                 key={item.label}
                 label={item.label}
-                selected={category == item.label}
                 icon={item.icon}
+                selected={category == item.label}
               />
             ))}
           </div>
