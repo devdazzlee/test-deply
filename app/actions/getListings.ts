@@ -18,7 +18,7 @@ export default async function getListings(
     params: IListingsParams
 ) {
     try {
-        const { 
+        const {
             userId,
             guestCount,
             roomCount,
@@ -27,19 +27,19 @@ export default async function getListings(
             endDate,
             locationValue,
             category,
-         } = params;
+        } = params;
 
         let query: any = {};
 
         if (userId) {
             query.userId = userId;
         }
-       
+
         if (category) {
-            console.log(category);
-            
+            const catArr = category.split(",")
+
             query.category = {
-                has: category
+                hasSome: catArr // Prisma operator to check for any match in the array
             };
         }
 
@@ -56,6 +56,7 @@ export default async function getListings(
         }
 
         if (bathroomCount) {
+
             query.bathroomCount = {
                 gte: +bathroomCount
             }
@@ -72,7 +73,7 @@ export default async function getListings(
                             {
                                 endDate: { gte: startDate },
                                 startDate: { lte: startDate },
-                            }, 
+                            },
                             {
                                 startDate: { lte: endDate },
                                 endDate: { gte: endDate },
@@ -93,8 +94,8 @@ export default async function getListings(
                     select: {
                         name: true,
                         image: true
-                    } 
                     }
+                }
             }
         });
 
@@ -107,6 +108,6 @@ export default async function getListings(
     } catch (error: any) {
         throw new Error(error);
         console.log(error);
-        
+
     }
 }

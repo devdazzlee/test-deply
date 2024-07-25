@@ -137,7 +137,7 @@ const RentModal = () => {
         setValue('category', allCategories);
     }
 
-    const handleSelectCat = (selectedCategory:string) => {
+    const handleSelectCat = (selectedCategory: string) => {
         const index = category.indexOf(selectedCategory);
 
         if (index === -1) {
@@ -179,9 +179,9 @@ const RentModal = () => {
                         />
                     </div>
                 ))}
-                <div 
-                 onClick={handleSelectAllCategories}
-            className={`
+                <div
+                    onClick={handleSelectAllCategories}
+                    className={`
                 rounded-xl
                 border-2
                 p-4
@@ -193,13 +193,13 @@ const RentModal = () => {
                 cursor-pointer
                 
             `}
-            >
-                <FaHandPointUp size={30} /> 
-                <div className="font-semibold">{"Select All"}</div>
+                >
+                    <FaHandPointUp size={30} />
+                    <div className="font-semibold">{"Select All"}</div>
 
-        </div>
-                
-                 
+                </div>
+
+
             </div>
         </div>
     )
@@ -231,22 +231,22 @@ const RentModal = () => {
                     subtitle="Description can help potential clients?"
                 />
                 <Counter
-                    title="Experiance"
-                    subtitle="How many years of experiance do you have?"
+                    title="Experience"
+                    subtitle="How many years of experience do you have?"
                     value={guestCount}
                     onChange={(value) => setCustomValue('guestCount', value)}
                 />
                 <hr />
                 <Counter
                     title="Maximum"
-                    subtitle="Maximum days availability? set 0 for no max"
+                    subtitle="How many maximum days your work is available for? Set 0 for no maximum"
                     value={roomCount}
                     onChange={(value) => setCustomValue('roomCount', value)}
                 />
                 <hr />
                 <Counter
                     title="Minimum"
-                    subtitle="Minimum days availability? set 0 for no minimum"
+                    subtitle="How many minimum days your work is available for? Set 0 for no minimum"
                     value={bathroomCount}
                     onChange={(value) => setCustomValue('bathroomCount', value)}
                 />

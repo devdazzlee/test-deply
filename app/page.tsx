@@ -8,7 +8,9 @@ interface HomeProps {
   searchParams: IListingsParams;
 }
 
-const Home = async ( {searchParams}: HomeProps ) => {
+const Home = async ({ searchParams }: HomeProps) => {
+
+
   const listings = await getListings(searchParams);
   const currentUser = await getCurrentUser();
 
@@ -36,7 +38,7 @@ const Home = async ( {searchParams}: HomeProps ) => {
         ">
         {listings.map((listing) => {
           return (
-            <ListingCard 
+            <ListingCard
               currentUser={currentUser}
               key={listing.id}
               listingUserName={listing?.user?.name}
@@ -50,5 +52,5 @@ const Home = async ( {searchParams}: HomeProps ) => {
   );
 }
 
-export const dynamic="force-dynamic";
+export const dynamic = "force-dynamic";
 export default Home;
