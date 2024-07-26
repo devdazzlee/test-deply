@@ -52,12 +52,18 @@ const ProfileClient: React.FC<ProfileClientProps> = ({ currentUser: user }) => {
             so on.
           </p>
 
-          <div className='pt-12 pb-8'>
+          <div className='pt-12 pb-8 flex gap-x-6'>
             <Link
               className='bg-theme hover:bg-hover text-white font-bold py-2 px-4 rounded-full'
               href='/favorites'
             >
               My Favourites
+            </Link>
+            <Link
+              className='bg-theme hover:bg-hover text-white font-bold py-2 px-4 rounded-full'
+              href='/profile/edit'
+            >
+              Edit Profile
             </Link>
           </div>
         </div>
