@@ -58,7 +58,7 @@ const UserMenu: React.FC<UserMenuProps> = ({ currentUser }) => {
               <>
                 <MenuItem label="Bookings" href="/trips" />
                 <MenuItem label="My Profile" href="/profile" />
-                <MenuItem label="Billing" />
+                <MenuItem label="Billing" href="/billing" />
                 <MenuItem label="Favorites" href="/favorites" />
                 {/* <MenuItem
                   href="/trips"
