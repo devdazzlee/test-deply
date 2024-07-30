@@ -35,3 +35,5 @@ export default async function getCurrentUser() {
     return null;
   }
 }
+
+export type CurrentUser = NonNullable<Awaited<ReturnType<typeof getCurrentUser>>>;
