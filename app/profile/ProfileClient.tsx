@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import {
   IconCircleDashedCheck,
@@ -48,7 +48,13 @@ function PasswordInput(props: InputProps) {
   );
 }
 
-export default function ProfileClient({ currentUser }: { currentUser: CurrentUser }) {
+export default function ProfileClient({
+  currentUser,
+  listing
+}: {
+  currentUser: CurrentUser;
+  listing: any;
+}) {
   return (
     <>
       {/* Cover photo */}
@@ -67,7 +73,7 @@ export default function ProfileClient({ currentUser }: { currentUser: CurrentUse
             width={200}
             height={200}
             // src='/images/profile-image.jpg'
-            alt="profile picture"
+            alt='profile picture'
             src={currentUser.image || "/images/placeholder.jpg"}
             className='w-full max-w-full h-full max-h-full object-cover'
           />
@@ -85,7 +91,7 @@ export default function ProfileClient({ currentUser }: { currentUser: CurrentUse
 
         <div className='pt-5 pl-4'>
           <h1 className='text-2xl font-bold'>{currentUser.name}</h1>
-          <p className="text-gray-500">{currentUser.email}</p>
+          <p className='text-gray-500'>{currentUser.email}</p>
         </div>
       </div>
 
@@ -224,7 +230,7 @@ export default function ProfileClient({ currentUser }: { currentUser: CurrentUse
         <h4 className='font-semibold'>Photos</h4>
         <p className='text-sm text-gray-600'>Drag to move photos around</p>
 
-        <PhotoSection />
+        <PhotoSection listing={listing} />
       </section>
 
       <section className='mx-6 md:mx-16 py-6'>
@@ -244,14 +250,13 @@ export default function ProfileClient({ currentUser }: { currentUser: CurrentUse
   );
 }
 
-function PhotoSection() {
+function PhotoSection({ listing }: any) {
+  let images: string[] = listing?.imageSrc || [];
   const [items, setItems] = useState(
-    [...Array(9)].map((_, index) => {
-      return {
-        id: index,
-        url: "/images/profile-image.jpg"
-      };
-    })
+    images.map((url: string, index: number) => ({
+      id: index,
+      url
+    }))
   );
 
   const onSortEnd = (oldIndex: number, newIndex: number) => {
