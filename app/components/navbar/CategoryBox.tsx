@@ -24,17 +24,19 @@ const CategoryBox: React.FC<CategoryBoxProps> = ({
 
   // If this category filter is the active one, clicking
   // it should remove it instead.
-  if (query['category'] === label) {
-    delete query['category'];
-  }
-  else {
-    query['category'] = label;
+  if (query["category"] === label) {
+    delete query["category"];
+  } else {
+    query["category"] = label;
   }
 
-  const url = qs.stringifyUrl({
-    url: '/',
-    query
-  }, { skipNull: true });
+  const url = qs.stringifyUrl(
+    {
+      url: "/",
+      query
+    },
+    { skipNull: true }
+  );
 
   return (
     <Link

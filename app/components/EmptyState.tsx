@@ -33,10 +33,7 @@ const EmptyState: React.FC<EmptyState> = ({
       <div className='w-48 mt-4'>
         {showReset && (
           <Link href='/'>
-            <Button
-              outline
-              label='Remove all filters'
-            />
+            <Button outline label='Remove all filters' />
           </Link>
         )}
       </div>

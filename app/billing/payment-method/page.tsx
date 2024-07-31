@@ -3,7 +3,7 @@
 import { IconCheck, IconX } from "@tabler/icons-react";
 import { Button } from "@nextui-org/react";
 import { Input } from "@nextui-org/react";
-import Link from 'next/link';
+import Link from "next/link";
 
 export default function PaymentMethod() {
   return (
@@ -45,7 +45,7 @@ export default function PaymentMethod() {
         </div>
 
         <div className='flex gap-2'>
-          <Link href="/billing">
+          <Link href='/billing'>
             <Button
               color='success'
               variant='solid'
@@ -56,7 +56,7 @@ export default function PaymentMethod() {
               Save
             </Button>
           </Link>
-          <Link href="/billing">
+          <Link href='/billing'>
             <Button
               color='default'
               variant='flat'

@@ -12,34 +12,32 @@ export interface IListingsParams {
   user?: Object;
 }
 
-export default async function getListings(
-    params: IListingsParams
-) {
-    try {
-        const {
-            userId,
-            guestCount,
-            roomCount,
-            bathroomCount,
-            startDate,
-            endDate,
-            locationValue,
-            category,
-        } = params;
+export default async function getListings(params: IListingsParams) {
+  try {
+    const {
+      userId,
+      guestCount,
+      roomCount,
+      bathroomCount,
+      startDate,
+      endDate,
+      locationValue,
+      category
+    } = params;
 
     let query: any = {};
 
-        if (userId) {
-            query.userId = userId;
-        }
+    if (userId) {
+      query.userId = userId;
+    }
 
-        if (category) {
-            const catArr = category.split(",")
+    if (category) {
+      const catArr = category.split(",");
 
-            query.category = {
-                hasSome: catArr // Prisma operator to check for any match in the array
-            };
-        }
+      query.category = {
+        hasSome: catArr // Prisma operator to check for any match in the array
+      };
+    }
 
     if (roomCount) {
       query.roomCount = {
@@ -53,59 +51,57 @@ export default async function getListings(
       };
     }
 
-        if (bathroomCount) {
+    if (bathroomCount) {
+      query.bathroomCount = {
+        gte: +bathroomCount
+      };
+    }
 
-            query.bathroomCount = {
-                gte: +bathroomCount
-            }
+    if (locationValue) {
+      query.locationValue = locationValue;
+    }
+    if (startDate && endDate) {
+      query.NOT = {
+        reservations: {
+          some: {
+            OR: [
+              {
+                endDate: { gte: startDate },
+                startDate: { lte: startDate }
+              },
+              {
+                startDate: { lte: endDate },
+                endDate: { gte: endDate }
+              }
+            ]
+          }
         }
+      };
+    }
 
-        if (locationValue) {
-            query.locationValue = locationValue;
+    const listings = await prisma.listing.findMany({
+      where: query,
+      orderBy: {
+        createdAt: "desc"
+      },
+      include: {
+        user: {
+          select: {
+            name: true,
+            image: true
+          }
         }
-        if (startDate && endDate) {
-            query.NOT = {
-                reservations: {
-                    some: {
-                        OR: [
-                            {
-                                endDate: { gte: startDate },
-                                startDate: { lte: startDate },
-                            },
-                            {
-                                startDate: { lte: endDate },
-                                endDate: { gte: endDate },
-                            }
-                        ]
-                    }
-                }
-            }
-        }
-
-        const listings = await prisma.listing.findMany({
-            where: query,
-            orderBy: {
-                createdAt: 'desc'
-            },
-            include: {
-                user: {
-                    select: {
-                        name: true,
-                        image: true
-                    }
-                }
-            }
-        });
+      }
+    });
 
     const safeListings = listings.map(listings => ({
       ...listings,
       createdAt: listings.createdAt.toISOString()
     }));
 
-        return safeListings;
-    } catch (error: any) {
-        throw new Error(error);
-        console.log(error);
-
-    }
+    return safeListings;
+  } catch (error: any) {
+    throw new Error(error);
+    console.log(error);
+  }
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import Logo from "../navbar/Logo";
-import Link from 'next/link';
+import Link from "next/link";
 
 const Footer: React.FC = ({}) => {
   return (
@@ -70,35 +70,23 @@ const Footer: React.FC = ({}) => {
           <div className='flex gap-4'>
             <span className='text-sm text-gray-500 sm:text-center '>
               © 2024{" "}
-              <Link
-                href="/"
-                className='cursor-pointer hover:underline'
-              >
+              <Link href='/' className='cursor-pointer hover:underline'>
                 ShutterGuide
               </Link>
               . All Rights Reserved.
             </span>
             <div className='text-sm text-gray-500 sm:text-center '>
-              <Link
-                href="/"
-                className='cursor-pointer hover:underline'
-              >
+              <Link href='/' className='cursor-pointer hover:underline'>
                 Terms
               </Link>
             </div>
             <div className='text-sm text-gray-500 sm:text-center '>
-              <Link
-                href="/"
-                className='cursor-pointer hover:underline'
-              >
+              <Link href='/' className='cursor-pointer hover:underline'>
                 Sitemap
               </Link>
             </div>
             <div className='text-sm text-gray-500 sm:text-center'>
-              <Link
-                href="/"
-                className='cursor-pointer hover:underline'
-              >
+              <Link href='/' className='cursor-pointer hover:underline'>
                 $ USD
               </Link>
             </div>
