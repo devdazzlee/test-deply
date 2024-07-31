@@ -1,25 +1,18 @@
-
-import getCurrentUser from "@/app/actions/getCurrentUser";
-import ProfileClient from "./ProfileClient";
-import ClientOnly from "../components/ClientOnly";
+import getCurrentUser from "../actions/getCurrentUser";
 import EmptyState from "../components/EmptyState";
+import ProfileClient from "./ProfileClient";
+import prisma from "@/app/libs/prismadb";
 
-const ProfilePage = async () => {
-	const currentUser = await getCurrentUser();
+export default async function ProfilePage() {
+  const currentUser = await getCurrentUser();
 
-	if (!currentUser) {
-		return (
-			<ClientOnly>
-				<EmptyState
-					title="Unauthorised"
-					subtitle="Please login"
-				/>
-			</ClientOnly>
-		)
-	}
-	return (
-		<ClientOnly> <ProfileClient currentUser={currentUser} /> </ClientOnly>
-	)
+  if (!currentUser) {
+    return <EmptyState title='Unauthorised' subtitle='Please login' />;
+  }
+
+  let listing = await prisma?.listing.findFirst({
+    where: { userId: currentUser.id }
+  });
+
+  return <ProfileClient currentUser={currentUser} listing={listing} />;
 }
-
-export default ProfilePage

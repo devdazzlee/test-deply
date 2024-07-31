@@ -3,10 +3,7 @@ import { NextResponse } from "next/server";
 import prisma from "@/app/libs/prismadb";
 import getCurrentUser from "@/app/actions/getCurrentUser";
 
-export async function POST(
-  request: Request, 
-) {
-
+export async function POST(request: Request) {
   const currentUser = await getCurrentUser();
 
   if (!currentUser) {
@@ -14,8 +11,8 @@ export async function POST(
   }
 
   const body = await request.json();
-  
-  const { 
+
+  const {
     title,
     description,
     imageSrc,
@@ -24,9 +21,8 @@ export async function POST(
     bathroomCount,
     guestCount,
     location,
-    price,
+    price
   } = body;
-   
 
   const imageSources = Array.isArray(imageSrc) ? imageSrc : [imageSrc];
 
@@ -41,7 +37,7 @@ export async function POST(
       guestCount,
       locationValue: location.value,
       price: parseInt(price, 10),
-      userId: currentUser.id,
+      userId: currentUser.id
     }
   });
 

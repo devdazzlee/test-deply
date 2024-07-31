@@ -6,19 +6,17 @@ interface IParams {
   authorId?: string;
 }
 
-export default async function getReservations(
-  params: IParams
-) {
+export default async function getReservations(params: IParams) {
   try {
     const { listingId, userId, authorId } = params;
 
     const query: any = {
-      approved:true
+      approved: true
     };
-        
+
     if (listingId) {
       query.listingId = listingId;
-    };
+    }
 
     if (userId) {
       query.userId = userId;
@@ -34,20 +32,19 @@ export default async function getReservations(
         listings: true
       },
       orderBy: {
-        createdAt: 'desc'
+        createdAt: "desc"
       }
     });
 
-    const safeReservations = reservations.map(
-      (reservation) => ({
+    const safeReservations = reservations.map(reservation => ({
       ...reservation,
       createdAt: reservation.createdAt.toISOString(),
       startDate: reservation.startDate.toISOString(),
       endDate: reservation.endDate.toISOString(),
       listing: {
         ...reservation.listings,
-        createdAt: reservation.listings.createdAt.toISOString(),
-      },
+        createdAt: reservation.listings.createdAt.toISOString()
+      }
     }));
 
     return safeReservations;

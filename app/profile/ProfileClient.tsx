@@ -1,44 +1,306 @@
-'use client';
-import { SafeUser } from "@/app/types";
-import { useRouter } from "next/navigation";
+"use client";
 
-interface ProfileClientProps {
-    currentUser?: SafeUser;
+import {
+  IconCircleDashedCheck,
+  IconEyeClosed,
+  IconEyeFilled,
+  IconPhotoFilled,
+  IconTrash
+} from "@tabler/icons-react";
+import clsx from "clsx";
+
+import { Button, Textarea } from "@nextui-org/react";
+import { Input, InputProps } from "@nextui-org/react";
+import { useState } from "react";
+import { arrayMoveImmutable } from "array-move";
+import SortableList, { SortableItem } from "react-easy-sort";
+import type { CurrentUser } from "../actions/getCurrentUser";
+import Image from "next/image";
+
+function PasswordInput(props: InputProps) {
+  const [isVisible, setIsVisible] = useState(false);
+  const toggleVisibility = () => setIsVisible(!isVisible);
+
+  return (
+    <Input
+      {...props}
+      variant='flat'
+      radius='sm'
+      labelPlacement='outside'
+      type='password'
+      endContent={
+        <Button
+          isIconOnly
+          variant='light'
+          size='sm'
+          onClick={toggleVisibility}
+          aria-label='toggle password visibility'
+          className='translate-x-2'
+        >
+          {isVisible ? (
+            <IconEyeClosed size={18} className='text-default-500' />
+          ) : (
+            <IconEyeFilled size={18} className='text-default-500' />
+          )}
+        </Button>
+      }
+    />
+  );
 }
-const ProfileClient: React.FC<ProfileClientProps> = ({
-    currentUser
-}) => {
-    const router = useRouter();
 
-    return (
-        currentUser&&<div className="flex py-8 md:py-16 px-4 items-center h-auto flex-wrap mx-auto">
+export default function ProfileClient({
+  currentUser,
+  listing
+}: {
+  currentUser: CurrentUser;
+  listing: any;
+}) {
+  return (
+    <>
+      {/* Cover photo */}
+      <div className='bg-[#ECECEE] h-40'></div>
 
+      {/* Profile photo + name */}
+      <div className='flex mb-16'>
+        <div
+          className={clsx(
+            "w-36 h-36 rounded-full bg-blue-500 shadow-xl -my-12 ml-10",
+            "overflow-hidden relative group",
+            "border-white border-3"
+          )}
+        >
+          <Image
+            width={200}
+            height={200}
+            // src='/images/profile-image.jpg'
+            alt='profile picture'
+            src={currentUser.image || "/images/placeholder.jpg"}
+            className='w-full max-w-full h-full max-h-full object-cover'
+          />
 
-            <div id="profile" className="w-full lg:rounded-l-lg lg:rounded-r-none shadow-xl bg-white opacity-75 mx-6 lg:mx-0">
+          <button
+            className={clsx(
+              "group-hover:opacity-100 opacity-0 transition-opacity",
+              "bg-black/70 text-white absolute inset-0",
+              "flex items-center justify-center gap-x-2 font-bold text-sm"
+            )}
+          >
+            <IconPhotoFilled size={18} /> Change
+          </button>
+        </div>
 
+        <div className='pt-5 pl-4'>
+          <h1 className='text-2xl font-bold'>{currentUser.name}</h1>
+          <p className='text-gray-500'>{currentUser.email}</p>
+        </div>
+      </div>
 
-                <div className="w-full px-4 md:px-12 text-center lg:text-left">
+      {/* Contact Info */}
+      <section className='mx-6 md:mx-16 flex max-md:flex-col md:items-start gap-x-12 gap-y-6 border-b-2 py-6'>
+        <div className='md:min-w-56 wl:min-w-96'>
+          <h4 className='font-semibold'>Contact Information</h4>
+          <p className='text-sm text-gray-600'>
+            This is your personal information
+          </p>
+        </div>
 
-                    <div className="flex mx-4 justify-between items-center w-full">
-                        <h1 className="text-2xl font-bold text-nowrap">{currentUser.name}</h1>
-                        <div className="rounded flex justify-end px-4">
+        <div className='flex-1 md:max-w-lg space-y-11'>
+          <Input
+            variant='flat'
+            radius='sm'
+            labelPlacement='outside'
+            label='Your name'
+            placeholder='Enter your name'
+            defaultValue={currentUser.name ?? ""}
+          />
+          <Input
+            variant='flat'
+            radius='sm'
+            labelPlacement='outside'
+            label='Phone Number'
+            placeholder='Enter your phone number'
+          />
+          <Input
+            variant='flat'
+            radius='sm'
+            labelPlacement='outside'
+            label='Location'
+            placeholder='Enter your location'
+          />
+        </div>
+      </section>
 
-                            <img src={currentUser.image || "/images/placeholder.jpg"} className="rounded-full w-1/6 h-1/6 shadow-lg lg:block" />
-                        </div>
-                    </div>
-                    <div className="mx-auto lg:mx-0  pt-3 border-b-2 border-green-500 opacity-25"></div>
-                    <p className="pt-4 text-base font-bold flex items-center justify-center lg:justify-start"><svg className="h-4 fill-current text-theme pr-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9 12H1v6a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-6h-8v2H9v-2zm0-1H0V5c0-1.1.9-2 2-2h4V2a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v1h4a2 2 0 0 1 2 2v6h-9V9H9v2zm3-8V2H8v1h4z" /></svg> {currentUser.email}</p>
-                    <p className="pt-2 text-gray-600 text-xs lg:text-sm flex items-center justify-center lg:justify-start"><svg className="h-4 fill-current text-theme pr-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M10 20a10 10 0 1 1 0-20 10 10 0 0 1 0 20zm7.75-8a8.01 8.01 0 0 0 0-4h-3.82a28.81 28.81 0 0 1 0 4h3.82zm-.82 2h-3.22a14.44 14.44 0 0 1-.95 3.51A8.03 8.03 0 0 0 16.93 14zm-8.85-2h3.84a24.61 24.61 0 0 0 0-4H8.08a24.61 24.61 0 0 0 0 4zm.25 2c.41 2.4 1.13 4 1.67 4s1.26-1.6 1.67-4H8.33zm-6.08-2h3.82a28.81 28.81 0 0 1 0-4H2.25a8.01 8.01 0 0 0 0 4zm.82 2a8.03 8.03 0 0 0 4.17 3.51c-.42-.96-.74-2.16-.95-3.51H3.07zm13.86-8a8.03 8.03 0 0 0-4.17-3.51c.42.96.74 2.16.95 3.51h3.22zm-8.6 0h3.34c-.41-2.4-1.13-4-1.67-4S8.74 3.6 8.33 6zM3.07 6h3.22c.2-1.35.53-2.55.95-3.51A8.03 8.03 0 0 0 3.07 6z" /></svg> Your Location - 25.0000° N, 71.0000° W</p>
-                    <p className="pt-8 text-sm">Totally optional short description about yourself, what you do and so on.</p>
+      {/* Password */}
+      <section className='mx-6 md:mx-16 flex max-md:flex-col md:items-start gap-x-12 gap-y-6 border-b-2 py-6'>
+        <div className='md:min-w-56 wl:min-w-96'>
+          <h4 className='font-semibold'>Password</h4>
+          <p className='text-sm text-gray-600'>
+            You can change the password here
+          </p>
+        </div>
 
-                    <div className="pt-12 pb-8">
-                        <button className="bg-theme hover:bg-hover text-white font-bold py-2 px-4 rounded-full" onClick={() => router.push("/favorites")} >
-                            My Favourites
-                        </button>
-                    </div>
-                </div>
+        <div className='flex-1 md:max-w-lg space-y-11'>
+          <PasswordInput
+            label='Current Password'
+            placeholder='Enter current password'
+          />
+          <PasswordInput
+            label='New Password'
+            placeholder='Enter new password'
+          />
+          <PasswordInput
+            label='Confirm New Password'
+            placeholder='Enter new password again'
+          />
+        </div>
+      </section>
+
+      {/* Bio */}
+      <section className='mx-6 md:mx-16 flex max-md:flex-col md:items-start gap-x-12 gap-y-6 border-b-2 py-6'>
+        <div className='md:min-w-56 wl:min-w-96'>
+          <h4 className='font-semibold'>Bio</h4>
+          <p className='text-sm text-gray-600'>Tell us about yourself</p>
+        </div>
+
+        <div className='flex-1 md:max-w-lg space-y-11'>
+          <Textarea
+            variant='flat'
+            label='Your Bio'
+            labelPlacement='outside'
+            placeholder='Enter your bio'
+            disableAutosize
+            // className='col-span-12 md:col-span-6 mb-6 md:mb-0'
+            classNames={{
+              input: "resize-y min-h-[140px]"
+            }}
+          />
+        </div>
+      </section>
+
+      {/* Social links */}
+      <section className='mx-6 md:mx-16 flex max-md:flex-col md:items-start gap-x-12 gap-y-6 border-b-2 py-6'>
+        <div className='md:min-w-56 wl:min-w-96'>
+          <h4 className='font-semibold'>Social links</h4>
+          <p className='text-sm text-gray-600'>
+            Link your social accounts here
+          </p>
+        </div>
+
+        <div className='flex-1 md:max-w-lg space-y-4'>
+          <Input
+            variant='flat'
+            radius='sm'
+            labelPlacement='outside-left'
+            label='Facebook'
+            placeholder='https://facebook.com/yourusername'
+            classNames={{
+              label: "!min-w-20",
+              base: "flex",
+              mainWrapper: "flex-1"
+            }}
+          />
+          <Input
+            variant='flat'
+            radius='sm'
+            labelPlacement='outside-left'
+            label='Instagram'
+            placeholder='https://instagram.com/yourusername'
+            classNames={{
+              label: "!min-w-20",
+              base: "flex",
+              mainWrapper: "flex-1"
+            }}
+          />
+          <Input
+            variant='flat'
+            radius='sm'
+            labelPlacement='outside-left'
+            label='LinkedIn'
+            placeholder='https://linkedin.com/yourusername'
+            classNames={{
+              label: "!min-w-20",
+              base: "flex",
+              mainWrapper: "flex-1"
+            }}
+          />
+        </div>
+      </section>
+
+      <section className='mx-6 md:mx-16 border-b-2 py-6'>
+        <h4 className='font-semibold'>Photos</h4>
+        <p className='text-sm text-gray-600'>Drag to move photos around</p>
+
+        <PhotoSection listing={listing} />
+      </section>
+
+      <section className='mx-6 md:mx-16 py-6'>
+        <Button
+          color='success'
+          variant='solid'
+          className='!font-bold'
+          endContent={<IconCircleDashedCheck />}
+        >
+          Save Changes
+        </Button>
+      </section>
+
+      {/*  */}
+      <div className='h-96'></div>
+    </>
+  );
+}
+
+function PhotoSection({ listing }: any) {
+  let images: string[] = listing?.imageSrc || [];
+  const [items, setItems] = useState(
+    images.map((url: string, index: number) => ({
+      id: index,
+      url
+    }))
+  );
+
+  const onSortEnd = (oldIndex: number, newIndex: number) => {
+    setItems(array => arrayMoveImmutable(array, oldIndex, newIndex));
+  };
+
+  return (
+    <SortableList
+      onSortEnd={onSortEnd}
+      className={clsx(
+        "mt-6 select-none",
+        "grid gap-4",
+        "md:max-w-lg grid-cols-[repeat(2,1fr)] ph:grid-cols-[repeat(3,1fr)]"
+      )}
+      draggedItemClassName='dragged'
+    >
+      {items.map(item => (
+        <SortableItem key={item.id}>
+          <div className='aspect-square rounded-xl relative overflow-hidden'>
+            <img
+              src={item.url}
+              className='w-full h-full object-cover absolute inset-0'
+            />
+            <div
+              className={clsx(
+                //
+                "absolute inset-0 cursor-grab bg-black/70",
+                "hover:opacity-100 opacity-0 transition-opacity",
+                "p-1.5 dark"
+              )}
+            >
+              <Button
+                isIconOnly
+                variant='ghost'
+                color='danger'
+                size='sm'
+                radius='sm'
+              >
+                <IconTrash size={20} />
+              </Button>
             </div>
-        </div>)
+          </div>
+        </SortableItem>
+      ))}
+    </SortableList>
+  );
 }
-
-export default ProfileClient

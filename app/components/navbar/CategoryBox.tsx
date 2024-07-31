@@ -1,74 +1,66 @@
-'use client';
+"use client";
 
-import { useRouter, useSearchParams } from "next/navigation";
-import React, { useCallback } from "react";
+import React from "react";
 import { IconType } from "react-icons";
 import qs from "query-string";
 
+import { useSearchParams } from "next/navigation";
+import Link from "next/link";
+
 interface CategoryBoxProps {
-    icon: IconType;
-    label: string;
-    selected?: boolean;
+  icon: IconType;
+  label: string;
+  selected?: boolean;
 }
 
 const CategoryBox: React.FC<CategoryBoxProps> = ({
-    icon: Icon,
-    label,
-    selected
+  icon: Icon,
+  label,
+  selected
 }) => {
-    const router = useRouter();
-    const params = useSearchParams();
+  const params = useSearchParams();
 
+  let query = qs.parse(params?.toString() ?? "");
 
-    const handleClick = useCallback(() => {
-        let currentQuery = {};
+  // If this category filter is the active one, clicking
+  // it should remove it instead.
+  if (query["category"] === label) {
+    delete query["category"];
+  } else {
+    query["category"] = label;
+  }
 
-        if (params) {
-            currentQuery = qs.parse(params.toString());
-        }
+  const url = qs.stringifyUrl(
+    {
+      url: "/",
+      query
+    },
+    { skipNull: true }
+  );
 
-        const updatedQuery: any = {
-            ...currentQuery,
-            category: label
-        }
-
-        if (params?.get('category') == label) {
-            delete updatedQuery.category;
-        }
-
-        const url = qs.stringifyUrl({
-            url: '/',
-            query: updatedQuery
-        }, {skipNull: true});
-
-        router.push(url);
-    }, [label, params, router]);
-
-    return (
-        <div
-            onClick={handleClick} 
-            className={`
-            flex 
-            flex-col 
-            items-center 
-            justify-center 
-            gap-2 
-            p-3 
-            border-b-2 
-            hover:text-neutral-800 
+  return (
+    <Link
+      href={url}
+      className={`
+            flex
+            flex-col
+            items-center
+            justify-center
+            gap-2
+            p-3
+            border-b-2
+            hover:text-neutral-800
             text-nowrap
-            transition 
-            cursor-pointer 
-            ${selected ? 'border-b-neutral-800' : 'border-transparent'}
-            ${selected ? 'text-neutral-800' : 'text-neutral-500'}
-        `}>
+            transition
+            cursor-pointer
+            ${selected ? "border-b-neutral-800" : "border-transparent"}
+            ${selected ? "text-neutral-800" : "text-neutral-500"}
+        `}
+    >
+      <Icon size={26} />
+      <div className='font-medium text-sm'>{label}</div>
+    </Link>
+  );
+};
 
-            <Icon size={26} />
-            <div className="font-medium text-sm">
-                {label}
-            </div>
-        </div>
-    )
-}
-
-export default CategoryBox
+export default CategoryBox;

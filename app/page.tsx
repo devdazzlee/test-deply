@@ -9,25 +9,20 @@ interface HomeProps {
 }
 
 const Home = async ({ searchParams }: HomeProps) => {
-
-
   const listings = await getListings(searchParams);
   const currentUser = await getCurrentUser();
 
-
   if (listings.length == 0) {
-    return (
-      <EmptyState showReset />
-    )
+    return <EmptyState showReset />;
   }
 
   return (
     <Container>
       <div
-        className="
+        className='
         pt-36
         sm:pt-24
-        grid 
+        grid
         grid-cols-1
         sm:grid-cols-1
         md:grid-cols-3
@@ -35,8 +30,9 @@ const Home = async ({ searchParams }: HomeProps) => {
         xl:grid-cols-5
         2xl:grid-cols-6
         gap-8
-        ">
-        {listings.map((listing) => {
+        '
+      >
+        {listings.map(listing => {
           return (
             <ListingCard
               currentUser={currentUser}
@@ -45,12 +41,12 @@ const Home = async ({ searchParams }: HomeProps) => {
               listingUserImage={listing?.user?.image}
               data={listing}
             />
-          )
+          );
         })}
       </div>
     </Container>
   );
-}
+};
 
 export const dynamic = "force-dynamic";
 export default Home;

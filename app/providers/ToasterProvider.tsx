@@ -1,11 +1,9 @@
-'use clieant';
+"use clieant";
 
 import { Toaster } from "react-hot-toast";
 
 const ToasterProvider = () => {
-    return (
-        <Toaster />
-    )
-}
+  return <Toaster />;
+};
 
 export default ToasterProvider;
