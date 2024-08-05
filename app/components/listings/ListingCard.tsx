@@ -119,7 +119,7 @@ const ListingCard: React.FC<ListingCardProps> = ({
           <RatingStars rating={data.averageRating} />
         </div>
 
-        <div className='font-light flex flex-wrap gap-x-2 text-neutral-500'>
+        <div className='font-light text-sm flex flex-wrap gap-x-2 text-neutral-500'>
           {reservationDate ||
             (Array.isArray(data.category) &&
               data.category
