@@ -52,14 +52,24 @@ const UserMenu: React.FC<UserMenuProps> = ({ currentUser }) => {
         </div>
       </div>
       {isOpen && (
-        <div className='absolute rounded-xl shadow-md w-[40vw] md:w-3/4 bg-white overflow-hidden right-0 top-12 text-sm'>
+        <div className='absolute rounded-xl shadow-md w-[40vw] md:w-[200px] bg-white overflow-hidden right-0 top-12 text-sm'>
           <div className='flex flex-col cursor-pointer'>
             {currentUser ? (
               <>
-                <MenuItem label='Bookings' href='/trips' />
-                <MenuItem label='My Profile' href='/profile' />
-                <MenuItem label='Billing' href='/billing' />
-                <MenuItem label='Favorites' href='/favorites' />
+               {/* <MenuItem label='Bookings' href='/trips' />
+                  <MenuItem label='My Profile' href='/profile' />
+                  <MenuItem label='Billing' href='/billing' />
+                  <MenuItem label='Favorites' href='/favorites' /> */}
+                
+                <MenuItem label="My Profile" href="/profile" />
+                <MenuItem label="Messages and Bookings" href="/trips" />
+                <MenuItem label="Billing and Subscriptions" href="/billing" />
+                <MenuItem label="Account Settings" href="#" />
+                
+                <hr />
+                
+                <MenuItem onClick={() => signOut()} label='Logout' />
+                
                 {/* <MenuItem
                   href="/trips"
                   label='My Bookings'
@@ -88,8 +98,6 @@ const UserMenu: React.FC<UserMenuProps> = ({ currentUser }) => {
                   href="/profile"
                   label='My Profile'
                 /> */}
-                <hr />
-                <MenuItem onClick={() => signOut()} label='Logout' />
               </>
             ) : (
               <>
