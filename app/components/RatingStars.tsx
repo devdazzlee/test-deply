@@ -4,19 +4,19 @@ interface RatingStarsProps {
   rating: number | null;
 }
 const RatingStars: React.FC<RatingStarsProps> = ({ rating }) => {
-  var stars = [0];
+  var stars = [0, 0, 0, 0, 0];
   if (rating !== null && typeof rating === "number") {
-    for (var i = 1; i < rating; i++) {
-      stars.push(i);
+    for (var i = 0; i < rating; i++) {
+      stars[i] = 1;
     }
   }
   return (
-    <div className='flex flex-row'>
+    <div className='flex flex-row items-center'>
       {stars.map((index, key) => (
         <div key={key}>
           <svg
             key={key}
-            className='w-4 h-4 text-rose-500 me-1'
+            className={`w-3.5 h-3.5 ${index == 0 ? 'text-black' : 'text-[#BF9B30]'} me-1`}
             aria-hidden='true'
             xmlns='http://www.w3.org/2000/svg'
             fill='currentColor'
@@ -27,11 +27,9 @@ const RatingStars: React.FC<RatingStarsProps> = ({ rating }) => {
         </div>
       ))}
       <div className='w-1 self-center h-1 mx-1.5 bg-gray-500 rounded-full'></div>
-      <div>
-        <p className='ms-2 text-sm font-bold font-light text-neutral-500 text-center'>
-          {rating && Math.ceil(rating)}
-        </p>
-      </div>
+      <p className='ms-2 text-sm mt-0.5 font-bold font-light text-neutral-500 text-center'>
+        {rating && Math.ceil(rating)}
+      </p>
     </div>
   );
 };
