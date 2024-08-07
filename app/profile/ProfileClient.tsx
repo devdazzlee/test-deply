@@ -110,12 +110,14 @@ export default function ProfileClient({
             radius='sm'
             labelPlacement='outside'
             label='Your name'
+            className="z-0"
             placeholder='Enter your name'
             defaultValue={currentUser.name ?? ""}
           />
           <Input
             variant='flat'
             radius='sm'
+            className="z-0"
             labelPlacement='outside'
             label='Phone Number'
             placeholder='Enter your phone number'
@@ -123,6 +125,7 @@ export default function ProfileClient({
           <Input
             variant='flat'
             radius='sm'
+            className="z-0"
             labelPlacement='outside'
             label='Location'
             placeholder='Enter your location'
@@ -143,12 +146,15 @@ export default function ProfileClient({
           <PasswordInput
             label='Current Password'
             placeholder='Enter current password'
+            className="z-0"
           />
           <PasswordInput
             label='New Password'
+            className="z-0"
             placeholder='Enter new password'
           />
           <PasswordInput
+            className="z-0"
             label='Confirm New Password'
             placeholder='Enter new password again'
           />
@@ -171,7 +177,8 @@ export default function ProfileClient({
             disableAutosize
             // className='col-span-12 md:col-span-6 mb-6 md:mb-0'
             classNames={{
-              input: "resize-y min-h-[140px]"
+              input: "resize-y min-h-[140px]",
+              label: "z-0"
             }}
           />
         </div>
@@ -194,7 +201,7 @@ export default function ProfileClient({
             label='Facebook'
             placeholder='https://facebook.com/yourusername'
             classNames={{
-              label: "!min-w-20",
+              label: "!min-w-20 z-0",
               base: "flex",
               mainWrapper: "flex-1"
             }}
@@ -206,7 +213,7 @@ export default function ProfileClient({
             label='Instagram'
             placeholder='https://instagram.com/yourusername'
             classNames={{
-              label: "!min-w-20",
+              label: "!min-w-20 z-0",
               base: "flex",
               mainWrapper: "flex-1"
             }}
@@ -218,7 +225,7 @@ export default function ProfileClient({
             label='LinkedIn'
             placeholder='https://linkedin.com/yourusername'
             classNames={{
-              label: "!min-w-20",
+              label: "!min-w-20 z-0",
               base: "flex",
               mainWrapper: "flex-1"
             }}
