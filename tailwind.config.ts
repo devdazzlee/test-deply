@@ -18,7 +18,7 @@ const config: Config = {
       },
       colors: {
         theme: "#202125",
-        hover: "#202145"
+        hover: "#F8F8F8"
       }
     },
     screens: {

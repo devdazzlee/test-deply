@@ -16,7 +16,7 @@ const RatingStars: React.FC<RatingStarsProps> = ({ rating }) => {
         <div key={key}>
           <svg
             key={key}
-            className={`w-3.5 h-3.5 ${index == 0 ? 'text-black' : 'text-[#BF9B30]'} me-1`}
+            className={`w-3.5 h-3.5 ${index == 0 ? 'text-hover' : 'text-[#BF9B30]'} me-1`}
             aria-hidden='true'
             xmlns='http://www.w3.org/2000/svg'
             fill='currentColor'
