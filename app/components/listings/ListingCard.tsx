@@ -115,20 +115,20 @@ const ListingCard: React.FC<ListingCardProps> = ({
           </div>
         )}
 
-        <div className='flex items-center'>
+        <div className='flex items-center justify-between'>
           <RatingStars rating={data.averageRating} />
+          <div className='flex flex-row items-center gap-1'>
+            <div className='font-semibold'>$ {price} </div>
+            {!reservation && <div className='font-light'>day</div>}
+          </div>
         </div>
 
-        <div className='font-light flex flex-wrap gap-x-2 text-neutral-500'>
+        <div className='font-light text-sm flex flex-wrap flex-row-reverse gap-x-2 text-neutral-500'>
           {reservationDate ||
             (Array.isArray(data.category) &&
               data.category
                 .slice(0, 3)
                 .map((item, index) => <div key={index}>{item}</div>))}
-        </div>
-        <div className='flex flex-row items-center gap-1'>
-          <div className='font-semibold'>$ {price} </div>
-          {!reservation && <div className='font-light'>day</div>}
         </div>
         {onAction && actionLabel && (
           <Button

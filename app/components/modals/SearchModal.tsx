@@ -17,387 +17,381 @@ import { SlCalender } from "react-icons/sl";
 import ContentType from "../inputs/ContentType";
 
 enum STEPS {
-  LOCATION = 0,
-  DATE = 1,
-  INFO = 2
+    LOCATION = 0,
+    DATE = 1,
+    INFO = 2
 }
 
 const SearchModal = () => {
-  const router = useRouter();
-  const params = useSearchParams();
-  const searchModal = useSearchModal();
+    const router = useRouter();
+    const params = useSearchParams();
+    const searchModal = useSearchModal();
 
-  const [location, setLocation] = useState<CountrySelectValue>();
-  const [category, setCategory] = useState<string[]>([]);
-  const [step, setStep] = useState(STEPS.LOCATION);
-  const [guestCount, setGuestCount] = useState(1);
-  const [roomCount, setRoomCount] = useState(3);
-  const [bathroomCount, setBathroomCount] = useState(1);
-  const [dateRange, setDateRange] = useState<Range>({
-    startDate: new Date(),
-    endDate: new Date(),
-    key: "selection"
-  });
-  const [calenderOption, setCalenderOption] = useState<string>("Dates");
-  const [stayOption, setStayOption] = useState<"Weekend" | "Week" | "Month">(
-    "Weekend"
-  );
-
-  const [months, setMonths] = useState<string[]>([]);
-  const [selectedMonths, setSelectedMonths] = useState<string[]>([]);
-
-  useEffect(() => {
-    const currentDate = new Date();
-    const generatedMonths = [];
-    for (let i = 0; i < 12; i++) {
-      const date = new Date(
-        currentDate.getFullYear(),
-        currentDate.getMonth() + i,
-        1
-      );
-      generatedMonths.push(
-        date.toLocaleString("default", { month: "long", year: "numeric" })
-      );
-    }
-    setMonths(generatedMonths);
-  }, []);
-
-  const handleMonthClick = (month: string) => {
-    setSelectedMonths(prevSelectedMonths => {
-      if (prevSelectedMonths.includes(month)) {
-        return prevSelectedMonths.filter(
-          selectedMonth => selectedMonth !== month
-        );
-      } else {
-        return [...prevSelectedMonths, month];
-      }
+    const [location, setLocation] = useState<CountrySelectValue>();
+    const [category, setCategory] = useState<string[]>([]);
+    const [step, setStep] = useState(STEPS.LOCATION);
+    const [guestCount, setGuestCount] = useState(1);
+    const [roomCount, setRoomCount] = useState(3);
+    const [bathroomCount, setBathroomCount] = useState(1);
+    const [dateRange, setDateRange] = useState<Range>({
+        startDate: new Date(),
+        endDate: new Date(),
+        key: "selection"
     });
-  };
+    const [calenderOption, setCalenderOption] = useState<string>("Dates");
+    const [stayOption, setStayOption] = useState<"Weekend" | "Week" | "Month">(
+        "Weekend"
+    );
 
-  const handleSelectCat = (selectedCategory: string) => {
-    const index = category.includes(selectedCategory);
+    const [months, setMonths] = useState<string[]>([]);
+    const [selectedMonths, setSelectedMonths] = useState<string[]>([]);
 
-    if (!index) {
-      const newCategories = [...category, selectedCategory];
-      setCategory(newCategories);
-    } else {
-      const newCategories = [
-        ...category.filter(cat => cat !== selectedCategory)
-      ];
-      setCategory(newCategories);
-    }
-  };
-  const scroll = (width: any) => {
-    const container = document.getElementById("monthsContainer");
-    if (container) {
-      container.scrollBy({
-        left: width,
-        behavior: "smooth"
-      });
-    }
-  };
-  const Map = useMemo(
-    () =>
-      dynamic(() => import("../Map"), {
-        ssr: false
-      }),
-    []
-  );
+    useEffect(() => {
+        const currentDate = new Date();
+        const generatedMonths = [];
+        for (let i = 0; i < 12; i++) {
+            const date = new Date(
+                currentDate.getFullYear(),
+                currentDate.getMonth() + i,
+                1
+            );
+            generatedMonths.push(
+                date.toLocaleString("default", { month: "long", year: "numeric" })
+            );
+        }
+        setMonths(generatedMonths);
+    }, []);
 
-  const onBack = useCallback(() => {
-    setStep(value => value - 1);
-  }, []);
-
-  const onNext = useCallback(() => {
-    setStep(value => value + 1);
-  }, []);
-
-  const onSubmit = useCallback(async () => {
-    if (step != STEPS.INFO) {
-      return onNext();
-    }
-
-    let currentQuery = {};
-
-    if (params) {
-      currentQuery = qs.parse(params.toString());
-    }
-
-    const updatedQuery: any = {
-      ...currentQuery,
-      locationValue: location?.value,
-      guestCount,
-      roomCount,
-      bathroomCount,
-      category: category.join(",") // Join the categories into a comma-separated string
+    const handleMonthClick = (month: string) => {
+        setSelectedMonths(prevSelectedMonths => {
+            if (prevSelectedMonths.includes(month)) {
+                return prevSelectedMonths.filter(
+                    selectedMonth => selectedMonth !== month
+                );
+            } else {
+                return [...prevSelectedMonths, month];
+            }
+        });
     };
 
-    if (dateRange.startDate) {
-      updatedQuery.startDate = formatISO(dateRange.startDate);
-    }
+    const handleSelectCat = (selectedCategory: string) => {
+        const index = category.includes(selectedCategory);
 
-    if (dateRange.endDate) {
-      updatedQuery.endDate = formatISO(dateRange.endDate);
-    }
-
-    const url = qs.stringifyUrl(
-      {
-        url: "/",
-        query: updatedQuery
-      },
-      { skipNull: true }
+        if (!index) {
+            const newCategories = [...category, selectedCategory];
+            setCategory(newCategories);
+        } else {
+            const newCategories = [
+                ...category.filter(cat => cat !== selectedCategory)
+            ];
+            setCategory(newCategories);
+        }
+    };
+    const scroll = (width: any) => {
+        const container = document.getElementById("monthsContainer");
+        if (container) {
+            container.scrollBy({
+                left: width,
+                behavior: "smooth"
+            });
+        }
+    };
+    const Map = useMemo(
+        () =>
+            dynamic(() => import("../Map"), {
+                ssr: false
+            }),
+        []
     );
 
-    setStep(STEPS.LOCATION);
-    searchModal.onClose();
+    const onBack = useCallback(() => {
+        setStep(value => value - 1);
+    }, []);
 
-    router.push(url);
-  }, [
-    step,
-    searchModal,
-    location,
-    router,
-    guestCount,
-    roomCount,
-    bathroomCount,
-    dateRange,
-    onNext,
-    params,
-    category
-  ]);
-  const experienceLabels = [
-    "1+ years",
-    "3+ years",
-    "5+ years",
-    "7+ years",
-    "9+ years"
-  ];
+    const onNext = useCallback(() => {
+        setStep(value => value + 1);
+    }, []);
 
-  const actionLabel = useMemo(() => {
-    if (step == STEPS.INFO) {
-      return "Search";
-    }
+    const onSubmit = useCallback(async () => {
+        if (step != STEPS.INFO) {
+            return onNext();
+        }
 
-    return "Next";
-  }, [step]);
+        let currentQuery = {};
 
-  const secondaryActionLabel = useMemo(() => {
-    if (step == STEPS.LOCATION) {
-      return undefined;
-    }
+        if (params) {
+            currentQuery = qs.parse(params.toString());
+        }
 
-    return "Back";
-  }, [step]);
+        const updatedQuery: any = {
+            ...currentQuery,
+            locationValue: location?.value,
+            guestCount,
+            roomCount,
+            bathroomCount,
+            category: category.join(",") // Join the categories into a comma-separated string
+        };
 
-  let bodyContent = (
-    <div className='flex flex-col gap-8'>
-      <Heading
-        title='Where are you based?'
-        subtitle='Find creators near you!'
-      />
-      <CountrySelect
-        value={location}
-        onChange={value => {
-          setLocation(value as CountrySelectValue);
-        }}
-      />
-      <hr />
-      <Map center={location?.latlng} />
-    </div>
-  );
+        if (dateRange.startDate) {
+            updatedQuery.startDate = formatISO(dateRange.startDate);
+        }
 
-  if (step == STEPS.DATE) {
-    bodyContent = (
-      <div className='flex flex-col gap-8'>
-        <Heading
-          title='When are you looking to book?'
-          subtitle='Ensure the creators are available for you!'
-        />
-        <div
-          className={`flex self-center justify-center w-fit p-2 rounded-full bg-neutral-100 items-center gap-2 }`}
-        >
-          <button
-            className={`"font-semibold py-1 px-2 rounded-full hover:shadow-md  active:bg-white   ${
-              calenderOption === "Dates" && "bg-white"
-            }`}
-            onClick={() => setCalenderOption("Dates")}
-          >
-            Dates
-          </button>
+        if (dateRange.endDate) {
+            updatedQuery.endDate = formatISO(dateRange.endDate);
+        }
 
-          <button
-            className={`font-semibold py-1 px-2 rounded-full  hover:shadow-md  active:bg-white  ${
-              calenderOption === "Flexible" && "bg-white"
-            }`}
-            onClick={() => setCalenderOption("Flexible")}
-          >
-            Flexible
-          </button>
+        const url = qs.stringifyUrl(
+            {
+                url: "/",
+                query: updatedQuery
+            },
+            { skipNull: true }
+        );
+
+        setStep(STEPS.LOCATION);
+        searchModal.onClose();
+
+        router.push(url);
+    }, [
+        step,
+        searchModal,
+        location,
+        router,
+        guestCount,
+        roomCount,
+        bathroomCount,
+        dateRange,
+        onNext,
+        params,
+        category
+    ]);
+    const experienceLabels = [
+        "1+ years",
+        "3+ years",
+        "5+ years",
+        "7+ years",
+        "9+ years"
+    ];
+
+    const actionLabel = useMemo(() => {
+        if (step == STEPS.INFO) {
+            return "Search";
+        }
+
+        return "Next";
+    }, [step]);
+
+    const secondaryActionLabel = useMemo(() => {
+        if (step == STEPS.LOCATION) {
+            return undefined;
+        }
+
+        return "Back";
+    }, [step]);
+
+    let bodyContent = (
+        <div className='flex flex-col gap-8'>
+            <Heading
+                title='Where are you based?'
+                subtitle='Find creators near you!'
+            />
+            <CountrySelect
+                value={location}
+                onChange={value => {
+                    setLocation(value as CountrySelectValue);
+                }}
+            />
+            <hr />
+            <Map center={location?.latlng} />
         </div>
-        {calenderOption === "Dates" ? (
-          <>
-            <div className='lg:hidden xs:block'>
-              <Calendar
-                months={1}
-                value={dateRange}
-                onChange={value => setDateRange(value.selection)}
-              />
-            </div>
-            <div className='hidden lg:block'>
-              <Calendar
-                months={2}
-                value={dateRange}
-                onChange={value => setDateRange(value.selection)}
-              />
-            </div>
-          </>
-        ) : (
-          <>
-            <h2 className='text-xl font-semibold text-center'>
-              Stay for a {stayOption}
-            </h2>
-            <div className='flex justify-center w-fit p-2 rounded-full bg-neutral-100 items-center gap-2 self-center'>
-              <button
-                className={`font-semibold py-1 px-2 rounded-full ${
-                  stayOption === "Weekend" ? "bg-white" : ""
-                }`}
-                onClick={() => setStayOption("Weekend")}
-              >
-                Weekend
-              </button>
-              <button
-                className={`font-semibold py-1 px-2 rounded-full ${
-                  stayOption === "Week" ? "bg-white" : ""
-                }`}
-                onClick={() => setStayOption("Week")}
-              >
-                Week
-              </button>
-              <button
-                className={`font-semibold py-1 px-2 rounded-full ${
-                  stayOption === "Month" ? "bg-white" : ""
-                }`}
-                onClick={() => setStayOption("Month")}
-              >
-                Month
-              </button>
-            </div>
-
-            <div className='flex w-full items-center'>
-              <button
-                onClick={() => scroll(-200)}
-                type='button'
-                className='text-black border shadow-sm  bg-white font-medium rounded-full text-sm p-2 h-fit text-center  items-center mr-4  hover:shadow-md'
-              >
-                <svg
-                  className='w-4 h-4 rotate-180'
-                  aria-hidden='true'
-                  xmlns='http://www.w3.org/2000/svg'
-                  fill='none'
-                  viewBox='0 0 14 10'
-                >
-                  <path
-                    stroke='currentColor'
-                    strokeLinecap='round'
-                    strokeLinejoin='round'
-                    strokeWidth='2'
-                    d='M1 5h12m0 0L9 1m4 4L9 9'
-                  />
-                </svg>
-              </button>
-              <div
-                id='monthsContainer'
-                className='flex  no-scrollbar overflow-x-auto gap-3 py-1'
-              >
-                {months.map((month, index) => (
-                  <button
-                    key={index}
-                    className={`flex flex-col items-center p-4 border rounded-lg shadow hover:shadow-md min-w-24 h-32 justify-center items-center
-                                                ${
-                                                  selectedMonths.includes(month)
-                                                    ? "border border-gray-700"
-                                                    : ""
-                                                }`}
-                    onClick={() => handleMonthClick(month)}
-                  >
-                    <SlCalender />
-
-                    <div className='text-md'>{month.split(" ")[0]}</div>
-                    <div className='text-sm text-gray-500'>
-                      {month.split(" ")[1]}
-                    </div>
-                  </button>
-                ))}
-              </div>
-              <button
-                onClick={() => scroll(200)}
-                type='button'
-                className='text-black border shadow-sm  bg-white font-medium rounded-full text-sm p-2 h-fit text-center items-center ml-4  hover:shadow-md'
-              >
-                <svg
-                  className='w-4 h-4'
-                  aria-hidden='true'
-                  xmlns='http://www.w3.org/2000/svg'
-                  fill='none'
-                  viewBox='0 0 14 10'
-                >
-                  <path
-                    stroke='currentColor'
-                    strokeLinecap='round'
-                    strokeLinejoin='round'
-                    strokeWidth='2'
-                    d='M1 5h12m0 0L9 1m4 4L9 9'
-                  />
-                </svg>
-              </button>
-            </div>
-          </>
-        )}
-      </div>
     );
-  }
 
-  if (step == STEPS.INFO) {
-    bodyContent = (
-      <div className='flex flex-col gap-8'>
-        <Heading title='More information' />
+    if (step == STEPS.DATE) {
+        bodyContent = (
+            <div className='flex flex-col gap-8'>
+                <Heading
+                    title='When are you looking to book?'
+                    subtitle='Ensure the creators are available for you!'
+                />
+                <div
+                    className={`flex self-center justify-center w-fit p-2 rounded-full bg-neutral-100 items-center gap-2 }`}
+                >
+                    <button
+                        className={`"font-semibold py-1 px-2 rounded-full hover:shadow-md  active:bg-white   ${calenderOption === "Dates" && "bg-white"
+                            }`}
+                        onClick={() => setCalenderOption("Dates")}
+                    >
+                        Dates
+                    </button>
 
-        <Stars
-          title='Rating'
-          subtitle='What rating do you want the creator to be?'
-          value={roomCount}
-          onChange={value => setRoomCount(value)}
-        />
-        <SlidingScale
-          title='Experience'
-          subtitle='How experienced do you want the creator to be?'
-          value={bathroomCount}
-          onChange={value => setBathroomCount(value)}
-          labels={experienceLabels}
-        />
+                    <button
+                        className={`font-semibold py-1 px-2 rounded-full  hover:shadow-md  active:bg-white  ${calenderOption === "Flexible" && "bg-white"
+                            }`}
+                        onClick={() => setCalenderOption("Flexible")}
+                    >
+                        Flexible
+                    </button>
+                </div>
+                {calenderOption === "Dates" ? (
+                    <>
+                        <div className='lg:hidden xs:block'>
+                            <Calendar
+                                months={1}
+                                value={dateRange}
+                                onChange={value => setDateRange(value.selection)}
+                            />
+                        </div>
+                        <div className='hidden lg:block'>
+                            <Calendar
+                                months={2}
+                                value={dateRange}
+                                onChange={value => setDateRange(value.selection)}
+                            />
+                        </div>
+                    </>
+                ) : (
+                    <>
+                        <h2 className='text-xl font-semibold text-center'>
+                            Stay for a {stayOption}
+                        </h2>
+                        <div className='flex justify-center w-fit p-2 rounded-full bg-neutral-100 items-center gap-2 self-center'>
+                            <button
+                                className={`font-semibold py-1 px-2 rounded-full ${stayOption === "Weekend" ? "bg-white" : ""
+                                    }`}
+                                onClick={() => setStayOption("Weekend")}
+                            >
+                                Weekend
+                            </button>
+                            <button
+                                className={`font-semibold py-1 px-2 rounded-full ${stayOption === "Week" ? "bg-white" : ""
+                                    }`}
+                                onClick={() => setStayOption("Week")}
+                            >
+                                Week
+                            </button>
+                            <button
+                                className={`font-semibold py-1 px-2 rounded-full ${stayOption === "Month" ? "bg-white" : ""
+                                    }`}
+                                onClick={() => setStayOption("Month")}
+                            >
+                                Month
+                            </button>
+                        </div>
 
-        <ContentType
-          title='Pick multiple categories'
-          subtitle=''
-          category={category}
-          onChange={item => handleSelectCat(item)}
+                        <div className='flex w-full items-center'>
+                            <button
+                                onClick={() => scroll(-200)}
+                                type='button'
+                                className='text-black border shadow-sm  bg-white font-medium rounded-full text-sm p-2 h-fit text-center  items-center mr-4  hover:shadow-md'
+                            >
+                                <svg
+                                    className='w-4 h-4 rotate-180'
+                                    aria-hidden='true'
+                                    xmlns='http://www.w3.org/2000/svg'
+                                    fill='none'
+                                    viewBox='0 0 14 10'
+                                >
+                                    <path
+                                        stroke='currentColor'
+                                        strokeLinecap='round'
+                                        strokeLinejoin='round'
+                                        strokeWidth='2'
+                                        d='M1 5h12m0 0L9 1m4 4L9 9'
+                                    />
+                                </svg>
+                            </button>
+                            <div
+                                id='monthsContainer'
+                                className='flex  no-scrollbar overflow-x-auto gap-3 py-1'
+                            >
+                                {months.map((month, index) => (
+                                    <button
+                                        key={index}
+                                        className={`flex flex-col items-center p-4 border rounded-lg shadow hover:shadow-md min-w-24 h-32 justify-center items-center
+                                                ${selectedMonths.includes(month)
+                                                ? "border border-gray-700"
+                                                : ""
+                                            }`}
+                                        onClick={() => handleMonthClick(month)}
+                                    >
+                                        <SlCalender />
+
+                                        <div className='text-md'>{month.split(" ")[0]}</div>
+                                        <div className='text-sm text-gray-500'>
+                                            {month.split(" ")[1]}
+                                        </div>
+                                    </button>
+                                ))}
+                            </div>
+                            <button
+                                onClick={() => scroll(200)}
+                                type='button'
+                                className='text-black border shadow-sm  bg-white font-medium rounded-full text-sm p-2 h-fit text-center items-center ml-4  hover:shadow-md'
+                            >
+                                <svg
+                                    className='w-4 h-4'
+                                    aria-hidden='true'
+                                    xmlns='http://www.w3.org/2000/svg'
+                                    fill='none'
+                                    viewBox='0 0 14 10'
+                                >
+                                    <path
+                                        stroke='currentColor'
+                                        strokeLinecap='round'
+                                        strokeLinejoin='round'
+                                        strokeWidth='2'
+                                        d='M1 5h12m0 0L9 1m4 4L9 9'
+                                    />
+                                </svg>
+                            </button>
+                        </div>
+                    </>
+                )}
+            </div>
+        );
+    }
+
+    if (step == STEPS.INFO) {
+        bodyContent = (
+            <div className='flex flex-col gap-8'>
+                <Heading title='More information' />
+
+                <Stars
+                    title='Rating'
+                    subtitle='What rating do you want the creator to be?'
+                    value={roomCount}
+                    onChange={value => setRoomCount(value)}
+                />
+                <SlidingScale
+                    title='Experience'
+                    subtitle='How experienced do you want the creator to be?'
+                    value={bathroomCount}
+                    onChange={value => setBathroomCount(value)}
+                    labels={experienceLabels}
+                />
+
+                <ContentType
+                    title='Pick multiple categories'
+                    subtitle=''
+                    category={category}
+                    onChange={item => handleSelectCat(item)}
+                />
+            </div>
+        );
+    }
+
+    return (
+        <Modal
+            isOpen={searchModal.isOpen}
+            onClose={searchModal.onClose}
+            onSubmit={onSubmit}
+            title='Filters'
+            actionLabel={actionLabel}
+            secondaryActionLabel={secondaryActionLabel}
+            secondaryAction={step == STEPS.LOCATION ? undefined : onBack}
+            body={bodyContent}
         />
-      </div>
     );
-  }
-
-  return (
-    <Modal
-      isOpen={searchModal.isOpen}
-      onClose={searchModal.onClose}
-      onSubmit={onSubmit}
-      title='Filters'
-      actionLabel={actionLabel}
-      secondaryActionLabel={secondaryActionLabel}
-      secondaryAction={step == STEPS.LOCATION ? undefined : onBack}
-      body={bodyContent}
-    />
-  );
 };
 
 export default SearchModal;
