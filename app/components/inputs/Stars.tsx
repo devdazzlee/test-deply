@@ -28,9 +28,8 @@ const Stars: React.FC<StarsProps> = ({ title, subtitle, value, onChange }) => {
         {Array.from({ length: 5 }, (_, index) => (
           <span key={index} onClick={() => handleClick(index + 1)}>
             <svg
-              className={`w-4 h-4 cursor-pointer text-2xl ${
-                index < value ? "text-rose-500" : "text-gray-300"
-              }`}
+              className={`w-4 h-4 cursor-pointer text-2xl ${index < value ? "text-[#BF9B30]" : "text-hover"
+                }`}
               aria-hidden='true'
               xmlns='http://www.w3.org/2000/svg'
               fill='currentColor'

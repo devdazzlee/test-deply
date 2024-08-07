@@ -42,7 +42,6 @@ const ListingClient: React.FC<ListingClientProps> = ({
 }) => {
   const loginModal = useLoginModal();
   const router = useRouter();
-  console.log(comments);
 
   const disabledDates = useMemo(() => {
     let dates: Date[] = [];
@@ -147,6 +146,7 @@ const ListingClient: React.FC<ListingClientProps> = ({
               bathroomCount={listing.bathroomCount}
               locationValue={listing.locationValue}
               averageRating={listing.averageRating}
+              numberOfRatings={listing.numberOfRatings}
             />
             <div
               className='

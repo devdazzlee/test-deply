@@ -101,8 +101,8 @@ const CommentSection: React.FC<CommentProps> = ({
                 >
                   <svg
                     className={`w-4 h-4 ${index < (hoverRating || rating)
-                        ? "text-[#BF9B30]"
-                        : "text-hover"
+                      ? "text-[#BF9B30]"
+                      : "text-hover"
                       }`}
                     aria-hidden='true'
                     xmlns='http://www.w3.org/2000/svg'
@@ -117,7 +117,7 @@ const CommentSection: React.FC<CommentProps> = ({
 
             <button
               type='submit'
-              className='inline-flex items-center py-2.5 px-4 text-xs font-medium text-center text-white bg-theme rounded-lg focus:ring-4 focus:ring-theme hover:bg-hover'
+              className='inline-flex items-center py-2.5 px-4 text-xs font-medium text-center text-white bg-theme rounded-lg focus:ring-4 focus:ring-theme hover:opacity-80'
             >
               Post review
             </button>
