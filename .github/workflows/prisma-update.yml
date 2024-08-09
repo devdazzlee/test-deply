@@ -1,0 +1,39 @@
+name: Prisma Migrate and Generate Client
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Load environment variables
+      id: load-env
+      run: |
+        source .github/env
+        echo "NODE_VERSION=$NODE_VERSION" >> $GITHUB_ENV
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Set up Prisma
+      run: npm install @prisma/client
+
+    - name: Run Prisma Migrate
+      env:
+        DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      run: npx prisma migrate deploy
+
+    - name: Generate Prisma Client
+      run: npx prisma generate
