@@ -21,6 +21,7 @@ interface ListingInfoProps {
   category: string[] | undefined;
   locationValue: string;
   averageRating: number | null;
+  numberOfRatings: number | null;
 }
 
 const ListingInfo: React.FC<ListingInfoProps> = ({
@@ -31,7 +32,8 @@ const ListingInfo: React.FC<ListingInfoProps> = ({
   bathroomCount,
   category,
   locationValue,
-  averageRating
+  averageRating,
+  numberOfRatings
 }) => {
   const { getByValue } = useCountries();
 
@@ -55,7 +57,7 @@ const ListingInfo: React.FC<ListingInfoProps> = ({
         </div>
 
         <div className='flex items-center'>
-          {<RatingStars rating={averageRating} />}
+          {<RatingStars rating={averageRating} numberOfRatings={numberOfRatings} />}
 
         </div>
 

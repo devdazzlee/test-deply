@@ -2,8 +2,9 @@
 
 interface RatingStarsProps {
   rating: number | null;
+  numberOfRatings: number | null;
 }
-const RatingStars: React.FC<RatingStarsProps> = ({ rating }) => {
+const RatingStars: React.FC<RatingStarsProps> = ({ rating, numberOfRatings }) => {
   var stars = [0, 0, 0, 0, 0];
   if (rating !== null && typeof rating === "number") {
     for (var i = 0; i < rating; i++) {
@@ -28,7 +29,7 @@ const RatingStars: React.FC<RatingStarsProps> = ({ rating }) => {
       ))}
       <div className='w-1 self-center h-1 mx-1.5 bg-gray-500 rounded-full'></div>
       <p className='ms-2 text-sm mt-0.5 font-bold font-light text-neutral-500 text-center'>
-        {rating && Math.ceil(rating)}
+        {numberOfRatings && Math.ceil(numberOfRatings)}
       </p>
     </div>
   );

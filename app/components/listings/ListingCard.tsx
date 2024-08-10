@@ -116,7 +116,7 @@ const ListingCard: React.FC<ListingCardProps> = ({
         )}
 
         <div className='flex items-center justify-between'>
-          <RatingStars rating={data.averageRating} />
+          <RatingStars rating={data.averageRating} numberOfRatings={data.numberOfRatings} />
           <div className='flex flex-row items-center gap-1'>
             <div className='font-semibold'>$ {price} </div>
             {!reservation && <div className='font-light'>day</div>}
