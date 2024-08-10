@@ -1,35 +1,32 @@
 import Stripe from 'stripe';
 import { NextRequest, NextResponse } from 'next/server';
-import { headers } from 'next/headers';
-import { buffer } from 'micro';
 import prisma from '@/app/libs/prismadb';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2024-06-20',
 });
 
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-};
-
 export async function POST(request: NextRequest) {
-  const sig = headers().get('stripe-signature') as string;
-  const buf = await buffer(request);
+  const buf = await request.arrayBuffer();
+  const sig = request.headers.get('stripe-signature') as string;
 
   let event: Stripe.Event;
 
   try {
-    event = stripe.webhooks.constructEvent(buf, sig, process.env.STRIPE_SECRET_WEBHOOK_KEY!);
+    const bodyBuffer = Buffer.from(buf);
+    event = stripe.webhooks.constructEvent(bodyBuffer, sig, process.env.STRIPE_SECRET_WEBHOOK_KEY!);
   } catch (err) {
-    console.error('Webhook signature verification failed:', err.message);
-    return new NextResponse(`Webhook Error: ${err.message}`, { status: 400 });
+    if (err instanceof Error) {
+      console.error('Webhook signature verification failed:', err.message);
+      return new NextResponse(`Webhook Error: ${err.message}`, { status: 400 });
+    } else {
+      console.error('Webhook signature verification failed with an unknown error');
+      return new NextResponse('Webhook Error: An unknown error occurred', { status: 400 });
+    }
   }
 
-  // Process different Stripe event types
   switch (event.type) {
-    case 'checkout.session.completed':
+    case 'checkout.session.completed': {
       const session = event.data.object as Stripe.Checkout.Session;
       const metadata = session.metadata as { userId: string; priceId: string };
       await prisma.subscription.create({
@@ -43,9 +40,10 @@ export async function POST(request: NextRequest) {
         },
       });
       break;
+    }
 
     case 'invoice.payment_succeeded':
-    case 'customer.subscription.updated':
+    case 'customer.subscription.updated': {
       const subscription = event.data.object as Stripe.Subscription;
       await prisma.subscription.update({
         where: { stripeSubscriptionId: subscription.id },
@@ -55,8 +53,9 @@ export async function POST(request: NextRequest) {
         },
       });
       break;
+    }
 
-    case 'customer.subscription.deleted':
+    case 'customer.subscription.deleted': {
       const canceledSubscription = event.data.object as Stripe.Subscription;
       await prisma.subscription.update({
         where: { stripeSubscriptionId: canceledSubscription.id },
@@ -65,8 +64,9 @@ export async function POST(request: NextRequest) {
         },
       });
       break;
+    }
 
-    case 'invoice.payment_failed':
+    case 'invoice.payment_failed': {
       const failedInvoice = event.data.object as Stripe.Invoice;
       await prisma.subscription.update({
         where: { stripeSubscriptionId: failedInvoice.subscription as string },
@@ -75,6 +75,7 @@ export async function POST(request: NextRequest) {
         },
       });
       break;
+    }
 
     default:
       console.log(`Unhandled event type: ${event.type}`);

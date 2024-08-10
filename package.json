@@ -39,6 +39,7 @@
     "react-select": "^5.8.0",
     "react-spinners": "^0.13.8",
     "sharp": "^0.33.3",
+    "stripe": "^16.7.0",
     "swiper": "^11.1.1",
     "world-countries": "^5.0.0",
     "zustand": "^4.5.1"
