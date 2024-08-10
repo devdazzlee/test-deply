@@ -283,10 +283,14 @@ function PhotoSection({ listing }: any) {
       {items.map(item => (
         <SortableItem key={item.id}>
           <div className='aspect-square rounded-xl relative overflow-hidden'>
-            <img
-              src={item.url}
-              className='w-full h-full object-cover absolute inset-0'
-            />
+            <div className='relative w-full h-full'>
+              <Image
+                src={item.url}
+                className='object-cover'
+                alt=''
+                layout='fill'
+              />
+            </div>
             <div
               className={clsx(
                 //

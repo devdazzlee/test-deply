@@ -3,6 +3,7 @@
 import { SafeComment } from "@/app/types";
 import React, { useState } from "react";
 import RatingStars from "../RatingStars";
+import Image from "next/image";
 
 interface CommentProps {
   comment: SafeComment;
@@ -22,13 +23,15 @@ const Comment: React.FC<CommentProps> = ({ comment }) => {
         <footer className='flex flex-col gap-y-2 justify-between  mb-2 relative'>
           <div className='flex items-center'>
             <p className='inline-flex items-center mr-3 text-sm text-gray-900 font-semibold'>
-              <img
-                className='mr-2 w-10 h-10 rounded-full'
+              <Image
+                className='mr-2 rounded-full'
                 src={
                   comment.user.image ||
                   "https://as1.ftcdn.net/v2/jpg/07/62/37/24/1000_F_762372494_0jJCh4efbXYIAkKJmXxK2eWS8wuaVpQS.jpg"
                 }
                 alt='Michael Gough'
+                width={40}  // 10 * 4 (since Next.js Image uses pixels)
+                height={40} // 10 * 4
               />
               {comment.user.name}
             </p>
@@ -37,7 +40,7 @@ const Comment: React.FC<CommentProps> = ({ comment }) => {
             </p>
           </div>
 
-          <RatingStars rating={comment.rating} />
+          <RatingStars rating={comment.rating} numberOfRatings={null} />
         </footer>
         <p className='text-gray-500'>{comment.text}</p>
       </article>
