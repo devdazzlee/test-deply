@@ -2,7 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/app/libs/prismadb";
 import { redirect } from "next/navigation";
 
-export async function GET(request: NextRequest, { params }: { params: { token: string } }) {
+interface IParams {
+    token?: string;
+}
+export async function GET(request: NextRequest, { params }: { params: IParams }) {
     const { token } = params
     const user = await prisma.user.findFirst({
         where: {
