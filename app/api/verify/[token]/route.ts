@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/app/libs/prismadb";
-import { redirect } from "next/navigation";
 
 interface IParams {
     token?: string;
@@ -24,5 +23,5 @@ export async function GET(request: NextRequest, { params }: { params: IParams })
             verificationToken: null
         }
     })
-    redirect("/")
+    return NextResponse.redirect(new URL("/", request.url));
 }
