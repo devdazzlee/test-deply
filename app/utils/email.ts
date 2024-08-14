@@ -1,5 +1,4 @@
 import nodemailer, { Transporter } from "nodemailer";
-import Logo from "../components/navbar/Logo";
 interface User {
     email: string;
     name: string;
