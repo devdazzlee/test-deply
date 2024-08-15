@@ -29,13 +29,14 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Listing not found' }, { status: 404 });
   }
 
-  const userFee = Math.round(totalPrice * 0.05);
+  const userFee = Math.round(totalPrice * 0.05); // 5% booking fee
   const totalWithFee = totalPrice + userFee;
 
   try {
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       line_items: [
+        // Line item for the base booking price
         {
           price_data: {
             currency: 'usd',
@@ -43,21 +44,33 @@ export async function POST(request: Request) {
               name: listing.title,
               description: `Booking from ${startDate} to ${endDate}`,
             },
-            unit_amount: totalWithFee * 100, // Stripe expects the amount in cents
+            unit_amount: totalPrice * 100, 
+          },
+          quantity: 1,
+        },
+        // Line item for the 5% booking fee
+        {
+          price_data: {
+            currency: 'usd',
+            product_data: {
+              name: 'Service Fee',
+              description: '5% booking fee for platform usage',
+            },
+            unit_amount: userFee * 100, // Fee in cents
           },
           quantity: 1,
         }
       ],
       mode: 'payment',
       success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/listings/${listingId}`,
+      cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/listings/${listingId}`, 
       metadata: {
         userId: currentUser.id,
         listingId,
         startDate,
         endDate,
         totalPrice,
-        userFee,
+        userFee, 
       },
     });
 
