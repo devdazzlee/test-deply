@@ -37,10 +37,14 @@ export async function POST(request: Request) {
       payment_method_types: ['card'],
       line_items: [
         {
-          name: listing.title,
-          description: `Booking from ${startDate} to ${endDate}`,
-          amount: totalWithFee * 100, 
-          currency: 'usd',
+          price_data: {
+            currency: 'usd',
+            product_data: {
+              name: listing.title,
+              description: `Booking from ${startDate} to ${endDate}`,
+            },
+            unit_amount: totalWithFee * 100, // Stripe expects the amount in cents
+          },
           quantity: 1,
         }
       ],
@@ -52,8 +56,8 @@ export async function POST(request: Request) {
         listingId,
         startDate,
         endDate,
-        totalPrice, 
-        userFee,  
+        totalPrice,
+        userFee,
       },
     });
 
