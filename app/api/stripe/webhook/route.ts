@@ -28,17 +28,31 @@ export async function POST(request: NextRequest) {
   switch (event.type) {
     case 'checkout.session.completed': {
       const session = event.data.object as Stripe.Checkout.Session;
-      const metadata = session.metadata as { userId: string; priceId: string };
-      await prisma.subscription.create({
-        data: {
-          userId: metadata.userId,
-          stripeCustomerId: session.customer as string,
-          stripeSubscriptionId: session.subscription as string,
-          status: 'active',
-          plan: metadata.priceId,
-          currentPeriodEnd: new Date(session.expires_at! * 1000),
-        },
-      });
+      const metadata = session.metadata as { userId: string; listingId?: string; startDate?: string; endDate?: string; totalPrice?: string; priceId?: string };
+
+      if (metadata.listingId && metadata.startDate && metadata.endDate && metadata.totalPrice) {
+        await prisma.reservation.create({
+          data: {
+            userId: metadata.userId,
+            listingId: metadata.listingId,
+            startDate: new Date(metadata.startDate),
+            endDate: new Date(metadata.endDate),
+            totalPrice: Number(metadata.totalPrice),
+            approved: false,
+          },
+        });
+      } else if (metadata.priceId) {
+        await prisma.subscription.create({
+          data: {
+            userId: metadata.userId,
+            stripeCustomerId: session.customer as string,
+            stripeSubscriptionId: session.subscription as string,
+            status: 'active',
+            plan: metadata.priceId,
+            currentPeriodEnd: new Date(session.expires_at! * 1000),
+          },
+        });
+      }
       break;
     }
 

@@ -18,6 +18,7 @@ import { useRouter } from "next/navigation";
 import { useMemo, useState, useCallback, useEffect } from "react";
 import { Range } from "react-date-range";
 import toast from "react-hot-toast";
+import { loadStripe } from '@stripe/stripe-js';
 
 const initialDateRange = {
   startDate: new Date(),
@@ -62,48 +63,35 @@ const ListingClient: React.FC<ListingClientProps> = ({
   const [totalPrice, setTotalPrice] = useState(listing.price);
   const [dateRange, setDateRange] = useState<Range>(initialDateRange);
 
-  const onCreateReservation = useCallback(() => {
+  const onCreateReservation = useCallback(async () => {
     if (!currentUser) {
       return loginModal.onOpen();
     }
-
+  
     setIsLoading(true);
-
-    axios
-      .post("/api/reservations", {
+  
+    try {
+      const response = await axios.post("/api/reservations", {
         totalPrice,
         startDate: dateRange.startDate,
         endDate: dateRange.endDate,
-        listingId: listing?.id
-      })
-      .then(() => {
-        toast.success("Listing reserved!");
-        router.push("/trips");
-        router.refresh();
-        setDateRange(initialDateRange);
-      })
-      .catch(() => {
-        toast.error("Something went wrong.");
-      })
-      .finally(() => {
-        setIsLoading(false);
+        listingId: listing?.id,
       });
-  }, [totalPrice, dateRange, listing?.id, router, currentUser, loginModal]);
-
-  useEffect(() => {
-    if (dateRange.startDate && dateRange.endDate) {
-      const dayCount = differenceInCalendarDays(
-        dateRange.endDate,
-        dateRange.startDate
-      );
-
-      if (dayCount && listing.price) {
-        setTotalPrice(dayCount * listing.price);
+  
+      const { sessionId } = response.data;
+  
+      const stripe = await loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
+      if (stripe && sessionId) {
+        await stripe.redirectToCheckout({ sessionId });
       } else {
-        setTotalPrice(listing.price);
+        throw new Error("Stripe initialisation failed");
       }
+    } catch (error) {
+      toast.error("Something went wrong. Please try again.");
+    } finally {
+      setIsLoading(false);
     }
-  }, [dateRange, listing.price]);
+  }, [totalPrice, dateRange, listing?.id, router, currentUser, loginModal]);
 
   // const category = useMemo(() => {
   //     return categories.filter((item) => item.label == listing.category);
