@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 
 import prisma from "@/app/libs/prismadb";
 import getCurrentUser from "@/app/actions/getCurrentUser";
+import Email from "@/app/utils/email";
 
 export async function POST(request: Request) {
   const currentUser = await getCurrentUser();
@@ -9,6 +10,7 @@ export async function POST(request: Request) {
   if (!currentUser) {
     return NextResponse.error();
   }
+
 
   //UNCOMMENT - CODE TO CHECK IF CREATOR HAS A SUBSCRIPTION BEFORE THEY CAN CREATE A LISTING
   // const activeSubscription = await prisma.subscription.findFirst({
@@ -52,6 +54,8 @@ export async function POST(request: Request) {
       userId: currentUser.id
     }
   });
-
+  if (currentUser.email && currentUser.name) {
+    new Email({ name: currentUser.name, email: currentUser.email }).sendNewListing()
+  }
   return NextResponse.json(listing);
 }

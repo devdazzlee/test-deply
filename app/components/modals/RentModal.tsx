@@ -60,7 +60,6 @@ const RentModal = () => {
   const guestCount = watch("guestCount");
   const roomCount = watch("roomCount");
   const bathroomCount = watch("bathroomCount");
-  // const imageSrc = watch('imageSrc');
 
   const Map = useMemo(
     () =>
@@ -101,11 +100,13 @@ const RentModal = () => {
       .post("/api/listings", data)
       .then(() => {
         toast.success("Listing Created!");
+
         router.refresh();
         setImageSrc([]);
         reset();
         setStep(STEPS.CATEGORY);
         rentModal.onClose();
+
       })
       .catch(error => {
         toast.error("Something went wrong.");
