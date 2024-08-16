@@ -24,11 +24,14 @@ model User {
   updatedAt      DateTime  @updatedAt
   favouriteIds   String[]  @db.ObjectId
 
+  stripeAccountId String?  
+  stripeOnboardingComplete Boolean @default(false) 
+
   accounts       Account[]
   listings       Listing[]
   reservations   Reservation[]
   comments       Comment[]
-  subscriptions  Subscription[] // New relation to Subscription model
+  subscriptions  Subscription[] 
 }
 
 model Account {
@@ -102,9 +105,9 @@ model Subscription {
   stripeCustomerId String   @unique
   stripeSubscriptionId String @unique 
   userId           String   @db.ObjectId
-  status           String   // active, inactive, past_due, etc.
-  plan             String   // reference to the Stripe plan ID
-  currentPeriodEnd DateTime // When the subscription period ends
+  status           String  
+  plan             String   
+  currentPeriodEnd DateTime 
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 
