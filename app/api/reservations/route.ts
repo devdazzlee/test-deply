@@ -23,20 +23,33 @@ export async function POST(request: Request) {
 
   const listing = await prisma.listing.findUnique({
     where: { id: listingId },
+    include: {
+      user: true, 
+    },
   });
 
-  if (!listing) {
+  if (!listing || !listing.user) {
     return NextResponse.json({ error: 'Listing not found' }, { status: 404 });
   }
 
-  const userFee = Math.round(totalPrice * 0.05); // 5% booking fee
+  const creator = listing.user;
+
+  if (!creator.stripeAccountId) {
+    return NextResponse.json({ error: 'Creator does not have a Stripe account.' }, { status: 400 });
+  }
+
+  // Always apply a 3% user fee
+  const userFee = Math.round(totalPrice * 0.03);
   const totalWithFee = totalPrice + userFee;
+
+  // If the creator has opted for the 5% booking fee option
+  const creatorFee = creator.subscriptionOption === 'booking_fee' ? Math.round(totalPrice * 0.05) : 0;
 
   try {
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       line_items: [
-        // Line item for the base booking price
+        // Line item for the base booking price (paid by user)
         {
           price_data: {
             currency: 'usd',
@@ -44,19 +57,19 @@ export async function POST(request: Request) {
               name: listing.title,
               description: `Booking from ${startDate} to ${endDate}`,
             },
-            unit_amount: totalPrice * 100, 
+            unit_amount: totalPrice * 100,
           },
           quantity: 1,
         },
-        // Line item for the 5% booking fee
+        // Line item for the 3% user fee
         {
           price_data: {
             currency: 'usd',
             product_data: {
               name: 'Service Fee',
-              description: '5% booking fee for platform usage',
+              description: '3% platform service fee',
             },
-            unit_amount: userFee * 100, // Fee in cents
+            unit_amount: userFee * 100, 
           },
           quantity: 1,
         }
@@ -64,6 +77,12 @@ export async function POST(request: Request) {
       mode: 'payment',
       success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/listings/${listingId}`, 
+      payment_intent_data: {
+        application_fee_amount: userFee * 100,
+        transfer_data: {
+          destination: creator.stripeAccountId, // Transfer the remaining amount to the creator
+        },
+      },
       metadata: {
         userId: currentUser.id,
         listingId,
@@ -71,6 +90,7 @@ export async function POST(request: Request) {
         endDate,
         totalPrice,
         userFee, 
+        creatorFee, // Store the 5% creator fee in metadata for further deduction (if applicable) in the webhook
       },
     });
 
