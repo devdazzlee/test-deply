@@ -21,7 +21,6 @@ export async function POST(request: Request) {
     }
 
     const checkoutSession = await stripe.checkout.sessions.create({
-      payment_method_types: ['card'],
       line_items: [
         {
           price: priceId,
@@ -35,8 +34,6 @@ export async function POST(request: Request) {
         userId: currentUser.id,
       },
     });
-
-    //No update required on db as stripe webhook handles that
 
     return NextResponse.json({ sessionId: checkoutSession.id });
   } catch (error) {

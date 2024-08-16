@@ -29,7 +29,6 @@ export async function POST(request: Request) {
   if (option === "flat_fee") {
     try {
       const session = await stripe.checkout.sessions.create({
-        payment_method_types: ['card'],
         line_items: [
           {
             price_data: {
