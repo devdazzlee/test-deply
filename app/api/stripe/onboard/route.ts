@@ -20,20 +20,28 @@ export async function POST() {
     // Check if the user already has a Stripe account
     if (!stripeAccountId) {
       const account = await stripe.accounts.create({
-        type: 'express',
+        country: 'US', // Adjust based on your target market
         email: currentUser.email!,
-        business_type: 'individual',
-        country: 'US', // adjust this based on your target market
+        controller: {
+          fees: {
+            payer: 'application',
+          },
+          losses: {
+            payments: 'application',
+          },
+          stripe_dashboard: {
+            type: 'express',
+          },
+        },
         capabilities: {
           card_payments: { requested: true },
           transfers: { requested: true },
         },
         metadata: {
-          userId: currentUser.id, 
+          userId: currentUser.id,
         },
       });
 
-      // Update user in the database with the created Stripe account ID
       await prisma.user.update({
         where: { id: currentUser.id },
         data: {
@@ -44,7 +52,7 @@ export async function POST() {
       stripeAccountId = account.id;
     }
 
-    // Create an account link for the onboarding flow
+    // Generate the onboarding link for Stripe Express
     const accountLink = await stripe.accountLinks.create({
       account: stripeAccountId,
       refresh_url: `${process.env.NEXT_PUBLIC_BASE_URL}/reauthenticate`, // URL to redirect if they need to restart the onboarding process
