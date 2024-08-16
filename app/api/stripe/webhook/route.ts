@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
         };
 
         if (metadata.listingId && metadata.startDate && metadata.endDate && metadata.totalPrice) {
-          // Create reservation
+          // checkout by customer
           await prisma.reservation.create({
             data: {
               userId: metadata.userId,
@@ -49,8 +49,9 @@ export async function POST(request: NextRequest) {
               approved: false,
             },
           });
-        } else if (metadata.priceId) {
-          // Create subscription
+        } 
+        else if (metadata.priceId) {
+          // checkout by creator 
           await prisma.subscription.create({
             data: {
               userId: metadata.userId,
