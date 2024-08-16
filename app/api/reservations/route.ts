@@ -40,7 +40,6 @@ export async function POST(request: Request) {
 
   // Always apply a 3% user fee
   const userFee = Math.round(totalPrice * 0.03);
-  const totalWithFee = totalPrice + userFee;
 
   // If the creator has opted for the 5% booking fee option
   const creatorFee = creator.subscriptionOption === 'booking_fee' ? Math.round(totalPrice * 0.05) : 0;

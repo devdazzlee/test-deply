@@ -72,14 +72,14 @@ async function verifyStripeSignature(request: NextRequest): Promise<Stripe.Event
  * Handles 'checkout.session.completed' webhook event.
  * Scenario: This event is triggered when a user completes a checkout session.
  */
-async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) {
+ async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) {
   const metadata = session.metadata as { 
     userId: string; 
     listingId?: string; 
     startDate?: string; 
     endDate?: string; 
     totalPrice?: string; 
-    priceId?: string;
+    creatorFee?: string;
     subscriptionOption?: string;
   };
 
@@ -109,11 +109,11 @@ async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) 
       },
     });
 
-    // Check if the creator has opted for the 5% booking fee
-    if (creator.subscriptionOption === 'booking_fee') {
-      const creatorFee = Math.round(Number(metadata.totalPrice) * 0.05); // 5% fee from base price
+    // If there's a creatorFee, transfer it to the platform
+    if (creator.subscriptionOption === 'booking_fee' && metadata.creatorFee) {
+      const creatorFee = Number(metadata.creatorFee);
 
-      // Transfer 5% from creator to platform
+      // Transfer 5% from the creator to the platform
       await stripe.transfers.create({
         amount: creatorFee * 100,
         currency: 'usd',
