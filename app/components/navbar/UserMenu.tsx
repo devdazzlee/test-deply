@@ -9,6 +9,9 @@ import useLoginModal from "@/app/hooks/useLoginModal";
 import useRentModal from "@/app/hooks/useRentModal";
 import { signOut } from "next-auth/react";
 import { SafeUser } from "@/app/types";
+import Link from "next/link";
+import { AiOutlineMessage } from "react-icons/ai";
+
 
 interface UserMenuProps {
   currentUser?: SafeUser | null;
@@ -53,6 +56,13 @@ const UserMenu: React.FC<UserMenuProps> = ({ currentUser }) => {
   return (
     <div className='relative'>
       <div className='flex flex-row items-center gap-3'>
+        {currentUser && <Link
+          href='/messages'
+          className='py-2 px-3 rounded-full hover:bg-neutral-100 transition cursor-pointer'
+        >
+          <AiOutlineMessage size={27} />
+
+        </Link>}
         <div
           onClick={onRent}
           className='hidden md:block text-sm font-semibold py-3 px-4 rounded-full hover:bg-neutral-100 transition cursor-pointer'
@@ -71,7 +81,7 @@ const UserMenu: React.FC<UserMenuProps> = ({ currentUser }) => {
         </div>
       </div>
       {isOpen && (
-        <div className='absolute rounded-xl shadow-md w-[40vw] md:w-[200px] bg-white overflow-hidden right-0 top-12 text-sm'>
+        <div className='absolute rounded-xl shadow-md w-[40vw] md:w-[200px] bg-white overflow-hidden right-0 top-12 text-sm z-20'>
           <div className='flex flex-col cursor-pointer'>
             {currentUser ? (
               <>
@@ -81,7 +91,7 @@ const UserMenu: React.FC<UserMenuProps> = ({ currentUser }) => {
                   <MenuItem label='Favorites' href='/favorites' /> */}
 
                 <MenuItem label="My Profile" href="/profile" />
-                <MenuItem label="Messages and Bookings" href="/trips" />
+                <MenuItem label="Approvals and Bookings" href="/bookings" />
                 <MenuItem label="Billing and Subscriptions" href="/billing" />
                 <MenuItem label="Account Settings" href="#" />
 

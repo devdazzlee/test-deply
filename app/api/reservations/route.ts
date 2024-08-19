@@ -25,7 +25,7 @@ export async function POST(request: Request) {
   const listing = await prisma.listing.findUnique({
     where: { id: listingId },
   });
- 
+
 
   if (!listing) {
     return NextResponse.json({ error: 'Listing not found' }, { status: 404 });
@@ -46,7 +46,7 @@ export async function POST(request: Request) {
               name: listing.title,
               description: `Booking from ${startDate} to ${endDate}`,
             },
-            unit_amount: totalPrice * 100, 
+            unit_amount: totalPrice * 100,
           },
           quantity: 1,
         },
@@ -65,23 +65,28 @@ export async function POST(request: Request) {
       ],
       mode: 'payment',
       success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/listings/${listingId}`, 
+      cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/listings/${listingId}`,
       metadata: {
         userId: currentUser.id,
         listingId,
         startDate,
         endDate,
         totalPrice,
-        userFee, 
+        userFee,
       },
     });
- if (currentUser.email && currentUser.name) {
-    new Email({ name: currentUser.name, email: currentUser.email }).sendNewBooking()
-  }
+    try {
+      if (currentUser.email && currentUser.name) {
+        await new Email({ name: currentUser.name, email: currentUser.email }).sendNewBooking();
+      }
+    } catch (emailError) {
+      console.error('Failed to send booking confirmation email:', emailError);
+    }
     return NextResponse.json({ sessionId: session.id });
   } catch (error) {
     console.error('Error creating Stripe Checkout session:', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
+
 
 }

@@ -15,9 +15,9 @@ const Map = dynamic(() => import("../Map"), {
 interface ListingInfoProps {
   user: SafeUser;
   description: string;
-  guestCount: number;
-  roomCount: number;
-  bathroomCount: number;
+  experience: number;
+  maxDays: number;
+  minDays: number;
   category: string[] | undefined;
   locationValue: string;
   averageRating: number | null;
@@ -27,9 +27,9 @@ interface ListingInfoProps {
 const ListingInfo: React.FC<ListingInfoProps> = ({
   user,
   description,
-  guestCount,
-  roomCount,
-  bathroomCount,
+  experience,
+  maxDays,
+  minDays,
   category,
   locationValue,
   averageRating,
@@ -62,9 +62,9 @@ const ListingInfo: React.FC<ListingInfoProps> = ({
         </div>
 
         <div className='flex flex-row items-center gap-4 font-light text-neutral-500'>
-          <div>{guestCount}/yrs experiance</div>
-          <div>{roomCount}/day maximum</div>
-          <div>{bathroomCount}/day minimum</div>
+          <div>{experience}/yrs experiance</div>
+          <div>{maxDays}/day maximum</div>
+          <div>{minDays}/day minimum</div>
         </div>
       </div>
 
