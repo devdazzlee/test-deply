@@ -11,8 +11,6 @@ export async function POST(request: Request) {
     return NextResponse.error();
   }
 
-
-  //UNCOMMENT - CODE TO CHECK IF CREATOR HAS A SUBSCRIPTION BEFORE THEY CAN CREATE A LISTING
   const activeSubscription = await prisma.subscription.findFirst({
     where: {
       userId: currentUser.id,
