@@ -14,7 +14,6 @@ jobs:
     - name: Load environment variables
       id: load-env
       run: |
-        source .github/env
         echo "NODE_VERSION=$NODE_VERSION" >> $GITHUB_ENV
 
     - name: Set up Node.js
@@ -27,6 +26,9 @@ jobs:
 
     - name: Set up Prisma
       run: npm install @prisma/client
+
+    - name: Set DATABASE_URL secret
+      run: echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> $GITHUB_ENV
 
     - name: Generate Prisma Client
       run: npx prisma db push
