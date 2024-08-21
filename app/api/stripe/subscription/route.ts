@@ -22,15 +22,16 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid subscription option" }, { status: 400 });
   }
 
+  // Check if the user already has an active subscription option
   if (currentUser.subscriptionOption && new Date() < new Date(currentUser.subscriptionExpiresAt!)) {
     return NextResponse.json({ error: "You already have a locked subscription option." }, { status: 400 });
   }
 
-  // If they choose the flat fee, charge them $299 through Stripe
+  // Handle the flat fee subscription option
   if (option === "flat_fee") {
     try {
       const session = await stripe.checkout.sessions.create({
-        payment_method_types: ['card'], 
+        payment_method_types: ['card'],
         line_items: [
           {
             price_data: {
@@ -49,6 +50,7 @@ export async function POST(request: Request) {
         cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/subscribe`,
         metadata: {
           userId: currentUser.id, // Pass user ID as metadata
+          subscriptionOption: option // Pass subscription option as metadata
         },
       });
 
@@ -59,22 +61,35 @@ export async function POST(request: Request) {
     }
   }
 
-  // If they choose the 5% booking fee, no upfront payment is needed
-  try {
-    const oneYearFromNow = new Date();
-    oneYearFromNow.setFullYear(oneYearFromNow.getFullYear() + 1);
+  // Handle the 5% booking fee subscription option
+  if (option === "booking_fee") {
+    try {
+      const oneYearFromNow = new Date();
+      oneYearFromNow.setFullYear(oneYearFromNow.getFullYear() + 1);
 
-    await prisma.user.update({
-      where: { id: currentUser.id },
-      data: {
-        subscriptionOption: "booking_fee", 
-        subscriptionExpiresAt: oneYearFromNow,
-      },
-    });
+      await prisma.user.update({
+        where: { id: currentUser.id },
+        data: {
+          subscriptionOption: "booking_fee",
+          subscriptionExpiresAt: oneYearFromNow,
+        },
+      });
 
-    return NextResponse.json({ message: "Subscription option saved" });
-  } catch (error) {
-    console.error("Error saving subscription option:", error);
-    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+      await prisma.subscription.create({
+        data: {
+          userId: currentUser.id,
+          stripeCustomerId: currentUser.stripeAccountId || "",
+          stripeSubscriptionId: "", // No Stripe subscription ID for "booking_fee"
+          status: 'active',
+          plan: 'booking_fee',
+          currentPeriodEnd: oneYearFromNow,
+        },
+      });
+
+      return NextResponse.json({ message: "Subscription option saved" });
+    } catch (error) {
+      console.error("Error saving subscription option:", error);
+      return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+    }
   }
 }
