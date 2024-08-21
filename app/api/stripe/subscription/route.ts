@@ -10,12 +10,13 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 export async function POST(request: Request) {
   const currentUser = await getCurrentUser();
 
+  // Ensure the user is authenticated
   if (!currentUser) {
     return NextResponse.error();
   }
 
   const body = await request.json();
-  const { option } = body; // "flat_fee" or "booking_fee"
+  const { option } = body; // Option is either "flat_fee" or "booking_fee"
 
   if (option !== "flat_fee" && option !== "booking_fee") {
     return NextResponse.json({ error: "Invalid subscription option" }, { status: 400 });
@@ -29,6 +30,7 @@ export async function POST(request: Request) {
   if (option === "flat_fee") {
     try {
       const session = await stripe.checkout.sessions.create({
+        payment_method_types: ['card'], 
         line_items: [
           {
             price_data: {
@@ -37,7 +39,7 @@ export async function POST(request: Request) {
                 name: 'Annual Subscription',
                 description: 'One-time payment of $299 for one year of no booking fees.',
               },
-              unit_amount: 29900,
+              unit_amount: 29900, // $299 in cents
             },
             quantity: 1,
           }
@@ -46,11 +48,10 @@ export async function POST(request: Request) {
         success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/payment-success`,
         cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/subscribe`,
         metadata: {
-          userId: currentUser.id,
+          userId: currentUser.id, // Pass user ID as metadata
         },
       });
 
-      // Return the session URL to redirect the user to Stripe for payment
       return NextResponse.json({ url: session.url });
     } catch (error) {
       console.error("Error creating Stripe Checkout session:", error);
@@ -59,7 +60,6 @@ export async function POST(request: Request) {
   }
 
   // If they choose the 5% booking fee, no upfront payment is needed
-  // Just update the database
   try {
     const oneYearFromNow = new Date();
     oneYearFromNow.setFullYear(oneYearFromNow.getFullYear() + 1);
@@ -67,7 +67,7 @@ export async function POST(request: Request) {
     await prisma.user.update({
       where: { id: currentUser.id },
       data: {
-        subscriptionOption: "booking_fee",
+        subscriptionOption: "booking_fee", 
         subscriptionExpiresAt: oneYearFromNow,
       },
     });
