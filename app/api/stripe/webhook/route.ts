@@ -70,6 +70,7 @@ async function verifyStripeSignature(request: NextRequest): Promise<Stripe.Event
 
 /**
  * Handles 'checkout.session.completed' webhook event.
+ * Scenario: This event is triggered when a user completes a checkout session.
  */
 async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) {
   const metadata = session.metadata as { 
@@ -77,10 +78,24 @@ async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) 
     subscriptionOption?: string;
   };
 
+  // Case 1: Handle creator subscription flat fee payment
   if (metadata.subscriptionOption === 'flat_fee') {
     const oneYearFromNow = new Date();
     oneYearFromNow.setFullYear(oneYearFromNow.getFullYear() + 1);
 
+    // Create the subscription entry in the database
+    await prisma.subscription.create({
+      data: {
+        userId: metadata.userId, 
+        stripeCustomerId: session.customer as string || null,
+        stripeSubscriptionId: session.subscription as string || null, 
+        status: 'active',
+        plan: 'flat_fee',
+        currentPeriodEnd: oneYearFromNow,
+      },
+    });
+
+    // Update the user to reflect the new subscription option
     await prisma.user.update({
       where: { id: metadata.userId },
       data: {
@@ -88,17 +103,32 @@ async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) 
         subscriptionExpiresAt: oneYearFromNow,
       },
     });
+  }
+}
 
-    await prisma.subscription.create({
+/**
+ * Handles 'account.updated' webhook event.
+ * Scenario: This event is triggered when the creator completes Stripe onboarding.
+ * - If the onboarding is complete, updates the creator's `stripeOnboardingComplete` field.
+ */
+async function handleAccountUpdated(account: Stripe.Account) {
+  if (account.capabilities?.transfers === 'active') {
+    const userId = account.metadata?.userId;
+    
+    if (!userId) {
+      console.error('No userId found in Stripe account metadata');
+      return;
+    }
+
+    await prisma.user.update({
+      where: { id: userId }, 
       data: {
-        userId: metadata.userId,
-        stripeCustomerId: session.customer as string,
-        stripeSubscriptionId: session.subscription as string,
-        status: 'active',
-        plan: metadata.subscriptionOption!,
-        currentPeriodEnd: oneYearFromNow,
+        stripeOnboardingComplete: true,
+        stripeAccountId: account.id, 
       },
     });
+
+    console.log(`Onboarding complete for user with ID: ${userId}, Stripe account: ${account.id}`);
   }
 }
 
@@ -106,24 +136,9 @@ async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) 
  * Handles 'customer.subscription.updated' and 'invoice.payment_succeeded' webhook events.
  */
 async function handleSubscriptionUpdated(subscription: Stripe.Subscription) {
-  const userId = subscription.metadata?.userId;
-
-  if (!userId) {
-    console.error('No userId found in subscription metadata');
-    return;
-  }
-
-  await prisma.subscription.upsert({
+  await prisma.subscription.update({
     where: { stripeSubscriptionId: subscription.id },
-    create: {
-      stripeCustomerId: subscription.customer as string,
-      stripeSubscriptionId: subscription.id,
-      userId: userId,
-      status: subscription.status,
-      plan: subscription.items.data[0].price.product as string, // Assuming single price product
-      currentPeriodEnd: new Date(subscription.current_period_end * 1000),
-    },
-    update: {
+    data: {
       status: subscription.status,
       currentPeriodEnd: new Date(subscription.current_period_end * 1000),
     },
@@ -152,30 +167,4 @@ async function handlePaymentFailed(invoice: Stripe.Invoice) {
       status: 'past_due',
     },
   });
-}
-
-/**
- * Handles 'account.updated' webhook event.
- * Scenario: This event is triggered when the creator completes Stripe onboarding.
- * - If the onboarding is complete, updates the creator's `stripeOnboardingComplete` field.
- */
-async function handleAccountUpdated(account: Stripe.Account) {
-  const userId = account.metadata?.userId;
-
-  if (!userId) {
-    console.error('No userId found in Stripe account metadata');
-    return;
-  }
-
-  if (account.capabilities?.transfers === 'active') {
-    await prisma.user.update({
-      where: { id: userId },
-      data: {
-        stripeOnboardingComplete: true,
-        stripeAccountId: account.id,
-      },
-    });
-
-    console.log(`Onboarding complete for user with ID: ${userId}, Stripe account: ${account.id}`);
-  }
 }
