@@ -2,7 +2,7 @@
 
 import { AiOutlineMenu } from "react-icons/ai";
 import Avatar from "../Avatar";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import MenuItem from "./MenuItem";
 import useRegisterModal from "@/app/hooks/useRegisterModal";
 import useLoginModal from "@/app/hooks/useLoginModal";
@@ -32,6 +32,24 @@ const UserMenu: React.FC<UserMenuProps> = ({ currentUser }) => {
     rentModal.onOpen();
   }, [currentUser, loginModal, rentModal]);
 
+  const menuRef = useRef<any>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: any) => {
+      if (
+        menuRef.current &&
+        !menuRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener('click', handleClickOutside);
+
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+    };
+  }, []);
+
   return (
     <div className='relative'>
       <div className='flex flex-row items-center gap-3'>
@@ -43,6 +61,7 @@ const UserMenu: React.FC<UserMenuProps> = ({ currentUser }) => {
         </div>
         <div
           onClick={toggleOpen}
+          ref={menuRef}
           className='p-4 md:py-1 md:px-2 border-[1px] border-neutral-200 flex flex-row items-center gap-3 rounded-full cursor-pointer hover:shadow-md transition'
         >
           <AiOutlineMenu />
@@ -56,20 +75,20 @@ const UserMenu: React.FC<UserMenuProps> = ({ currentUser }) => {
           <div className='flex flex-col cursor-pointer'>
             {currentUser ? (
               <>
-               {/* <MenuItem label='Bookings' href='/trips' />
+                {/* <MenuItem label='Bookings' href='/trips' />
                   <MenuItem label='My Profile' href='/profile' />
                   <MenuItem label='Billing' href='/billing' />
                   <MenuItem label='Favorites' href='/favorites' /> */}
-                
+
                 <MenuItem label="My Profile" href="/profile" />
                 <MenuItem label="Messages and Bookings" href="/trips" />
                 <MenuItem label="Billing and Subscriptions" href="/billing" />
                 <MenuItem label="Account Settings" href="#" />
-                
+
                 <hr />
-                
+
                 <MenuItem onClick={() => signOut()} label='Logout' />
-                
+
                 {/* <MenuItem
                   href="/trips"
                   label='My Bookings'

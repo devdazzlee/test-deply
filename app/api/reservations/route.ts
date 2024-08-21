@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import Stripe from 'stripe';
 import prisma from "@/app/libs/prismadb";
 import getCurrentUser from "@/app/actions/getCurrentUser";
+import Email from "@/app/utils/email";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2024-06-20',
@@ -27,6 +28,7 @@ export async function POST(request: Request) {
       user: true, 
     },
   });
+ 
 
   if (!listing || !listing.user) {
     return NextResponse.json({ error: 'Listing not found' }, { status: 404 });
@@ -92,10 +94,13 @@ export async function POST(request: Request) {
         creatorFee, // Store the 5% creator fee in metadata for further deduction (if applicable) in the webhook
       },
     });
-
+ if (currentUser.email && currentUser.name) {
+    new Email({ name: currentUser.name, email: currentUser.email }).sendNewBooking()
+  }
     return NextResponse.json({ sessionId: session.id });
   } catch (error) {
     console.error('Error creating Stripe Checkout session:', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
+
 }

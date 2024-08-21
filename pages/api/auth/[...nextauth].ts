@@ -44,10 +44,12 @@ export const authOptions: AuthOptions = {
           credentials.password,
           user.hashedPassword
         );
-
         if (!isCorrectPassword) {
           throw new Error("Invalid credentials");
         }
+        // if (!user.emailVerified) {
+        //   throw new Error("You must verify your email first. ");
+        // }
         return user;
       }
     })
