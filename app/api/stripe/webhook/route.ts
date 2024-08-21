@@ -86,11 +86,11 @@ async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) 
     // Create the subscription entry in the database
     await prisma.subscription.create({
       data: {
-        userId: metadata.userId, 
-        stripeCustomerId: session.customer as string || null,
-        stripeSubscriptionId: session.subscription as string || null, 
+        userId: metadata.userId,
+        stripeCustomerId: session.customer ? session.customer as string : '', // Set an empty string if null
+        stripeSubscriptionId: session.subscription ? session.subscription as string : '', // Set an empty string if null
         status: 'active',
-        plan: 'flat_fee',
+        plan: 'flat_fee', 
         currentPeriodEnd: oneYearFromNow,
       },
     });
