@@ -55,8 +55,8 @@ export async function POST() {
     // Generate the onboarding link for Stripe Express
     const accountLink = await stripe.accountLinks.create({
       account: stripeAccountId,
-      refresh_url: `${process.env.NEXT_PUBLIC_BASE_URL}/reauthenticate`, // URL to redirect if they need to restart the onboarding process
-      return_url: `${process.env.NEXT_PUBLIC_BASE_URL}/dashboard`, // URL to redirect upon successful onboarding
+      refresh_url: `${process.env.NEXT_PUBLIC_BASE_URL}/billing`, // URL to redirect if they need to restart the onboarding process
+      return_url: `${process.env.NEXT_PUBLIC_BASE_URL}/billing`, // URL to redirect upon successful onboarding
       type: 'account_onboarding',
     });
 
