@@ -1,5 +1,6 @@
 "use client";
 
+import type { SubStatus } from "@/app/actions/getSubscriptionStatus";
 import Container from "../Container";
 import Categories from "./Categories";
 import Logo from "./Logo";
@@ -9,9 +10,10 @@ import { SafeUser } from "@/app/types";
 
 interface NavbarProps {
   currentUser?: SafeUser | null;
+  subStatus?: SubStatus | null;
 }
 
-const Navbar: React.FC<NavbarProps> = ({ currentUser }) => {
+const Navbar: React.FC<NavbarProps> = ({ currentUser, subStatus }) => {
   // console.log(currentUser);
   return (
     <div className='fixed w-full bg-white z-10 shadow-sm'>
@@ -25,12 +27,12 @@ const Navbar: React.FC<NavbarProps> = ({ currentUser }) => {
           <div className='hidden sm:flex flex-row items-center justify-between gap-3 md:gap-0'>
             <Logo />
             <Search />
-            <UserMenu currentUser={currentUser} />
+            <UserMenu currentUser={currentUser} subStatus={subStatus} />
           </div>
           <div className='sm:hidden flex flex-col gap-3'>
             <div className='flex flex-row justify-between w-full'>
               <Logo />
-              <UserMenu currentUser={currentUser} />
+              <UserMenu currentUser={currentUser} subStatus={subStatus} />
             </div>
             <Search />
           </div>

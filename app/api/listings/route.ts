@@ -13,16 +13,18 @@ export async function POST(request: Request) {
 
 
   //UNCOMMENT - CODE TO CHECK IF CREATOR HAS A SUBSCRIPTION BEFORE THEY CAN CREATE A LISTING
-  // const activeSubscription = await prisma.subscription.findFirst({
-  //   where: {
-  //     userId: currentUser.id,
-  //     status: 'active',
-  //   },
-  // });
+  const activeSubscription = await prisma.subscription.findFirst({
+    where: {
+      userId: currentUser.id,
+      status: 'active',
+    },
+  });
 
-  // if (!activeSubscription) {
-  //   return NextResponse.json({ error: 'You must have an active subscription to create a listing' }, { status: 403 });
-  // }
+  if (!activeSubscription) {
+    return NextResponse.json({
+      error: 'You must have an active subscription to create a listing',
+    }, { status: 403 });
+  }
 
   const body = await request.json();
 

@@ -33,3 +33,5 @@ export default async function getSubscriptionStatus() {
     throw new Error(error.message || 'Failed to fetch subscription status');
   }
 }
+
+export type SubStatus = Awaited<ReturnType<typeof getSubscriptionStatus>>;

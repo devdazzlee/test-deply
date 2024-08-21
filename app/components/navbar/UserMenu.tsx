@@ -9,12 +9,16 @@ import useLoginModal from "@/app/hooks/useLoginModal";
 import useRentModal from "@/app/hooks/useRentModal";
 import { signOut } from "next-auth/react";
 import { SafeUser } from "@/app/types";
+import type { SubStatus } from "@/app/actions/getSubscriptionStatus";
+import { useRouter } from "next/navigation";
 
 interface UserMenuProps {
   currentUser?: SafeUser | null;
+  subStatus?: SubStatus | null;
 }
 
-const UserMenu: React.FC<UserMenuProps> = ({ currentUser }) => {
+const UserMenu: React.FC<UserMenuProps> = ({ currentUser, subStatus }) => {
+  const router = useRouter();
   const registerModal = useRegisterModal();
   const loginModal = useLoginModal();
   const rentModal = useRentModal();
@@ -27,6 +31,11 @@ const UserMenu: React.FC<UserMenuProps> = ({ currentUser }) => {
   const onRent = useCallback(() => {
     if (!currentUser) {
       return loginModal.onOpen();
+    }
+    
+    if (!subStatus) {
+      router.push("/subscribe");
+      return;
     }
 
     rentModal.onOpen();
