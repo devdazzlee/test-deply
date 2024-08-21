@@ -128,7 +128,7 @@ export default function SubscribePage() {
               <span className="text-5xl font-extrabold tracking-tight">$290</span>
               <span className="ml-1 text-xl font-semibold">/year</span>
             </p>
-            <p className="mt-6 ">You're an established creator</p>
+            <p className="mt-6 ">You&apos;re an established creator</p>
             <ul role="list" className="mt-6 space-y-6">
               <li className="flex">
                 <svg
@@ -181,5 +181,3 @@ export default function SubscribePage() {
     </div>
   );
 }
-
-
