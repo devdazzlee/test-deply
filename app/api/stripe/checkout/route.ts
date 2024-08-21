@@ -28,7 +28,7 @@ export async function POST(request: Request) {
         },
       ],
       mode: 'subscription',
-      success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/success`, //HANDLE REDIRECTION 
+      success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/payment-success`, //HANDLE REDIRECTION 
       cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/cancel`, //HANDLE REDIRECTION
       metadata: {
         userId: currentUser.id,

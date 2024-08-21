@@ -1,8 +1,38 @@
 'use client';
 
+import { useState } from "react";
+import { toast } from "react-hot-toast";
+import axios from "axios";
+import { useRouter } from "next/navigation";
 import Button from "../components/Button";
 
 export default function SubscribePage() {
+  const router = useRouter();
+  const [loading, setLoading] = useState(false);
+
+  const subscribeAction = async (option: string) => {
+    setLoading(true);
+
+    axios
+      .post("/api/stripe/subscription", { option })
+      .then((response: any) => {
+        const { url } = response.data;
+
+        if (url) {
+          window.location.href = url;
+        } else {
+          toast.success("Subscription option selected");
+          router.refresh(); 
+        }
+      })
+      .catch((error: any) => {
+        toast.error(error?.response?.data?.error || "Something went wrong.");
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  };
+  
   return (
     <div className="">
       <div>
@@ -81,7 +111,11 @@ export default function SubscribePage() {
             </ul>
           </div>
           <div className="p-4">
-            <Button label='Subscribe'/>
+          <Button
+                label="Subscribe"
+                onClick={() => subscribeAction("booking_fee")}
+                disabled={loading}
+              />
           </div>
         </div>
         <div className="relative p-8  border border-gray-200 rounded-2xl shadow-sm flex flex-col">
@@ -135,7 +169,11 @@ export default function SubscribePage() {
             </ul>
           </div>
           <div className="p-4">
-            <Button label='Subscribe'/>
+          <Button
+                label="Subscribe"
+                onClick={() => subscribeAction("flat_fee")} 
+                disabled={loading}
+              />
           </div>
         </div>
       </div>

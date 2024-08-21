@@ -43,8 +43,8 @@ export async function POST(request: Request) {
           }
         ],
         mode: 'payment',
-        success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/success`,
-        cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/cancel`,
+        success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/payment-success`,
+        cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/subscribe`,
         metadata: {
           userId: currentUser.id,
         },
