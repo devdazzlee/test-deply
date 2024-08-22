@@ -7,7 +7,6 @@ import Logo from "./Logo";
 import Search from "./Search";
 import UserMenu from "./UserMenu";
 import { SafeUser } from "@/app/types";
-import type { SubStatus } from "@/app/actions/getSubscriptionStatus";
 
 interface NavbarProps {
   currentUser?: SafeUser | null;
