@@ -1,5 +1,6 @@
 "use client";
 
+import type { SubStatus } from "@/app/actions/getSubscriptionStatus";
 import Container from "../Container";
 import Categories from "./Categories";
 import Logo from "./Logo";
@@ -14,8 +15,8 @@ interface NavbarProps {
 }
 
 
-
 const Navbar: React.FC<NavbarProps> = ({ currentUser, subStatus }) => {
+
   return (
     <div className='fixed w-full bg-white z-20 shadow-sm'>
       <div
