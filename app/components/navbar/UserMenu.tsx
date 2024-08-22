@@ -20,6 +20,7 @@ interface UserMenuProps {
 }
 
 const UserMenu: React.FC<UserMenuProps> = ({ currentUser, subStatus }) => {
+
   const registerModal = useRegisterModal();
   const loginModal = useLoginModal();
   const rentModal = useRentModal();
@@ -35,7 +36,7 @@ const UserMenu: React.FC<UserMenuProps> = ({ currentUser, subStatus }) => {
     if (!currentUser) {
       return loginModal.onOpen();
     }
-
+   
     if (!subStatus) {
       router.push("/subscribe");
       return;

@@ -35,3 +35,4 @@ export default async function getSubscriptionStatus() {
 }
 
 export type SubStatus = Awaited<ReturnType<typeof getSubscriptionStatus>>;
+

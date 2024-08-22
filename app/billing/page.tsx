@@ -1,10 +1,9 @@
 "use client";
 
+import { useCallback, useState } from "react";
+import axios from "axios";
+import { toast } from "react-hot-toast";
 import { Visa } from "react-payment-logos/dist/logo";
-import { IconEdit } from "@tabler/icons-react";
-import Link from "next/link";
-
-import { Button } from "@nextui-org/react";
 import {
   Table,
   TableHeader,
@@ -14,8 +13,32 @@ import {
   TableCell
 } from "@nextui-org/react";
 import { Pagination } from "@nextui-org/react";
+import Button from "../components/Button";
 
 export default function BillingPage() {
+  const [loading, setLoading] = useState(false);
+
+  const onboardAction = useCallback(() => {
+    setLoading(true);
+
+    axios
+      .post("/api/stripe/onboard")
+      .then((response: any) => {
+        if (response.data?.url) {
+          window.location.href = response.data.url; 
+        } else {
+          toast.error("Onboarding failed. No URL returned.");
+        }
+      })
+      .catch((error: any) => {
+        console.error(error);
+        toast.error("Failed to initiate onboarding process.");
+      })
+      .finally(() => {
+        setLoading(false); 
+      });
+  }, []);
+
   return (
     <div className='p-10 pt-0'>
       <div className='bg-[#101727] rounded-xl shadow-xl p-6 text-white'>
@@ -36,18 +59,13 @@ export default function BillingPage() {
               Expires on 16 Feb 2027
             </p>
           </div>
-          <div className='ml-auto dark text-foreground font-bold'>
-            <Link href='/billing/payment-method'>
-              <Button
-                color='secondary'
-                variant='solid'
-                startContent={<IconEdit size={16} />}
-                radius='sm'
-                className='!font-bold'
-              >
-                Edit
-              </Button>
-            </Link>
+          <div className='ml-auto'>
+          <Button
+              onClick={onboardAction}
+              label={loading ? "Loading..." : "Stripe Onboard"}
+              outline
+              disabled={loading}
+            />
           </div>
         </div>
       </div>
