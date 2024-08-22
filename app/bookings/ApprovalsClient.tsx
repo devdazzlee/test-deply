@@ -22,23 +22,7 @@ const ApprovalsClient: React.FC<ApprovalsClientProps> = ({
   currentUser
 }) => {
 
-  if (approvals.length == 0) {
-    return (
-      <ClientOnly>
-        <div className="text-2xl flex items-center gap-2 font-bold md:py-6 py-8 p-8 w-full">
-          <FaListCheck />
-          <h1>
 
-            Your Approvals
-          </h1>
-        </div>
-        <EmptyState
-          title='No requests to approve'
-          subtitle="Looks like there aren't any potential bookings yet"
-        />
-      </ClientOnly>
-    );
-  }
   const router = useRouter();
   const [cancelId, setCancelingid] = useState("");
   const [approveId, setApproveid] = useState("");
@@ -82,6 +66,24 @@ const ApprovalsClient: React.FC<ApprovalsClientProps> = ({
     },
     [router]
   );
+
+  if (approvals.length == 0) {
+    return (
+      <ClientOnly>
+        <div className="text-2xl flex items-center gap-2 font-bold md:py-6 py-8 p-8 w-full">
+          <FaListCheck />
+          <h1>
+
+            Your Approvals
+          </h1>
+        </div>
+        <EmptyState
+          title='No requests to approve'
+          subtitle="Looks like there aren't any potential bookings yet"
+        />
+      </ClientOnly>
+    );
+  }
 
   return (
     <Container>

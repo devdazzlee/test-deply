@@ -24,23 +24,7 @@ const BookingClient: React.FC<BookingClientProps> = ({
   currentUser
 }) => {
 
-  if (reservations.length == 0) {
-    return (
-      <ClientOnly>
-        <div className="text-2xl flex items-center gap-2 font-bold md:py-0 py-16 p-8 w-full">
-          <FaSwatchbook />
-          <h1>
 
-            Your Bookings
-          </h1>
-        </div>
-        <EmptyState
-          title='No bookings found'
-          subtitle="Looks like you don't have any bookings."
-        />
-      </ClientOnly>
-    );
-  }
   const router = useRouter();
   const [deletingId, setDeletingId] = useState("");
 
@@ -63,6 +47,24 @@ const BookingClient: React.FC<BookingClientProps> = ({
     },
     [router]
   );
+
+  if (reservations.length == 0) {
+    return (
+      <ClientOnly>
+        <div className="text-2xl flex items-center gap-2 font-bold md:py-0 py-16 p-8 w-full">
+          <FaSwatchbook />
+          <h1>
+
+            Your Bookings
+          </h1>
+        </div>
+        <EmptyState
+          title='No bookings found'
+          subtitle="Looks like you don't have any bookings."
+        />
+      </ClientOnly>
+    );
+  }
 
   return (
     <Container>
