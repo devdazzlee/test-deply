@@ -67,9 +67,9 @@ const ListingClient: React.FC<ListingClientProps> = ({
     if (!currentUser) {
       return loginModal.onOpen();
     }
-  
+
     setIsLoading(true);
-  
+
     try {
       const response = await axios.post("/api/reservations", {
         totalPrice,
@@ -77,9 +77,9 @@ const ListingClient: React.FC<ListingClientProps> = ({
         endDate: dateRange.endDate,
         listingId: listing?.id,
       });
-  
+
       const { sessionId } = response.data;
-  
+
       const stripe = await loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
       if (stripe && sessionId) {
         await stripe.redirectToCheckout({ sessionId });
@@ -129,9 +129,9 @@ const ListingClient: React.FC<ListingClientProps> = ({
               user={listing.user}
               category={listing.category}
               description={listing.description}
-              roomCount={listing.roomCount}
-              guestCount={listing.guestCount}
-              bathroomCount={listing.bathroomCount}
+              maxDays={listing.maxDays}
+              experience={listing.experience}
+              minDays={listing.minDays}
               locationValue={listing.locationValue}
               averageRating={listing.averageRating}
               numberOfRatings={listing.numberOfRatings}

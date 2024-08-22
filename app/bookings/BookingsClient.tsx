@@ -4,22 +4,27 @@ import { toast } from "react-hot-toast";
 import axios from "axios";
 import { useCallback, useState } from "react";
 import { useRouter } from "next/navigation";
+import { FaSwatchbook } from "react-icons/fa";
 
 import { SafeReservation, SafeUser } from "@/app/types";
 
 import Heading from "@/app/components/Heading";
 import Container from "@/app/components/Container";
 import ListingCard from "@/app/components/listings/ListingCard";
+import ClientOnly from "../components/ClientOnly";
+import EmptyState from "../components/EmptyState";
 
-interface TripsClientProps {
+interface BookingClientProps {
   reservations: SafeReservation[];
   currentUser?: SafeUser | null;
 }
 
-const TripsClient: React.FC<TripsClientProps> = ({
+const BookingClient: React.FC<BookingClientProps> = ({
   reservations,
   currentUser
 }) => {
+
+
   const router = useRouter();
   const [deletingId, setDeletingId] = useState("");
 
@@ -42,6 +47,24 @@ const TripsClient: React.FC<TripsClientProps> = ({
     },
     [router]
   );
+
+  if (reservations.length == 0) {
+    return (
+      <ClientOnly>
+        <div className="text-2xl flex items-center gap-2 font-bold md:py-0 py-16 p-8 w-full">
+          <FaSwatchbook />
+          <h1>
+
+            Your Bookings
+          </h1>
+        </div>
+        <EmptyState
+          title='No bookings found'
+          subtitle="Looks like you don't have any bookings."
+        />
+      </ClientOnly>
+    );
+  }
 
   return (
     <Container>
@@ -78,4 +101,4 @@ const TripsClient: React.FC<TripsClientProps> = ({
   );
 };
 
-export default TripsClient;
+export default BookingClient;

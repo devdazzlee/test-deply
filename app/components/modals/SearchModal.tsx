@@ -30,9 +30,9 @@ const SearchModal = () => {
     const [location, setLocation] = useState<CountrySelectValue>();
     const [category, setCategory] = useState<string[]>([]);
     const [step, setStep] = useState(STEPS.LOCATION);
-    const [guestCount, setGuestCount] = useState(1);
-    const [roomCount, setRoomCount] = useState(3);
-    const [bathroomCount, setBathroomCount] = useState(1);
+    const [experience, setExperience] = useState(1);
+    const [averageRating, setAverageRating] = useState(3);
+    // const [bathroomCount, setBathroomCount] = useState(1);
     const [dateRange, setDateRange] = useState<Range>({
         startDate: new Date(),
         endDate: new Date(),
@@ -126,9 +126,9 @@ const SearchModal = () => {
         const updatedQuery: any = {
             ...currentQuery,
             locationValue: location?.value,
-            guestCount,
-            roomCount,
-            bathroomCount,
+            experience,
+            averageRating,
+            //  bathroomCount,
             category: category.join(",") // Join the categories into a comma-separated string
         };
 
@@ -157,9 +157,9 @@ const SearchModal = () => {
         searchModal,
         location,
         router,
-        guestCount,
-        roomCount,
-        bathroomCount,
+        experience,
+        averageRating,
+        //bathroomCount,
         dateRange,
         onNext,
         params,
@@ -359,14 +359,14 @@ const SearchModal = () => {
                 <Stars
                     title='Rating'
                     subtitle='What rating do you want the creator to be?'
-                    value={roomCount}
-                    onChange={value => setRoomCount(value)}
+                    value={averageRating}
+                    onChange={value => setAverageRating(value)}
                 />
                 <SlidingScale
                     title='Experience'
                     subtitle='How experienced do you want the creator to be?'
-                    value={bathroomCount}
-                    onChange={value => setBathroomCount(value)}
+                    value={experience}
+                    onChange={value => setExperience(value)}
                     labels={experienceLabels}
                 />
 

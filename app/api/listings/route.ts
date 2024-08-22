@@ -31,9 +31,9 @@ export async function POST(request: Request) {
     description,
     imageSrc,
     category,
-    roomCount,
-    bathroomCount,
-    guestCount,
+    experience,
+    maxDays,
+    minDays,
     location,
     price
   } = body;
@@ -46,9 +46,9 @@ export async function POST(request: Request) {
       description,
       imageSrc: imageSources,
       category,
-      roomCount,
-      bathroomCount,
-      guestCount,
+      experience,
+      maxDays,
+      minDays,
       locationValue: location.value,
       price: parseInt(price, 10),
       userId: currentUser.id

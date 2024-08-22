@@ -15,7 +15,7 @@ const Search = () => {
   const locationValue = params?.get("locationValue");
   const startDate = params?.get("startDate");
   const endDate = params?.get("endDate");
-  const guestCount = params?.get("guestCount");
+  const experience = params?.get("experience");
 
   const locationLabel = useMemo(() => {
     if (locationValue) {
@@ -42,16 +42,16 @@ const Search = () => {
   }, [startDate, endDate]);
 
   const guestLabel = useMemo(() => {
-    if (guestCount) {
-      return `${guestCount} experiance`;
+    if (experience) {
+      return `${experience} experiance`;
     }
 
     return "Add filter";
-  }, [guestCount]);
+  }, [experience]);
 
   return (
     <div
-      className='border-[1px] w-full md:w-auto py-2 rounded-full shadow-sm hover:shadow-md transition cursor-pointer z-50'
+      className='border-[1px] w-full md:w-auto py-2 rounded-full shadow-sm hover:shadow-md transition cursor-pointer z-10'
       onClick={searchModal.onOpen}
     >
       <div className='flex flex-row items-center justify-between'>

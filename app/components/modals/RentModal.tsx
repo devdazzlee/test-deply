@@ -45,9 +45,9 @@ const RentModal = () => {
     defaultValues: {
       category: [],
       location: null,
-      guestCount: 1,
-      roomCount: 1,
-      bathroomCount: 1,
+      experience: 1,
+      maxDays: 1,
+      minDays: 1,
       imageSrc: [],
       price: 1,
       title: "",
@@ -57,9 +57,9 @@ const RentModal = () => {
 
   const category = watch("category");
   const location = watch("location");
-  const guestCount = watch("guestCount");
-  const roomCount = watch("roomCount");
-  const bathroomCount = watch("bathroomCount");
+  const experience = watch("experience");
+  const maxDays = watch("maxDays");
+  const minDays = watch("minDays");
 
   const Map = useMemo(
     () =>
@@ -230,22 +230,22 @@ const RentModal = () => {
         <Counter
           title='Experience'
           subtitle='How many years of experience do you have?'
-          value={guestCount}
-          onChange={value => setCustomValue("guestCount", value)}
+          value={experience}
+          onChange={value => setCustomValue("experience", value)}
         />
         <hr />
         <Counter
           title='Maximum'
           subtitle='How many maximum days your work is available for? Set 0 for no maximum'
-          value={roomCount}
-          onChange={value => setCustomValue("roomCount", value)}
+          value={maxDays}
+          onChange={value => setCustomValue("maxDays", value)}
         />
         <hr />
         <Counter
           title='Minimum'
           subtitle='How many minimum days your work is available for? Set 0 for no minimum'
-          value={bathroomCount}
-          onChange={value => setCustomValue("bathroomCount", value)}
+          value={minDays}
+          onChange={value => setCustomValue("minDays", value)}
         />
       </div>
     );

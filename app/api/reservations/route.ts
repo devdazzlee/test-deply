@@ -1,3 +1,5 @@
+
+
 import { NextResponse } from "next/server";
 import Stripe from 'stripe';
 import prisma from "@/app/libs/prismadb";
@@ -25,10 +27,9 @@ export async function POST(request: Request) {
   const listing = await prisma.listing.findUnique({
     where: { id: listingId },
     include: {
-      user: true, 
+      user: true,
     },
   });
- 
 
   if (!listing || !listing.user) {
     return NextResponse.json({ error: 'Listing not found' }, { status: 404 });
@@ -70,14 +71,15 @@ export async function POST(request: Request) {
               name: 'Service Fee',
               description: '3% platform service fee',
             },
-            unit_amount: userFee * 100, 
+            unit_amount: userFee * 100,
           },
           quantity: 1,
         }
       ],
       mode: 'payment',
       success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/listings/${listingId}`, 
+      cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/listings/${listingId}`,
+      
       payment_intent_data: {
         application_fee_amount: userFee * 100,
         transfer_data: {
@@ -90,13 +92,19 @@ export async function POST(request: Request) {
         startDate,
         endDate,
         totalPrice,
-        userFee, 
+        userFee,
         creatorFee, // Store the 5% creator fee in metadata for further deduction (if applicable) in the webhook
       },
     });
- if (currentUser.email && currentUser.name) {
-    new Email({ name: currentUser.name, email: currentUser.email }).sendNewBooking()
-  }
+
+    try {
+      if (currentUser.email && currentUser.name) {
+        await new Email({ name: currentUser.name, email: currentUser.email }).sendNewBooking();
+      }
+
+    } catch (emailError) {
+      console.error('Failed to send booking confirmation email:', emailError);
+    }
     return NextResponse.json({ sessionId: session.id });
   } catch (error) {
     console.error('Error creating Stripe Checkout session:', error);
