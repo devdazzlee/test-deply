@@ -11,17 +11,21 @@ import { signOut } from "next-auth/react";
 import { SafeUser } from "@/app/types";
 import Link from "next/link";
 import { AiOutlineMessage } from "react-icons/ai";
-
+import { useRouter } from "next/navigation";
+import type { SubStatus } from "@/app/actions/getSubscriptionStatus";
 
 interface UserMenuProps {
   currentUser?: SafeUser | null;
+  subStatus?: SubStatus | null;
 }
 
-const UserMenu: React.FC<UserMenuProps> = ({ currentUser }) => {
+const UserMenu: React.FC<UserMenuProps> = ({ currentUser, subStatus }) => {
   const registerModal = useRegisterModal();
   const loginModal = useLoginModal();
   const rentModal = useRentModal();
   const [isOpen, setIsOpen] = useState(false);
+  const router = useRouter();
+
 
   const toggleOpen = useCallback(() => {
     setIsOpen(value => !value);
@@ -30,6 +34,11 @@ const UserMenu: React.FC<UserMenuProps> = ({ currentUser }) => {
   const onRent = useCallback(() => {
     if (!currentUser) {
       return loginModal.onOpen();
+    }
+
+    if (!subStatus) {
+      router.push("/subscribe");
+      return;
     }
 
     rentModal.onOpen();

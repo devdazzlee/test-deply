@@ -6,12 +6,16 @@ import Logo from "./Logo";
 import Search from "./Search";
 import UserMenu from "./UserMenu";
 import { SafeUser } from "@/app/types";
+import type { SubStatus } from "@/app/actions/getSubscriptionStatus";
 
 interface NavbarProps {
   currentUser?: SafeUser | null;
+  subStatus?: SubStatus | null;
 }
 
-const Navbar: React.FC<NavbarProps> = ({ currentUser }) => {
+
+
+const Navbar: React.FC<NavbarProps> = ({ currentUser, subStatus }) => {
   return (
     <div className='fixed w-full bg-white z-20 shadow-sm'>
       <div
@@ -24,12 +28,12 @@ const Navbar: React.FC<NavbarProps> = ({ currentUser }) => {
           <div className='hidden sm:flex flex-row items-center justify-between gap-3 md:gap-0'>
             <Logo />
             <Search />
-            <UserMenu currentUser={currentUser} />
+            <UserMenu currentUser={currentUser} subStatus={subStatus} />
           </div>
           <div className='sm:hidden flex flex-col gap-3'>
             <div className='flex flex-row justify-between w-full'>
               <Logo />
-              <UserMenu currentUser={currentUser} />
+              <UserMenu currentUser={currentUser} subStatus={subStatus} />
             </div>
             <Search />
           </div>

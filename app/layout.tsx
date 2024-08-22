@@ -10,6 +10,7 @@ import getCurrentUser from "./actions/getCurrentUser";
 import RentModal from "./components/modals/RentModal";
 import SearchModal from "./components/modals/SearchModal";
 import { Providers } from "./providers";
+import getSubscriptionStatus from "./actions/getSubscriptionStatus";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -24,6 +25,7 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const currentUser = await getCurrentUser();
+  const subStatus = await getSubscriptionStatus();
 
   return (
     <html lang='en'>
@@ -33,7 +35,7 @@ export default async function RootLayout({
         <RentModal />
         <LoginModal />
         <RegisterModal />
-        <Navbar currentUser={currentUser} />
+        <Navbar currentUser={currentUser} subStatus={subStatus} />
 
         <Providers>
           <div className='pb-20 pt-28'>{children}</div>
