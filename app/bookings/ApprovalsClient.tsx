@@ -48,7 +48,7 @@ const ApprovalsClient: React.FC<ApprovalsClientProps> = ({
       setCancelingid(id);
 
       axios
-        .delete(`/api/approvals/${id}`)
+        .delete(`/api/reservations/${id}`)
         .then(() => {
           toast.success("Request cancelled");
           router.refresh();
@@ -68,7 +68,7 @@ const ApprovalsClient: React.FC<ApprovalsClientProps> = ({
       setApproveid(id);
 
       axios
-        .put(`/api/approvals/${id}`)
+        .put(`/api/reservations/${id}`)
         .then(() => {
           toast.success("Request approved");
           router.refresh();
