@@ -18,7 +18,7 @@ import { useRouter } from "next/navigation";
 import { useMemo, useState, useCallback, useEffect } from "react";
 import { Range } from "react-date-range";
 import toast from "react-hot-toast";
-import { loadStripe } from '@stripe/stripe-js';
+import { loadStripe } from "@stripe/stripe-js";
 
 const initialDateRange = {
   startDate: new Date(),
@@ -75,12 +75,14 @@ const ListingClient: React.FC<ListingClientProps> = ({
         totalPrice,
         startDate: dateRange.startDate,
         endDate: dateRange.endDate,
-        listingId: listing?.id,
+        listingId: listing?.id
       });
 
       const { sessionId } = response.data;
 
-      const stripe = await loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
+      const stripe = await loadStripe(
+        process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
+      );
       if (stripe && sessionId) {
         await stripe.redirectToCheckout({ sessionId });
       } else {
@@ -99,15 +101,7 @@ const ListingClient: React.FC<ListingClientProps> = ({
 
   return (
     <Container>
-      <div
-        className='
-                max-w-screen-lg 
-                mx-auto
-                mt-16
-                sm:mt-0
-            
-                '
-      >
+      <div className='max-w-screen-lg mx-auto mt-16 sm:mt-0'>
         <div className='flex flex-col gap-6'>
           <ListingHead
             title={listing.title}
@@ -116,16 +110,11 @@ const ListingClient: React.FC<ListingClientProps> = ({
             id={listing.id}
             currentUser={currentUser}
           />
-          <div
-            className='
-                    grid 
-                    grid-cols-1 
-                    md:grid-cols-7 
-                    md:gap-10 
-                    mt-6
-                    '
-          >
+          <div className='grid grid-cols-1 md:grid-cols-7 md:gap-10 mt-6'>
             <ListingInfo
+              listingId={listing.id}
+              listingApproved={listing.approved || false}
+              currentUser={currentUser}
               user={listing.user}
               category={listing.category}
               description={listing.description}
@@ -136,14 +125,7 @@ const ListingClient: React.FC<ListingClientProps> = ({
               averageRating={listing.averageRating}
               numberOfRatings={listing.numberOfRatings}
             />
-            <div
-              className='
-                        order-first 
-                        mb-10 
-                        md:order-last 
-                        md:col-span-3
-                    '
-            >
+            <div className='order-first mb-10 md:order-last md:col-span-3'>
               <ListingReservation
                 price={listing.price}
                 totalPrice={totalPrice}

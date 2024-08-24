@@ -101,6 +101,9 @@ const UserMenu: React.FC<UserMenuProps> = ({ currentUser, subStatus }) => {
 
                 <MenuItem label='My Profile' href='/profile' />
                 <MenuItem label='Approvals and Bookings' href='/bookings' />
+                {currentUser?.role === "admin" && (
+                  <MenuItem label='Admin Approvals' href='/admin-approvals' />
+                )}
                 <MenuItem label='Billing and Subscriptions' href='/billing' />
                 <MenuItem label='Account Settings' href='#' />
 
