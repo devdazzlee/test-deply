@@ -10,8 +10,7 @@ export const config = {
     "/profile", 
     "/messages", 
     "/billing", 
-    "/payment-success", 
-    "/admin-approvals", 
+    "/payment-success",  
     "/subscribe",
   ]
 
