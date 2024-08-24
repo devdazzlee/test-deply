@@ -1,18 +1,18 @@
-import getCurrentUser from "./actions/getCurrentUser";
-import getListings, { IListingsParams } from "./actions/getListings";
-import Container from "./components/Container";
-import EmptyState from "./components/EmptyState";
-import ListingCard from "./components/listings/ListingCard";
+import getCurrentUser from "../actions/getCurrentUser";
+import getListings, { IListingsParams } from "../actions/getListings";
+import Container from "../components/Container";
+import EmptyState from "../components/EmptyState";
+import ListingCard from "../components/listings/ListingCard";
 
 interface HomeProps {
   searchParams: IListingsParams;
 }
 
-const Home = async ({ searchParams }: HomeProps) => {
-  const listings = await getListings(searchParams, {
-    approvalFilter: 'approved'
-  });
+export default async function AdminApprovals ({ searchParams }: HomeProps) {
   const currentUser = await getCurrentUser();
+  const listings = await getListings(searchParams, {
+    approvalFilter: 'unapproved'
+  });
 
   if (listings.length == 0) {
     return <EmptyState showReset />;
@@ -48,6 +48,3 @@ const Home = async ({ searchParams }: HomeProps) => {
     </Container>
   );
 };
-
-export const dynamic = "force-dynamic";
-export default Home;

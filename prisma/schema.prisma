@@ -25,8 +25,8 @@ model User {
   updatedAt      DateTime  @updatedAt
   favouriteIds   String[]  @db.ObjectId
 
-  stripeAccountId String?  
-  stripeOnboardingComplete Boolean @default(false) 
+  stripeAccountId String?
+  stripeOnboardingComplete Boolean @default(false)
 
   subscriptionOption String? // "flat_fee" or "booking_fee"
   subscriptionExpiresAt DateTime?
@@ -35,7 +35,7 @@ model User {
   listings       Listing[]
   reservations   Reservation[]
   comments       Comment[]
-  subscriptions  Subscription[] 
+  subscriptions  Subscription[]
 }
 
 model Account {
@@ -72,6 +72,7 @@ model Listing {
   price Int
   averageRating Float? @default(0.0)
   numberOfRatings Int? @default(0)
+  approved Boolean @default(false)
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
   reservations Reservation[]
@@ -86,13 +87,13 @@ model Reservation {
   endDate DateTime
   totalPrice Int
   createdAt DateTime @default(now())
-  approved Boolean @default(false)
+  approved Boolean? @default(false)
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
   listings Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
 }
 
-model Comment { 
+model Comment {
   id String @id @default(auto()) @map("_id") @db.ObjectId
   text String?
   createdAt DateTime @default(now())
@@ -107,11 +108,11 @@ model Comment {
 model Subscription {
   id               String   @id @default(auto()) @map("_id") @db.ObjectId
   stripeCustomerId String   @unique
-  stripeSubscriptionId String @unique 
+  stripeSubscriptionId String @unique
   userId           String   @db.ObjectId
-  status           String  
-  plan             String   
-  currentPeriodEnd DateTime 
+  status           String
+  plan             String
+  currentPeriodEnd DateTime
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 
