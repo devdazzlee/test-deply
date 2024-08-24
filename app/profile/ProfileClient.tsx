@@ -1,6 +1,9 @@
 "use client";
 
+import axios from "axios";
+
 import {
+  IconAlertTriangle,
   IconCircleDashedCheck,
   IconEyeClosed,
   IconEyeFilled,
@@ -16,6 +19,8 @@ import { arrayMoveImmutable } from "array-move";
 import SortableList, { SortableItem } from "react-easy-sort";
 import type { CurrentUser } from "../actions/getCurrentUser";
 import Image from "next/image";
+import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
 
 function PasswordInput(props: InputProps) {
   const [isVisible, setIsVisible] = useState(false);
@@ -58,7 +63,7 @@ export default function ProfileClient({
   return (
     <>
       {/* Cover photo */}
-      <div className='bg-[#ECECEE] h-40'></div>
+      <div className='bg-[#ECECEE] h-40 -mt-10'></div>
 
       {/* Profile photo + name */}
       <div className='flex mb-16'>
@@ -110,14 +115,14 @@ export default function ProfileClient({
             radius='sm'
             labelPlacement='outside'
             label='Your name'
-            className="z-0"
+            className='z-0'
             placeholder='Enter your name'
             defaultValue={currentUser.name ?? ""}
           />
           <Input
             variant='flat'
             radius='sm'
-            className="z-0"
+            className='z-0'
             labelPlacement='outside'
             label='Phone Number'
             placeholder='Enter your phone number'
@@ -125,7 +130,7 @@ export default function ProfileClient({
           <Input
             variant='flat'
             radius='sm'
-            className="z-0"
+            className='z-0'
             labelPlacement='outside'
             label='Location'
             placeholder='Enter your location'
@@ -146,15 +151,15 @@ export default function ProfileClient({
           <PasswordInput
             label='Current Password'
             placeholder='Enter current password'
-            className="z-0"
+            className='z-0'
           />
           <PasswordInput
             label='New Password'
-            className="z-0"
+            className='z-0'
             placeholder='Enter new password'
           />
           <PasswordInput
-            className="z-0"
+            className='z-0'
             label='Confirm New Password'
             placeholder='Enter new password again'
           />
@@ -233,12 +238,16 @@ export default function ProfileClient({
         </div>
       </section>
 
-      <section className='mx-6 md:mx-16 border-b-2 py-6'>
-        <h4 className='font-semibold'>Photos</h4>
-        <p className='text-sm text-gray-600'>Drag to move photos around</p>
+      {/* Listing photos reordering */}
+      {listing && (
+        <section className='mx-6 md:mx-16 border-b-2 py-6'>
+          <h4 className='font-semibold'>Listing Photos</h4>
+          <p className='text-sm text-gray-600'>Drag to move photos around</p>
 
-        <PhotoSection listing={listing} />
-      </section>
+          <PhotoSection listing={listing} />
+          <ListingDeleter listing={listing} />
+        </section>
+      )}
 
       <section className='mx-6 md:mx-16 py-6'>
         <Button
@@ -250,10 +259,45 @@ export default function ProfileClient({
           Save Changes
         </Button>
       </section>
-
-      {/*  */}
-      <div className='h-96'></div>
     </>
+  );
+}
+
+function ListingDeleter({ listing }: { listing: any }) {
+  const router = useRouter();
+
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const onDelete = () => {
+    if (!listing) return;
+
+    setIsDeleting(true);
+
+    const id = listing.id;
+    axios
+      .delete(`/api/listings/${id}`)
+      .then(() => {
+        toast.success("Listing deleted");
+        router.refresh();
+      })
+      .catch(error => {
+        toast.error(error?.response?.data?.error);
+      }).finally(() => {
+        setIsDeleting(false);
+      });
+  };
+
+  return (
+    <Button
+      color='danger'
+      variant='solid'
+      className='!font-bold mt-6'
+      endContent={<IconAlertTriangle />}
+      onClick={onDelete}
+      isLoading={isDeleting}
+    >
+      Delete Listing
+    </Button>
   );
 }
 
@@ -269,6 +313,10 @@ function PhotoSection({ listing }: any) {
   const onSortEnd = (oldIndex: number, newIndex: number) => {
     setItems(array => arrayMoveImmutable(array, oldIndex, newIndex));
   };
+
+  if (images.length === 0) {
+    return null;
+  }
 
   return (
     <SortableList
