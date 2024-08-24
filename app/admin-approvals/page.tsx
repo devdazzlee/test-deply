@@ -8,6 +8,7 @@ interface HomeProps {
   searchParams: IListingsParams;
 }
 
+export const dynamic = "force-dynamic";
 export default async function AdminApprovals ({ searchParams }: HomeProps) {
   const currentUser = await getCurrentUser();
   const listings = await getListings(searchParams, {
