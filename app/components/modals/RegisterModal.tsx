@@ -57,7 +57,7 @@ const RegisterModal = () => {
 
   const bodyContent = (
     <div className='flex flex-col gap-4'>
-      <Heading title='Welcome to ShutterSpace' subtitle='Create an account!' />
+      <Heading title='Welcome to Shutter Guide' subtitle='Create an account!' />
       <Input
         id='email'
         label='Email'
