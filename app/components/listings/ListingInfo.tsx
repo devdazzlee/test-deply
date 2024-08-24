@@ -9,12 +9,18 @@ import { useState } from "react";
 import RatingStars from "../RatingStars";
 import { Button } from "@nextui-org/react";
 import { IconHomeCheck } from "@tabler/icons-react";
+import axios from "axios";
+import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
 
 const Map = dynamic(() => import("../Map"), {
   ssr: false
 });
 
 interface ListingInfoProps {
+  listingId: string;
+  listingApproved: boolean;
+  currentUser: SafeUser | null | undefined;
   user: SafeUser;
   description: string;
   experience: number;
@@ -27,6 +33,9 @@ interface ListingInfoProps {
 }
 
 const ListingInfo: React.FC<ListingInfoProps> = ({
+  listingId,
+  listingApproved,
+  currentUser,
   user,
   description,
   experience,
@@ -37,6 +46,7 @@ const ListingInfo: React.FC<ListingInfoProps> = ({
   averageRating,
   numberOfRatings
 }) => {
+  const router = useRouter();
   const { getByValue } = useCountries();
 
   const coordinates = getByValue(locationValue)?.latlng;
@@ -49,18 +59,39 @@ const ListingInfo: React.FC<ListingInfoProps> = ({
     setShowAllCategories(prevState => !prevState);
   };
 
+  const [approving, setApproving] = useState(false);
+
+  const approveListing = () => {
+    setApproving(true);
+    axios
+      .post(`/api/listings/${listingId}/approve`)
+      .then(() => {
+        toast.success("Listing approved");
+        router.refresh();
+      })
+      .catch(error => {
+        toast.error(error?.response?.data?.error);
+      }).finally(() => {
+        setApproving(false);
+      });
+  };
+
   return (
     <div className='col-span-4 flex flex-col gap-8'>
       <div className='flex flex-col gap-2'>
-        <Button
-          color='danger'
-          variant='solid'
-          className='!font-bold mt-6 self-start mb-4'
-          size="lg"
-          endContent={<IconHomeCheck />}
-        >
-          Approve Listing
-        </Button>
+        {currentUser?.role === "admin" && !listingApproved && (
+          <Button
+            color='danger'
+            variant='solid'
+            className='!font-bold mt-6 self-start mb-4'
+            size='lg'
+            endContent={<IconHomeCheck />}
+            onClick={approveListing}
+            isLoading={approving}
+          >
+            Approve Listing
+          </Button>
+        )}
 
         <div className='text-xl font-semibold flex flex-row items-center gap-2'>
           <div>Hosted by {user?.name}</div>
