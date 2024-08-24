@@ -37,7 +37,7 @@ export default function SubscribePage() {
     <>
       <div>
         <h2 className='text-3xl font-bold text-center mt-12 sm:text-5xl'>
-          Pricing 2
+          Pricing
         </h2>
         <p className='max-w-3xl mx-auto mt-4 text-xl text-center'>
           Your creation. Your control.
