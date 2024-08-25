@@ -36,7 +36,7 @@ const UserMenu: React.FC<UserMenuProps> = ({ currentUser, subStatus }) => {
     if (!currentUser) {
       return loginModal.onOpen();
     }
-   
+
     if (!subStatus) {
       router.push("/subscribe");
       return;
@@ -100,9 +100,16 @@ const UserMenu: React.FC<UserMenuProps> = ({ currentUser, subStatus }) => {
                   <MenuItem label='Billing' href='/billing' />
                   <MenuItem label='Favorites' href='/favorites' /> */}
 
+                <div
+                  onClick={onRent}
+                  className='md:hidden block text-sm font-semibold py-3 px-4 hover:bg-neutral-100 transition cursor-pointer'
+                >
+                  Get Started
+                </div>
                 <MenuItem label="My Profile" href="/profile" />
                 <MenuItem label="Approvals and Bookings" href="/bookings" />
                 <MenuItem label="Billing and Subscriptions" href="/billing" />
+                <MenuItem label="Reservations" href="/reservations" />
                 <MenuItem label="Account Settings" href="#" />
 
                 <hr />
