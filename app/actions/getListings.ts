@@ -13,7 +13,10 @@ export interface IListingsParams {
   user?: Object;
 }
 
-export default async function getListings(params: IListingsParams) {
+export default async function getListings(
+  params: IListingsParams,
+  opts?: { approvalFilter?: "all" | "approved" | "unapproved" }
+) {
   try {
     const {
       userId,
@@ -86,8 +89,30 @@ export default async function getListings(params: IListingsParams) {
       };
     }
 
+    let approvalFilter = opts?.approvalFilter || "all";
+    let filter = {};
+    switch (approvalFilter) {
+      case "all":
+        break;
+
+      case "approved":
+        filter = {
+          approved: true
+        };
+        break;
+
+      case "unapproved":
+        filter = {
+          approved: false,
+        };
+        break;
+    }
+
     const listings = await prisma.listing.findMany({
-      where: query,
+      where: {
+        ...query,
+        ...filter
+      },
       orderBy: {
         createdAt: "desc"
       },

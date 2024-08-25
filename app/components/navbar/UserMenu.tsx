@@ -20,13 +20,11 @@ interface UserMenuProps {
 }
 
 const UserMenu: React.FC<UserMenuProps> = ({ currentUser, subStatus }) => {
-
   const registerModal = useRegisterModal();
   const loginModal = useLoginModal();
   const rentModal = useRentModal();
   const [isOpen, setIsOpen] = useState(false);
   const router = useRouter();
-
 
   const toggleOpen = useCallback(() => {
     setIsOpen(value => !value);
@@ -37,9 +35,12 @@ const UserMenu: React.FC<UserMenuProps> = ({ currentUser, subStatus }) => {
       return loginModal.onOpen();
     }
 
-    if (!subStatus) {
-      router.push("/subscribe");
-      return;
+
+    if (!process.env.NEXT_PUBLIC_ALLOW_WITHOUT_SUB) {
+      if (!subStatus) {
+        router.push("/subscribe");
+        return;
+      }
     }
 
     rentModal.onOpen();
@@ -49,30 +50,29 @@ const UserMenu: React.FC<UserMenuProps> = ({ currentUser, subStatus }) => {
 
   useEffect(() => {
     const handleClickOutside = (event: any) => {
-      if (
-        menuRef.current &&
-        !menuRef.current.contains(event.target)) {
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
         setIsOpen(false);
       }
     };
 
-    document.addEventListener('click', handleClickOutside);
+    document.addEventListener("click", handleClickOutside);
 
     return () => {
-      document.removeEventListener('click', handleClickOutside);
+      document.removeEventListener("click", handleClickOutside);
     };
   }, []);
 
   return (
     <div className='relative'>
       <div className='flex flex-row items-center gap-3'>
-        {currentUser && <Link
-          href='/messages'
-          className='py-2 px-3 rounded-full hover:bg-neutral-100 transition cursor-pointer'
-        >
-          <AiOutlineMessage size={27} />
-
-        </Link>}
+        {currentUser && (
+          <Link
+            href='/messages'
+            className='py-2 px-3 rounded-full hover:bg-neutral-100 transition cursor-pointer'
+          >
+            <AiOutlineMessage size={27} />
+          </Link>
+        )}
         <div
           onClick={onRent}
           className='hidden md:block text-sm font-semibold py-3 px-4 rounded-full hover:bg-neutral-100 transition cursor-pointer'
@@ -95,11 +95,7 @@ const UserMenu: React.FC<UserMenuProps> = ({ currentUser, subStatus }) => {
           <div className='flex flex-col cursor-pointer'>
             {currentUser ? (
               <>
-                {/* <MenuItem label='Bookings' href='/trips' />
-                  <MenuItem label='My Profile' href='/profile' />
-                  <MenuItem label='Billing' href='/billing' />
-                  <MenuItem label='Favorites' href='/favorites' /> */}
-
+              
                 <div
                   onClick={onRent}
                   className='md:hidden block text-sm font-semibold py-3 px-4 hover:bg-neutral-100 transition cursor-pointer'
@@ -109,8 +105,12 @@ const UserMenu: React.FC<UserMenuProps> = ({ currentUser, subStatus }) => {
                 <MenuItem label="My Profile" href="/profile" />
                 <MenuItem label="Approvals and Bookings" href="/bookings" />
                 <MenuItem label="Billing and Subscriptions" href="/billing" />
+         {currentUser?.role === "admin" && (
+                  <MenuItem label='Admin Approvals' href='/admin-approvals' />
+                )}
                 <MenuItem label="Reservations" href="/reservations" />
                 <MenuItem label="Account Settings" href="#" />
+
 
                 <hr />
 

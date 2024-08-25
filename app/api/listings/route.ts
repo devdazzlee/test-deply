@@ -11,17 +11,22 @@ export async function POST(request: Request) {
     return NextResponse.error();
   }
 
-  const activeSubscription = await prisma.subscription.findFirst({
-    where: {
-      userId: currentUser.id,
-      status: 'active',
-    },
-  });
+  if (!process.env.NEXT_PUBLIC_ALLOW_WITHOUT_SUB) {
+    const activeSubscription = await prisma.subscription.findFirst({
+      where: {
+        userId: currentUser.id,
+        status: "active"
+      }
+    });
 
-  if (!activeSubscription) {
-    return NextResponse.json({
-      error: 'You must have an active subscription to create a listing',
-    }, { status: 403 });
+    if (!activeSubscription) {
+      return NextResponse.json(
+        {
+          error: "You must have an active subscription to create a listing"
+        },
+        { status: 403 }
+      );
+    }
   }
 
   const body = await request.json();
@@ -55,7 +60,10 @@ export async function POST(request: Request) {
     }
   });
   if (currentUser.email && currentUser.name) {
-    new Email({ name: currentUser.name, email: currentUser.email }).sendNewListing()
+    new Email({
+      name: currentUser.name,
+      email: currentUser.email
+    }).sendNewListing();
   }
   return NextResponse.json(listing);
 }
