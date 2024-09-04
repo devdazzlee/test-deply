@@ -1,8 +1,5 @@
 "use client";
 
-import { toast } from "react-hot-toast";
-import axios from "axios";
-import { useCallback, useState } from "react";
 import { useRouter } from "next/navigation";
 import { FaSwatchbook } from "react-icons/fa";
 
@@ -23,29 +20,6 @@ const BookingClient: React.FC<BookingClientProps> = ({
   reservations,
   currentUser
 }) => {
-  const router = useRouter();
-  const [deletingId, setDeletingId] = useState("");
-
-  const onCancel = useCallback(
-    (id: string) => {
-      setDeletingId(id);
-
-      axios
-        .delete(`/api/reservations/${id}`)
-        .then(() => {
-          toast.success("Reservation cancelled");
-          router.refresh();
-        })
-        .catch(error => {
-          toast.error(error?.response?.data?.error);
-        })
-        .finally(() => {
-          setDeletingId("");
-        });
-    },
-    [router]
-  );
-
   if (reservations.length == 0) {
     return (
       <ClientOnly>
@@ -66,7 +40,7 @@ const BookingClient: React.FC<BookingClientProps> = ({
       <Heading title='Reservations' subtitle='Your booking with creators!' />
       <div
         className='
-          mt-10
+          my-10
           grid 
           grid-cols-1 
           sm:grid-cols-2 
@@ -83,10 +57,7 @@ const BookingClient: React.FC<BookingClientProps> = ({
             data={reservation.listing}
             reservation={reservation}
             actionId={reservation.id}
-            onAction={onCancel}
-            disabled={deletingId === reservation.id}
-            actionLabel='Cancel reservation'
-            secondarybtn='Approve'
+            type='booking'
             currentUser={currentUser}
             listingUserName={null}
             listingUserImage={undefined}
