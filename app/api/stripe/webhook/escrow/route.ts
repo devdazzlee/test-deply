@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
         return await handlePostNewReservation(session as Stripe.Checkout.Session);
 
     default:
-        console.log(`Unhandled event type: ${event.type}`);
+        // console.log(`Unhandled event type: ${event.type}`);
         return new NextResponse('Unhandled event type', { status: 400 });
   }
 }
@@ -84,7 +84,7 @@ async function handlePostNewReservation(session: Stripe.Checkout.Session){
           approved: false,
         },
       });
-        console.log("New Reservation Created: \n", newReservation);
+        // console.log("New Reservation Created: \n", newReservation);
         return new NextResponse('New Reservation Created', { status: 200 });
 
     } catch (error) {
