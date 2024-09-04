@@ -3,11 +3,19 @@
 import Button from "@/app/components/Button";
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
+import useRentModal from "../hooks/useRentModal";
+import { useCallback } from "react";
 
 export default function PaymentSuccess() {
   const searchParams = useSearchParams();
 
   const nextUrl = searchParams?.get('next') || "/";
+  
+  const rentModal = useRentModal();
+
+  const onRent = useCallback(() => {
+    rentModal.onOpen();
+  }, [rentModal]);
 
   return (
     <div className="bg-gray-100">
@@ -24,17 +32,21 @@ export default function PaymentSuccess() {
           </h3>
           <p className="text-gray-600 my-2">
             Thank you for completing your secure online payment.
+            Check your email for verification.
           </p>
           <p> Have a great day!</p>
           <div className="py-10 text-center">
-            <Link
+           {/*  <Link
               href={nextUrl}
               className="max-w-sm block mx-auto"
-            >
+            > */}
+            <div className="max-w-sm mx-auto">
               <Button
                 label='Continue'
+                onClick={onRent}
               />
-            </Link>
+            </div>
+            {/* </Link> */}
           </div>
         </div>
       </div>

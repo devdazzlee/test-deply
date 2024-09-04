@@ -74,7 +74,8 @@ const LoginModal = () => {
         label='Email'
         disabled={isLoading}
         register={register}
-        errors={errors}
+        // errors={errors}
+        errors={{}}
         onKeyDown={inputKeyDown}
         required
       />
@@ -85,7 +86,8 @@ const LoginModal = () => {
         disabled={isLoading}
         onKeyDown={inputKeyDown}
         register={register}
-        errors={errors}
+        errors={{}}
+        // errors={errors}
         required
       />
     </div>

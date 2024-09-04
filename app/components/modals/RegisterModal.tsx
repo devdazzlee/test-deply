@@ -3,7 +3,7 @@
 import axios from "axios";
 import { AiFillGithub } from "react-icons/ai";
 import { FcGoogle } from "react-icons/fc";
-import { useCallback, useState } from "react";
+import { KeyboardEvent, useCallback, useState } from "react";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import useRegisterModal from "@/app/hooks/useRegisterModal";
 import useLoginModal from "@/app/hooks/useLoginModal";
@@ -36,14 +36,14 @@ const RegisterModal = () => {
     setIsLoading(true);
 
     axios
-      .post("api/register", data)
+      .post("/api/register", data)
       .then(() => {
         toast.success("Success!");
         registerModal.onClose();
         loginModal.onOpen();
       })
       .catch(error => {
-        toast.error("Someting Went Wrong with registration.");
+        toast.error(error.response?.data?.error ?? "Someting Went Wrong with registration.");
       })
       .finally(() => {
         setIsLoading(false);
@@ -54,6 +54,13 @@ const RegisterModal = () => {
     registerModal.onClose();
     loginModal.onOpen();
   }, [loginModal, registerModal]);
+  
+  
+  const inputKeyDown = useCallback((event: KeyboardEvent) => {
+    if (event.key === "Enter") {
+      handleSubmit(onSubmit)();
+    }
+  } , []);
 
   const bodyContent = (
     <div className='flex flex-col gap-4'>
@@ -64,6 +71,7 @@ const RegisterModal = () => {
         disabled={isLoading}
         register={register}
         errors={errors}
+        onKeyDown={inputKeyDown}
         required
       />
       <Input
@@ -72,6 +80,7 @@ const RegisterModal = () => {
         disabled={isLoading}
         register={register}
         errors={errors}
+        onKeyDown={inputKeyDown}
         required
       />
       <Input
@@ -80,6 +89,7 @@ const RegisterModal = () => {
         label='password'
         disabled={isLoading}
         register={register}
+        onKeyDown={inputKeyDown}
         errors={errors}
         required
       />
