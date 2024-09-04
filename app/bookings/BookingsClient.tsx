@@ -23,8 +23,6 @@ const BookingClient: React.FC<BookingClientProps> = ({
   reservations,
   currentUser
 }) => {
-
-
   const router = useRouter();
   const [deletingId, setDeletingId] = useState("");
 
@@ -51,12 +49,9 @@ const BookingClient: React.FC<BookingClientProps> = ({
   if (reservations.length == 0) {
     return (
       <ClientOnly>
-        <div className="text-2xl flex items-center gap-2 font-bold md:py-0 py-16 p-8 w-full">
+        <div className='text-2xl flex items-center gap-2 font-bold md:py-0 py-16 p-8 w-full'>
           <FaSwatchbook />
-          <h1>
-
-            Your Bookings
-          </h1>
+          <h1>Your Bookings</h1>
         </div>
         <EmptyState
           title='No bookings found'
@@ -91,6 +86,7 @@ const BookingClient: React.FC<BookingClientProps> = ({
             onAction={onCancel}
             disabled={deletingId === reservation.id}
             actionLabel='Cancel reservation'
+            secondarybtn='Approve'
             currentUser={currentUser}
             listingUserName={null}
             listingUserImage={undefined}

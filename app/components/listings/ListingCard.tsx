@@ -56,18 +56,46 @@ const ListingCard: React.FC<ListingCardProps> = ({
     },
     [onAction, actionId, disabled]
   );
-  const handleApprove = useCallback(
-    (e: React.MouseEvent<HTMLButtonElement>) => {
-      e.stopPropagation();
+  // const handleApprove = useCallback(
+  //   (e: React.MouseEvent<HTMLButtonElement>) => {
+  //     e.stopPropagation();
 
-      if (disabled) {
-        return;
+  //     if (disabled) {
+  //       return;
+  //     }
+
+  //     secondaryOnAction?.(actionId);
+  //   },
+  //   [secondaryOnAction, actionId, disabled]
+  // );
+
+  const handleApprove = useCallback(async () => {
+    if (!reservation || !reservation.id) return;
+
+    try {
+      const response = await fetch(
+        `/api/reservations/approve-reservation/${reservation.id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json"
+          }
+        }
+      );
+
+      if (response.ok) {
+        // router.refresh(); // Refresh the page to reflect the status change
+        alert("Reservation Completed!");
+      } else {
+        const errorData = await response.json();
+        console.error("Error approving reservation:", errorData);
+        alert("Failed to approve the reservation. Please try again.");
       }
-
-      secondaryOnAction?.(actionId);
-    },
-    [secondaryOnAction, actionId, disabled]
-  );
+    } catch (error) {
+      console.error("Error approving reservation:", error);
+      alert("An error occurred while approving the reservation.");
+    }
+  }, [reservation, router]);
 
   const price = useMemo(() => {
     if (reservation) {
@@ -116,7 +144,10 @@ const ListingCard: React.FC<ListingCardProps> = ({
         )}
 
         <div className='flex items-center justify-between'>
-          <RatingStars rating={data.averageRating} numberOfRatings={data.numberOfRatings} />
+          <RatingStars
+            rating={data.averageRating}
+            numberOfRatings={data.numberOfRatings}
+          />
           <div className='flex flex-row items-center gap-1'>
             <div className='font-semibold'>$ {price} </div>
             {!reservation && <div className='font-light'>day</div>}
