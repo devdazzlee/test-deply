@@ -52,7 +52,7 @@ const BillingClient: React.FC<BillingClientProps> = ({ currentUser }) => {
     }, []);
 
     return (
-        <div className='px-6 md:pt-0 pt-12'>
+        <div className='px-6 md:pt-0 pt-12  min-h-[50vh]'>
             {/* <div className='bg-[#101727] rounded-xl shadow-lg p-6 text-white'>
         <h3 className='font-semibold text-xl'>Payment Method</h3>
         <div className='bg-[#28303D] rounded p-4 mt-4 font-semibold flex items-center'>

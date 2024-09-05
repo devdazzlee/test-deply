@@ -77,9 +77,9 @@ export async function POST(request: Request) {
         }
       ],
       mode: 'payment',
-      success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
+      success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/payment-success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/listings/${listingId}`,
-      
+
       payment_intent_data: {
         application_fee_amount: userFee * 100,
         transfer_data: {

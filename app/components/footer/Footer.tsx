@@ -23,7 +23,7 @@ const Footer: React.FC = ({ }) => {
                   </Link>
                 </li>
                 <li className="mb-4">
-                  <Link href='/subscriptions' className='hover:underline'>
+                  <Link href='/subscribe' className='hover:underline'>
                     Subscriptions
                   </Link>
                 </li>
