@@ -1,5 +1,6 @@
 "use client";
 
+import { KeyboardEventHandler } from "react";
 import { FieldErrors, FieldValues, UseFormRegister } from "react-hook-form";
 import { BiDollar } from "react-icons/bi";
 
@@ -12,7 +13,8 @@ interface InputProps {
   required?: boolean;
   register: UseFormRegister<FieldValues>;
   errors: FieldErrors;
-}
+  onKeyDown?: KeyboardEventHandler<HTMLInputElement>;
+};
 
 const Input: React.FC<InputProps> = ({
   id,
@@ -22,7 +24,8 @@ const Input: React.FC<InputProps> = ({
   formatPrice,
   required,
   register,
-  errors
+  errors,
+  onKeyDown
 }) => {
   return (
     <div className='w-full relative'>
@@ -38,6 +41,7 @@ const Input: React.FC<InputProps> = ({
         {...register(id, { required })}
         placeholder=' '
         type={type}
+        onKeyDown={onKeyDown}
         className={`
                     peer
                     w-full

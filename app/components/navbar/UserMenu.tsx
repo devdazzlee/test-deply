@@ -13,6 +13,7 @@ import Link from "next/link";
 import { AiOutlineMessage } from "react-icons/ai";
 import { useRouter } from "next/navigation";
 import type { SubStatus } from "@/app/actions/getSubscriptionStatus";
+import clsx from "clsx";
 
 interface UserMenuProps {
   currentUser?: SafeUser | null;
@@ -34,7 +35,6 @@ const UserMenu: React.FC<UserMenuProps> = ({ currentUser, subStatus }) => {
     if (!currentUser) {
       return loginModal.onOpen();
     }
-
 
     if (!process.env.NEXT_PUBLIC_ALLOW_WITHOUT_SUB) {
       if (!subStatus) {
@@ -62,6 +62,16 @@ const UserMenu: React.FC<UserMenuProps> = ({ currentUser, subStatus }) => {
     };
   }, []);
 
+  // let planName = currentUser?.subscriptionOption
+  let planName: string | null = null;
+
+  switch (currentUser?.subscriptionOption) {
+    case "booking_fee":
+      planName = "Basic";
+    case "flat_fee":
+      planName = "Pro";
+  }
+
   return (
     <div className='relative'>
       <div className='flex flex-row items-center gap-3'>
@@ -86,7 +96,16 @@ const UserMenu: React.FC<UserMenuProps> = ({ currentUser, subStatus }) => {
         >
           <AiOutlineMenu />
           <div className='hidden md:block'>
-            <Avatar src={currentUser?.image} />
+            {/* ======================= */}
+            {/* ======================= */}
+            {/* Gold trim here */}
+            <Avatar
+              src={currentUser?.image}
+              isSubscribed={Boolean(subStatus)}
+            />
+            {/* /Gold trim here */}
+            {/* ======================= */}
+            {/* ======================= */}
           </div>
         </div>
       </div>
@@ -95,22 +114,38 @@ const UserMenu: React.FC<UserMenuProps> = ({ currentUser, subStatus }) => {
           <div className='flex flex-col cursor-pointer'>
             {currentUser ? (
               <>
-              
                 <div
                   onClick={onRent}
                   className='md:hidden block text-sm font-semibold py-3 px-4 hover:bg-neutral-100 transition cursor-pointer'
                 >
                   Get Started
                 </div>
-                <MenuItem label="My Profile" href="/profile" />
-                <MenuItem label="Approvals and Bookings" href="/bookings" />
-                <MenuItem label="Billing and Subscriptions" href="/billing" />
-         {currentUser?.role === "admin" && (
+
+                {planName && (
+                  <>
+                    <div className='flex py-2 p-2 justify-center'>
+                      <h1
+                        className={clsx(
+                          "inline-block bg-clip-text text-transparent",
+                          "font-bold text-xl",
+                          "bg-gradient-to-r from-amber-600 via-red-400 to-amber-400 bg-clip-text text-transparent"
+                        )}
+                      >
+                        {planName} Plan
+                      </h1>
+                    </div>
+                    <hr />
+                  </>
+                )}
+
+                <MenuItem label='My Profile' href='/profile' />
+                <MenuItem label='Approvals and Bookings' href='/bookings' />
+                <MenuItem label='Billing and Subscriptions' href='/billing' />
+                {currentUser?.role === "admin" && (
                   <MenuItem label='Admin Approvals' href='/admin-approvals' />
                 )}
-                <MenuItem label="Reservations" href="/reservations" />
-                <MenuItem label="Account Settings" href="#" />
-
+                <MenuItem label='Reservations' href='/reservations' />
+                <MenuItem label='Account Settings' href='#' />
 
                 <hr />
 

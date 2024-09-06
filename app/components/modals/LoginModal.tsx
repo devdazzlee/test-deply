@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { KeyboardEvent, useCallback, useState } from "react";
 import { toast } from "react-hot-toast";
 import { signIn } from "next-auth/react";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
@@ -59,6 +59,12 @@ const LoginModal = () => {
     loginModal.onClose();
     registerModal.onOpen();
   }, [loginModal, registerModal]);
+  
+  const inputKeyDown = useCallback((event: KeyboardEvent) => {
+    if (event.key === "Enter") {
+      handleSubmit(onSubmit)();
+    }
+  } , []);
 
   const bodyContent = (
     <div className='flex flex-col gap-4'>
@@ -68,7 +74,9 @@ const LoginModal = () => {
         label='Email'
         disabled={isLoading}
         register={register}
-        errors={errors}
+        // errors={errors}
+        errors={{}}
+        onKeyDown={inputKeyDown}
         required
       />
       <Input
@@ -76,8 +84,10 @@ const LoginModal = () => {
         label='Password'
         type='password'
         disabled={isLoading}
+        onKeyDown={inputKeyDown}
         register={register}
-        errors={errors}
+        errors={{}}
+        // errors={errors}
         required
       />
     </div>
