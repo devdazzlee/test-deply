@@ -94,8 +94,8 @@ async function handlePostNewReservation(session: Stripe.Checkout.Session){
 }
 
 // Disable body parser for Stripe security
-export const config = {
-    api: {
-      bodyParser: false,
-    },
-  };
+// export const config = {
+//     api: {
+//       bodyParser: false,
+//     },
+//   };

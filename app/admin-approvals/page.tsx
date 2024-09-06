@@ -9,10 +9,10 @@ interface HomeProps {
 }
 
 export const dynamic = "force-dynamic";
-export default async function AdminApprovals ({ searchParams }: HomeProps) {
+export default async function AdminApprovals({ searchParams }: HomeProps) {
   const currentUser = await getCurrentUser();
   const listings = await getListings(searchParams, {
-    approvalFilter: 'unapproved'
+    approvalFilter: "unapproved"
   });
 
   if (listings.length == 0) {
@@ -39,6 +39,7 @@ export default async function AdminApprovals ({ searchParams }: HomeProps) {
             <ListingCard
               currentUser={currentUser}
               key={listing.id}
+              type='approval'
               listingUserName={listing?.user?.name}
               listingUserImage={listing?.user?.image}
               data={listing}
@@ -48,4 +49,4 @@ export default async function AdminApprovals ({ searchParams }: HomeProps) {
       </div>
     </Container>
   );
-};
+}
