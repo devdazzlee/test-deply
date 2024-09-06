@@ -21,61 +21,14 @@ const ApprovalsClient: React.FC<ApprovalsClientProps> = ({
   approvals,
   currentUser
 }) => {
-
-
   const router = useRouter();
-  const [cancelId, setCancelingid] = useState("");
-  const [approveId, setApproveid] = useState("");
-
-  const onCancel = useCallback(
-    (id: string) => {
-      setCancelingid(id);
-
-      axios
-        .delete(`/api/reservations/${id}`)
-        .then(() => {
-          toast.success("Request cancelled");
-          router.refresh();
-        })
-        .catch(() => {
-          toast.error("Something went wrong when cancelling request");
-        })
-        .finally(() => {
-          setCancelingid("");
-        });
-    },
-    [router]
-  );
-
-  const onApprove = useCallback(
-    (id: string) => {
-      setApproveid(id);
-
-      axios
-        .put(`/api/reservations/${id}`)
-        .then(() => {
-          toast.success("Request approved");
-          router.refresh();
-        })
-        .catch(() => {
-          toast.error("Something went wrong when approving request");
-        })
-        .finally(() => {
-          setApproveid("");
-        });
-    },
-    [router]
-  );
 
   if (approvals.length == 0) {
     return (
       <ClientOnly>
-        <div className="text-2xl flex items-center gap-2 font-bold md:py-6 py-8 p-8 w-full">
+        <div className='text-2xl flex items-center gap-2 font-bold md:py-6 py-8 p-8 w-full'>
           <FaListCheck />
-          <h1>
-
-            Your Approvals
-          </h1>
+          <h1>Your Approvals</h1>
         </div>
         <EmptyState
           title='No requests to approve'
@@ -96,12 +49,8 @@ const ApprovalsClient: React.FC<ApprovalsClientProps> = ({
             data={reservation.listing}
             reservation={reservation}
             actionId={reservation.id}
-            onAction={onApprove}
-            disabled={cancelId == reservation.id}
-            actionLabel='Approve booking request'
+            type='approval'
             currentUser={currentUser}
-            secondarybtn='Reject booking request'
-            secondaryOnAction={onCancel}
             listingUserImage={undefined}
             listingUserName={null}
           />

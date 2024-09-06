@@ -3,10 +3,16 @@ import { NextResponse } from "next/server";
 import getCurrentUser from "@/app/actions/getCurrentUser";
 import prisma from "@/app/libs/prismadb";
 import Email from "@/app/utils/email";
+import Stripe from 'stripe';
 
 interface IParams {
   reservationId?: string;
 }
+
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+  apiVersion: '2024-06-20',
+});
+
 
 export async function DELETE(
   request: Request,
@@ -27,6 +33,19 @@ export async function DELETE(
   const res = await prisma.reservation.findUnique({
     where: { id: reservationId },
     include: { user: true } // Include the user who made the reservation
+  });
+
+  
+  if (!res || res.status !== "escrow") {
+    return new NextResponse('Reservation not found', { status: 404 });
+  }
+
+  const transfer = await stripe.transfers.create({
+    amount: res.totalPrice * 100,
+    currency: 'usd',
+    destination: res.userAccount,
+    description: `Refund for rejected reservation ${res.id}`,
+    transfer_group: res.id,
   });
 
   const reservation = await prisma.reservation.deleteMany({

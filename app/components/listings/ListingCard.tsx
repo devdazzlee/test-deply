@@ -3,7 +3,7 @@
 import useCountries from "@/app/hooks/useCountries";
 import { SafeListing, SafeReservation, SafeUser } from "@/app/types";
 import { useRouter } from "next/navigation";
-import { useCallback, useMemo } from "react";
+import { useMemo, useState } from "react";
 import { format } from "date-fns";
 import Image from "next/image";
 import HeartButton from "../HeartButton";
@@ -11,6 +11,8 @@ import Button from "../Button";
 import Avatar from "../Avatar";
 import RatingStars from "../RatingStars";
 import Link from "next/link";
+import axios from "axios";
+import { toast } from "react-hot-toast";
 
 interface ListingCardProps {
   data: SafeListing;
@@ -19,6 +21,7 @@ interface ListingCardProps {
   reservation?: SafeReservation;
   onAction?: (id: string) => void;
   disabled?: boolean;
+  type: string;
   actionLabel?: string;
   actionId?: string;
   currentUser?: SafeUser | null;
@@ -34,6 +37,7 @@ const ListingCard: React.FC<ListingCardProps> = ({
   onAction,
   disabled,
   actionLabel,
+  type,
   actionId = "",
   currentUser,
   secondarybtn,
@@ -41,33 +45,112 @@ const ListingCard: React.FC<ListingCardProps> = ({
 }) => {
   const router = useRouter();
   const { getByValue } = useCountries();
+  const [disableApproveBtn, setDisableApproveBtn] = useState(false);
+  const [disableRejectBtn, setDisableRejectBtn] = useState(false);
+  const [disableCompleteBtn, setDisableCompleteBtn] = useState(false);
+  const [disableRefundBtn, setDisableRefundBtn] = useState(false);
 
   const location = getByValue(data.locationValue);
 
-  const handleCancel = useCallback(
-    (e: React.MouseEvent<HTMLButtonElement>) => {
-      e.stopPropagation();
+  // for photographer
+  const handleApprove = async () => {
+    if (!reservation || !reservation.id) return;
+    setDisableApproveBtn(true);
 
-      if (disabled) {
-        return;
+    axios
+      .put(`/api/reservations/${reservation.id}`)
+      .then(() => {
+        toast.success("Request approved");
+        setDisableApproveBtn(false);
+        router.refresh();
+      })
+      .catch(() => {
+        toast.error("Something went wrong when approving request");
+        setDisableApproveBtn(false);
+      });
+  };
+
+  // for photographer
+  const handleReject = async () => {
+    if (!reservation || !reservation.id) return;
+
+    setDisableRejectBtn(true);
+
+    axios
+      .delete(`/api/reservations/${reservation.id}`)
+      .then(() => {
+        toast.success("Request cancelled");
+        setDisableRejectBtn(false);
+        router.refresh();
+      })
+      .catch(() => {
+        setDisableRejectBtn(false);
+        toast.error("Something went wrong when cancelling request");
+      })
+      .finally(() => {});
+  };
+
+  // for user who booked
+  const handleCompleted = async () => {
+    if (!reservation || !reservation.id) return;
+    setDisableCompleteBtn(true);
+
+    try {
+      const response = await axios.put(
+        `/api/reservations/approve-reservation/${reservation.id}`,
+        {},
+        {
+          headers: {
+            "Content-Type": "application/json"
+          }
+        }
+      );
+
+      if (response.status === 200) {
+        toast.success("Reservation Completed!");
+        setDisableCompleteBtn(false);
+      } else {
+        console.error("Error approving reservation:", response.data);
+        toast.error("Failed to approve the reservation. Please try again.");
+        setDisableCompleteBtn(false);
       }
+    } catch (error) {
+      setDisableCompleteBtn(false);
+      console.error("Error approving reservation:", error);
+      alert("An error occurred while approving the reservation.");
+    }
+  };
 
-      onAction?.(actionId);
-    },
-    [onAction, actionId, disabled]
-  );
-  const handleApprove = useCallback(
-    (e: React.MouseEvent<HTMLButtonElement>) => {
-      e.stopPropagation();
+  // for user who booked
+  const handleRefund = async () => {
+    if (!reservation || !reservation.id) return;
+    setDisableRefundBtn(true);
 
-      if (disabled) {
-        return;
+    try {
+      const response = await axios.put(
+        `/api/reservations/refund-reservation/${reservation.id}`,
+        {},
+        {
+          headers: {
+            "Content-Type": "application/json"
+          }
+        }
+      );
+
+      if (response.status === 200) {
+        toast.success("Refund Requested Successsfully!");
+        setDisableRefundBtn(false);
+      } else {
+        console.error("Error requesting refund:", response.data);
+        toast.error("Failed to request refund. Please try again.");
+        setDisableRefundBtn(false);
       }
-
-      secondaryOnAction?.(actionId);
-    },
-    [secondaryOnAction, actionId, disabled]
-  );
+    } catch (error) {
+      setDisableRefundBtn(false);
+      console.error("Error requesting refund:", error);
+      toast.error("Failed to request refund. Please try again.");
+    }
+  };
 
   const price = useMemo(() => {
     if (reservation) {
@@ -116,7 +199,10 @@ const ListingCard: React.FC<ListingCardProps> = ({
         )}
 
         <div className='flex items-center justify-between'>
-          <RatingStars rating={data.averageRating} numberOfRatings={data.numberOfRatings} />
+          <RatingStars
+            rating={data.averageRating}
+            numberOfRatings={data.numberOfRatings}
+          />
           <div className='flex flex-row items-center gap-1'>
             <div className='font-semibold'>$ {price} </div>
             {!reservation && <div className='font-light'>day</div>}
@@ -130,22 +216,42 @@ const ListingCard: React.FC<ListingCardProps> = ({
                 .slice(0, 3)
                 .map((item, index) => <div key={index}>{item}</div>))}
         </div>
-        {onAction && actionLabel && (
-          <Button
-            disabled={disabled}
-            small
-            label={actionLabel}
-            onClick={handleCancel}
-          />
-        )}
-        {secondarybtn && (
+        {type === "approval" && (
           <>
+            <Button
+              disabled={disableApproveBtn}
+              small
+              label={
+                disableApproveBtn ? "Approving ..." : "Approve Reservation"
+              }
+              onClick={handleApprove}
+            />
             <hr />
             <Button
+              disabled={disableRejectBtn}
               outline
               small
-              label={secondarybtn}
-              onClick={handleApprove}
+              label={disableRejectBtn ? "Rejecting ..." : "Reject Reservation"}
+              onClick={handleReject}
+            />
+          </>
+        )}
+
+        {type === "booking" && (
+          <>
+            <Button
+              disabled={disableCompleteBtn}
+              small
+              label={disableCompleteBtn ? "Completing ..." : "Job Completed"}
+              onClick={handleCompleted}
+            />
+            <hr />
+            <Button
+              disabled={disableRefundBtn}
+              outline
+              small
+              label={disableRefundBtn ? "Requesting ..." : "Request Refund"}
+              onClick={handleRefund}
             />
           </>
         )}

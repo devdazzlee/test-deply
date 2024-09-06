@@ -61,6 +61,7 @@ const PropertiesClient: React.FC<PropertiesClientProps> = ({
       >
         {listings.map(listing => (
           <ListingCard
+            type='approval'
             key={listing.id}
             data={listing}
             actionId={listing.id}
