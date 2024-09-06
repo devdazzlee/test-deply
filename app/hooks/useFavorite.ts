@@ -24,8 +24,8 @@ const useFavourite = ({ listingId, currentUser }: IUseFavourite) => {
 
   const toggleFavorite = useCallback(
     async (e: React.MouseEvent<HTMLDivElement>) => {
-      e.stopPropagation();
 
+      e.preventDefault();
       if (!currentUser) {
         return loginModal.onOpen();
       }
@@ -35,13 +35,14 @@ const useFavourite = ({ listingId, currentUser }: IUseFavourite) => {
 
         if (hasFavourited) {
           request = () => axios.delete(`/api/favorites/${listingId}`);
+          toast.success("Unliked post");
         } else {
           request = () => axios.post(`/api/favorites/${listingId}`);
+          toast.success("Liked post");
         }
 
         await request();
         router.refresh();
-        toast.success("Success");
       } catch (error) {
         toast.error("Something went wrong.");
       }
