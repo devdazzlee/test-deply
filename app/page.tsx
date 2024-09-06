@@ -10,7 +10,7 @@ interface HomeProps {
 
 const Home = async ({ searchParams }: HomeProps) => {
   const listings = await getListings(searchParams, {
-    approvalFilter: 'approved'
+    approvalFilter: "approved"
   });
   const currentUser = await getCurrentUser();
 
@@ -36,6 +36,7 @@ const Home = async ({ searchParams }: HomeProps) => {
         {listings.map(listing => {
           return (
             <ListingCard
+              type=''
               currentUser={currentUser}
               key={listing.id}
               listingUserName={listing?.user?.name}

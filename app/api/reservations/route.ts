@@ -1,10 +1,7 @@
-
-
 import { NextResponse } from "next/server";
 import Stripe from 'stripe';
 import prisma from "@/app/libs/prismadb";
 import getCurrentUser from "@/app/actions/getCurrentUser";
-import Email from "@/app/utils/email";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2024-06-20',
@@ -41,17 +38,13 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Creator does not have a Stripe account.' }, { status: 400 });
   }
 
-  // Always apply a 3% user fee
-  const userFee = Math.round(totalPrice * 0.03);
-
-  // If the creator has opted for the 5% booking fee option
-  const creatorFee = creator.subscriptionOption === 'booking_fee' ? Math.round(totalPrice * 0.05) : 0;
+  const userFee = (totalPrice * 0.03) * 100 + 30;
+  console.log("User Fee Calculated:", userFee);  
 
   try {
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       line_items: [
-        // Line item for the base booking price (paid by user)
         {
           price_data: {
             currency: 'usd',
@@ -63,7 +56,6 @@ export async function POST(request: Request) {
           },
           quantity: 1,
         },
-        // Line item for the 3% user fee
         {
           price_data: {
             currency: 'usd',
@@ -71,7 +63,7 @@ export async function POST(request: Request) {
               name: 'Service Fee',
               description: '3% platform service fee',
             },
-            unit_amount: userFee * 100,
+            unit_amount: userFee,
           },
           quantity: 1,
         }
@@ -79,36 +71,20 @@ export async function POST(request: Request) {
       mode: 'payment',
       success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/payment-success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/listings/${listingId}`,
-
-      payment_intent_data: {
-        application_fee_amount: userFee * 100,
-        transfer_data: {
-          destination: creator.stripeAccountId, // Transfer the remaining amount to the creator
-        },
-      },
       metadata: {
         userId: currentUser.id,
+        userStripeId: currentUser.stripeAccountId,
         listingId,
         startDate,
         endDate,
-        totalPrice,
-        userFee,
-        creatorFee, // Store the 5% creator fee in metadata for further deduction (if applicable) in the webhook
+        totalPrice: totalPrice.toString(),
+        userFee: userFee.toString(),
       },
     });
 
-    try {
-      if (currentUser.email && currentUser.name) {
-        await new Email({ name: currentUser.name, email: currentUser.email }).sendNewBooking();
-      }
-
-    } catch (emailError) {
-      console.error('Failed to send booking confirmation email:', emailError);
-    }
     return NextResponse.json({ sessionId: session.id });
   } catch (error) {
     console.error('Error creating Stripe Checkout session:', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
-
 }
