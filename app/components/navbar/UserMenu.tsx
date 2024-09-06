@@ -86,7 +86,13 @@ const UserMenu: React.FC<UserMenuProps> = ({ currentUser, subStatus }) => {
         >
           <AiOutlineMenu />
           <div className='hidden md:block'>
+            {/* ======================= */}
+            {/* ======================= */}
+            {/* Gold trim here */}
             <Avatar src={currentUser?.image} />
+            {/* /Gold trim here */}
+            {/* ======================= */}
+            {/* ======================= */}
           </div>
         </div>
       </div>
@@ -95,7 +101,7 @@ const UserMenu: React.FC<UserMenuProps> = ({ currentUser, subStatus }) => {
           <div className='flex flex-col cursor-pointer'>
             {currentUser ? (
               <>
-              
+
                 <div
                   onClick={onRent}
                   className='md:hidden block text-sm font-semibold py-3 px-4 hover:bg-neutral-100 transition cursor-pointer'
