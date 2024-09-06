@@ -13,6 +13,7 @@ import Link from "next/link";
 import { AiOutlineMessage } from "react-icons/ai";
 import { useRouter } from "next/navigation";
 import type { SubStatus } from "@/app/actions/getSubscriptionStatus";
+import clsx from "clsx";
 
 interface UserMenuProps {
   currentUser?: SafeUser | null;
@@ -60,6 +61,16 @@ const UserMenu: React.FC<UserMenuProps> = ({ currentUser, subStatus }) => {
       document.removeEventListener("click", handleClickOutside);
     };
   }, []);
+
+  // let planName = currentUser?.subscriptionOption
+  let planName: string | null = null;
+
+  switch (currentUser?.subscriptionOption) {
+    case "booking_fee":
+      planName = "Basic";
+    case "flat_fee":
+      planName = "Pro";
+  }
 
   return (
     <div className='relative'>
@@ -109,6 +120,24 @@ const UserMenu: React.FC<UserMenuProps> = ({ currentUser, subStatus }) => {
                 >
                   Get Started
                 </div>
+
+                {planName && (
+                  <>
+                    <div className='flex py-2 p-2 justify-center'>
+                      <h1
+                        className={clsx(
+                          "inline-block bg-clip-text text-transparent",
+                          "font-bold text-xl",
+                          "bg-gradient-to-r from-amber-600 via-red-400 to-amber-400 bg-clip-text text-transparent"
+                        )}
+                      >
+                        {planName} Plan
+                      </h1>
+                    </div>
+                    <hr />
+                  </>
+                )}
+
                 <MenuItem label='My Profile' href='/profile' />
                 <MenuItem label='Approvals and Bookings' href='/bookings' />
                 <MenuItem label='Billing and Subscriptions' href='/billing' />
