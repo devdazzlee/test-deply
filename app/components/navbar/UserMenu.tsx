@@ -35,7 +35,6 @@ const UserMenu: React.FC<UserMenuProps> = ({ currentUser, subStatus }) => {
       return loginModal.onOpen();
     }
 
-
     if (!process.env.NEXT_PUBLIC_ALLOW_WITHOUT_SUB) {
       if (!subStatus) {
         router.push("/subscribe");
@@ -89,7 +88,10 @@ const UserMenu: React.FC<UserMenuProps> = ({ currentUser, subStatus }) => {
             {/* ======================= */}
             {/* ======================= */}
             {/* Gold trim here */}
-            <Avatar src={currentUser?.image} />
+            <Avatar
+              src={currentUser?.image}
+              isSubscribed={Boolean(subStatus)}
+            />
             {/* /Gold trim here */}
             {/* ======================= */}
             {/* ======================= */}
@@ -101,22 +103,20 @@ const UserMenu: React.FC<UserMenuProps> = ({ currentUser, subStatus }) => {
           <div className='flex flex-col cursor-pointer'>
             {currentUser ? (
               <>
-
                 <div
                   onClick={onRent}
                   className='md:hidden block text-sm font-semibold py-3 px-4 hover:bg-neutral-100 transition cursor-pointer'
                 >
                   Get Started
                 </div>
-                <MenuItem label="My Profile" href="/profile" />
-                <MenuItem label="Approvals and Bookings" href="/bookings" />
-                <MenuItem label="Billing and Subscriptions" href="/billing" />
-         {currentUser?.role === "admin" && (
+                <MenuItem label='My Profile' href='/profile' />
+                <MenuItem label='Approvals and Bookings' href='/bookings' />
+                <MenuItem label='Billing and Subscriptions' href='/billing' />
+                {currentUser?.role === "admin" && (
                   <MenuItem label='Admin Approvals' href='/admin-approvals' />
                 )}
-                <MenuItem label="Reservations" href="/reservations" />
-                <MenuItem label="Account Settings" href="#" />
-
+                <MenuItem label='Reservations' href='/reservations' />
+                <MenuItem label='Account Settings' href='#' />
 
                 <hr />
 
