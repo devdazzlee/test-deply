@@ -33,8 +33,23 @@ export async function PUT(request: NextRequest, { params }: { params: IParams })
         return NextResponse.rewrite("/unauthorised");
     }
 
+    const receiver = await prisma.user.findUnique({
+      where: {id: reservation.receiverId},
+    })
+
+    // calculating the amount to transfer to creator based on their subscription
+    let transferAmount
+    if (receiver?.subscriptionOption === "booking_fee"){
+      transferAmount=reservation.totalPrice * 100 * 0.95; // deduct 5% if subscription is booking_fee
+    } else if (receiver?.subscriptionOption === "flat_fee"){
+      transferAmount=reservation.totalPrice * 100
+    } else{
+      console.log("Error: Invalid Receiver Subscription Option")
+      return new NextResponse('Error: Invalid Receiver Subscription Option', { status: 400 });
+    }
+
     const transfer = await stripe.transfers.create({
-      amount: reservation.totalPrice * 100,
+      amount: transferAmount,
       currency: 'usd',
       destination: reservation.receiverAccount,
       description: `Payment for reservation ${reservation.id}`,
