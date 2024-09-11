@@ -13,7 +13,7 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 
-const Map = dynamic(() => import("../Map"), {
+const Map = dynamic(() => import("../GoogleMaps"), {
   ssr: false
 });
 
@@ -71,7 +71,8 @@ const ListingInfo: React.FC<ListingInfoProps> = ({
       })
       .catch(error => {
         toast.error(error?.response?.data?.error);
-      }).finally(() => {
+      })
+      .finally(() => {
         setApproving(false);
       });
   };
@@ -117,7 +118,7 @@ const ListingInfo: React.FC<ListingInfoProps> = ({
       <hr />
       <div className='text-lg font-light text-neutral-500'>{description}</div>
       <hr />
-      <Map center={coordinates} />
+      <Map position={coordinates} />
       <hr />
 
       <div className='flex flex-wrap gap-x-4 gap-y-2'>

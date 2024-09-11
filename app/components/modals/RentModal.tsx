@@ -63,7 +63,7 @@ const RentModal = () => {
 
   const Map = useMemo(
     () =>
-      dynamic(() => import("../Map"), {
+      dynamic(() => import("../GoogleMaps"), {
         ssr: false
       }),
     []
@@ -106,7 +106,6 @@ const RentModal = () => {
         reset();
         setStep(STEPS.CATEGORY);
         rentModal.onClose();
-
       })
       .catch(error => {
         toast.error("Something went wrong.");
@@ -215,7 +214,7 @@ const RentModal = () => {
           onChange={value => setCustomValue("location", value)}
         />
 
-        <Map center={location?.latlng} />
+        <Map position={location?.latlng} />
       </div>
     );
   }
