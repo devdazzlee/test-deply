@@ -1,5 +1,4 @@
 import { NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
 import prisma from '@/app/libs/prismadb';
 import getCurrentUser from '@/app/actions/getCurrentUser';
 
@@ -13,7 +12,7 @@ export async function DELETE() {
   const userId = currentUser.id;
 
   try {
-    await prisma.$transaction(async (prisma: PrismaClient) => {
+    await prisma.$transaction(async (prisma) => {
       await prisma.account.deleteMany({
         where: {
           userId: userId,
