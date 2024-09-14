@@ -2,13 +2,14 @@
 
 import useRentModal from "@/app/hooks/useRentModal";
 
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useState, useEffect } from "react";
 import Modal from "./Modal";
 import Heading from "../Heading";
 import { categories } from "../navbar/Categories";
 import CategoryInput from "../inputs/CategoryInput";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
-import CountrySelect from "../inputs/CountrySelect";
+import CountrySelect, { CountrySelectValue } from "../inputs/CountrySelect";
+import CitySelect from "../inputs/CitySelect";
 import dynamic from "next/dynamic";
 import Counter from "../inputs/Counter";
 import ImageUpload from "../inputs/ImageUpload";
@@ -33,6 +34,7 @@ const RentModal = () => {
 
   const [step, setStep] = useState(STEPS.CATEGORY);
   const [isLoading, setIsLoading] = useState(false);
+  const [country, setCountry] = useState<CountrySelectValue>();
 
   const {
     register,
@@ -45,6 +47,7 @@ const RentModal = () => {
     defaultValues: {
       category: [],
       location: null,
+      locationCoords: [],
       experience: 1,
       maxDays: 1,
       minDays: 1,
@@ -60,6 +63,7 @@ const RentModal = () => {
   const experience = watch("experience");
   const maxDays = watch("maxDays");
   const minDays = watch("minDays");
+  const locationCoords = watch("locationCoords");
 
   const Map = useMemo(
     () =>
@@ -76,6 +80,11 @@ const RentModal = () => {
       shouldValidate: true
     });
   };
+
+  useEffect(() => {
+    console.log("Current Country: ", location);
+    console.log("Current Location: ", locationCoords);
+  }, [locationCoords, location]);
 
   const onBack = () => {
     setStep(value => value - 1);
@@ -204,17 +213,29 @@ const RentModal = () => {
 
   if (step == STEPS.LOCATION) {
     bodyContent = (
-      <div className='flex flex-col gap-8 '>
+      <div className='flex flex-col gap-8'>
         <Heading
-          title='Where are you located?'
-          subtitle='Help potential clients find you!'
+          title='Where are you based?'
+          subtitle='Find creators near you!'
         />
         <CountrySelect
-          value={location}
-          onChange={value => setCustomValue("location", value)}
+          value={country}
+          onChange={value => {
+            setCustomValue("location", value);
+          }}
         />
+        {location && (
+          <CitySelect
+            value={locationCoords}
+            countryCode={location.value}
+            onChange={value => {
+              setCustomValue("locationCoords", value);
+            }}
+          />
+        )}
 
-        <Map position={location?.latlng} />
+        <hr />
+        <Map position={locationCoords?.latlng} />
       </div>
     );
   }

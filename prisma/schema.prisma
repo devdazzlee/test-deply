@@ -59,21 +59,22 @@ model Account {
 }
 
 model Listing {
-  id              String   @id @default(auto()) @map("_id") @db.ObjectId
-  title           String
-  description     String
-  imageSrc        String[]
-  createdAt       DateTime @default(now())
-  category        String[]
-  experience      Int
-  maxDays         Int
-  minDays         Int
-  locationValue   String
-  userId          String   @db.ObjectId
-  price           Int
-  averageRating   Float?   @default(0.0)
-  numberOfRatings Int?     @default(0)
-  approved        Boolean  @default(false)
+  id                  String   @id @default(auto()) @map("_id") @db.ObjectId
+  title               String
+  description         String
+  imageSrc            String[]
+  createdAt           DateTime @default(now())
+  category            String[]
+  experience          Int
+  maxDays             Int
+  minDays             Int
+  locationValue       String
+  locationCoordinates String[]
+  userId              String   @db.ObjectId
+  price               Int
+  averageRating       Float?   @default(0.0)
+  numberOfRatings     Int?     @default(0)
+  approved            Boolean  @default(false)
 
   user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   reservations Reservation[]

@@ -28,6 +28,7 @@ interface ListingInfoProps {
   minDays: number;
   category: string[] | undefined;
   locationValue: string;
+  locationCoords: string[];
   averageRating: number | null;
   numberOfRatings: number | null;
 }
@@ -43,13 +44,14 @@ const ListingInfo: React.FC<ListingInfoProps> = ({
   minDays,
   category,
   locationValue,
+  locationCoords,
   averageRating,
   numberOfRatings
 }) => {
   const router = useRouter();
   const { getByValue } = useCountries();
 
-  const coordinates = getByValue(locationValue)?.latlng;
+  const coordinates = locationCoords;
 
   // State to manage whether to show all categories or not
   const [showAllCategories, setShowAllCategories] = useState(false);
