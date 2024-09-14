@@ -46,6 +46,7 @@ export async function POST() {
         where: { id: currentUser.id },
         data: {
           stripeAccountId: account.id,
+          stripeOnboardingComplete: true
         },
       });
 

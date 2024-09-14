@@ -145,7 +145,7 @@ const UserMenu: React.FC<UserMenuProps> = ({ currentUser, subStatus }) => {
                   <MenuItem label='Admin Approvals' href='/admin-approvals' />
                 )}
                 <MenuItem label='Reservations' href='/reservations' />
-                <MenuItem label='Account Settings' href='#' />
+                <MenuItem label='Account Settings' href='/account-settings' />
 
                 <hr />
 
