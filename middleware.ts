@@ -7,6 +7,8 @@ export const config = {
     "/reservations",
     "/properties",
     "/account-settings",
+    "/faq",
+    "/terms-and-conditions",
     "/profile",
     "/messages",
     "/billing",

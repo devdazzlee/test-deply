@@ -29,7 +29,7 @@ export default function FaqPage() {
                             </div>
                         </details>
                         <details>
-                            <summary className="py-2 outline-none cursor-pointer focus:underline">Can I return a product if I'm not satisfied?</summary>
+                            <summary className="py-2 outline-none cursor-pointer focus:underline">Can I return a product if I&apos;m not satisfied?</summary>
                             <div className="px-4 pb-4">
                                 <p>Yes, we have a hassle-free return policy. If you are not satisfied with your purchase, you can initiate a return within 30 days of receiving the product. Please contact our customer support at <a href="" className="underline">example@gmail.com</a> for assistance.</p>
                             </div>
