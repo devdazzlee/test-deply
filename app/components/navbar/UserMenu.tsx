@@ -35,6 +35,8 @@ const UserMenu: React.FC<UserMenuProps> = ({ currentUser, subStatus }) => {
     if (!currentUser) {
       return loginModal.onOpen();
     }
+    console.log(subStatus);
+
 
     if (!process.env.NEXT_PUBLIC_ALLOW_WITHOUT_SUB) {
       if (!subStatus) {

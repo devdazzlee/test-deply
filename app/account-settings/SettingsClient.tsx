@@ -7,7 +7,7 @@ import ListingCard from "../components/listings/ListingCard";
 import { SafeListing, SafeUser } from "../types";
 import type { CurrentUser } from "../actions/getCurrentUser";
 
-import { Button, Input, InputProps } from "@nextui-org/react";
+import { Button, Input, InputProps, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, useDisclosure } from "@nextui-org/react";
 import { IconAlertTriangle, IconCircleDashedCheck, IconEyeClosed, IconEyeFilled, IconTrash } from "@tabler/icons-react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
@@ -26,6 +26,41 @@ const SettingsClient: React.FC<SettingsClientProps> = ({
     listing,
     currentUser
 }) => {
+    const router = useRouter();
+
+    // Define state to store input values
+    const [username, setUsername] = useState(currentUser?.name ?? "");
+    const [email, setEmail] = useState(currentUser?.email ?? "");
+    // const [location, setLocation] = useState("");
+    const [newPassword, setNewPassword] = useState("");
+    const [confirmNewPassword, setConfirmNewPassword] = useState("");
+
+    // Handle form submission
+    const handleSaveChanges = () => {
+        // Validate form if necessary
+        if (newPassword !== confirmNewPassword)
+            return toast.error("New password and confirm password do not match")
+        // Prepare the payload with user inputs
+        const payload = {
+            name: username,
+            email,
+            // location,
+            newPassword,
+            confirmNewPassword,
+        };
+
+        // Make the API request to update the user details
+        axios
+            .post('/api/user/update', payload)
+            .then(() => {
+                toast.success('Changes saved successfully');
+                router.refresh(); // Optional: Refresh the page to reflect changes
+            })
+            .catch(error => {
+                toast.error(error?.response?.data?.error || 'Failed to save changes');
+            });
+    };
+
     return (
         <>
             {/* Contact Info */}
@@ -45,7 +80,8 @@ const SettingsClient: React.FC<SettingsClientProps> = ({
                         label='Your username'
                         className='z-0'
                         placeholder='Enter your username'
-                        defaultValue={currentUser.name ?? ""}
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)}  // Capture input value
                     />
                     <Input
                         variant='flat'
@@ -54,16 +90,19 @@ const SettingsClient: React.FC<SettingsClientProps> = ({
                         labelPlacement='outside'
                         label='Your email'
                         placeholder='Enter your email'
-                        defaultValue={currentUser.email ?? ""}
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}  // Capture input value
                     />
-                    <Input
+                    {/* <Input
                         variant='flat'
                         radius='sm'
                         className='z-0'
                         labelPlacement='outside'
                         label='Location'
                         placeholder='Enter your location'
-                    />
+                        value={location}
+                        onChange={(e) => setLocation(e.target.value)}  // Capture input value
+                    /> */}
                 </div>
             </section>
 
@@ -77,49 +116,123 @@ const SettingsClient: React.FC<SettingsClientProps> = ({
                 </div>
 
                 <div className='flex-1 md:max-w-lg space-y-11'>
-                    <PasswordInput
-                        label='Current Password'
-                        placeholder='Enter current password'
-                        className='z-0'
-                    />
+
                     <PasswordInput
                         label='New Password'
-                        className='z-0'
                         placeholder='Enter new password'
+                        value={newPassword}
+                        onChange={(e) => setNewPassword(e.target.value)}  // Capture input value
                     />
                     <PasswordInput
-                        className='z-0'
                         label='Confirm New Password'
                         placeholder='Enter new password again'
+                        value={confirmNewPassword}
+                        onChange={(e) => setConfirmNewPassword(e.target.value)}  // Capture input value
                     />
                 </div>
             </section>
-            {listing && (
-                <section className='mx-6 md:mx-16 border-b-2 py-6'>
-                    <h4 className='font-semibold'>Listing Photos</h4>
-                    <p className='text-sm text-gray-600'>Drag to move photos around</p>
 
-                    <PhotoSection listing={listing} />
-                    <ListingDeleter listing={listing} />
-                </section>
-            )}
-
-            <section className='mx-6 md:mx-16 py-6 border-b-2'>
+            {/* Save Changes Button */}
+            <section className='mx-6 md:mx-16 pt-6'>
                 <Button
                     color='success'
                     variant='solid'
                     className='!font-bold'
                     endContent={<IconCircleDashedCheck />}
+                    onClick={handleSaveChanges}  // Handle form submission
                 >
                     Save Changes
                 </Button>
             </section>
+            <DeleteAccountButton />
+
             <section className='mx-6 md:mx-16 flex max-md:flex-col md:items-start gap-x-12 gap-y-6 border-b-2 py-6'>
                 <Heading title="Reviews you got on your listings" />
             </section>
-
         </>
-    )
+    );
+};
+
+const DeleteAccountButton = () => {
+    const { isOpen, onOpen, onOpenChange } = useDisclosure();
+
+    const [confirmText, setConfirmText] = useState("");
+    const [isDeleting, setIsDeleting] = useState(false);
+    const router = useRouter();
+
+    // Function to handle account deletion
+    const handleDeleteAccount = () => {
+        if (confirmText !== "delete") {
+            toast.error("You must type 'delete' to confirm");
+            return;
+        }
+
+        setIsDeleting(true);
+        // Call the API to delete the account
+        axios
+            .delete("/api/user/delete") // Replace with your actual delete API endpoint
+            .then(() => {
+                toast.success("Account deleted successfully");
+                router.push("/goodbye"); // Redirect the user or refresh the page
+            })
+            .catch((error) => {
+                toast.error(error || "Failed to delete account");
+            })
+            .finally(() => {
+                setIsDeleting(false);
+                // setIsModalOpen(false);
+            });
+    };
+
+    return (
+        <>
+            {/* Button to open the modal */}
+            <section className='mx-6 md:mx-16 py-6 border-b-2'>
+                <Button
+                    color='danger'
+                    variant='solid'
+                    className='!font-bold'
+                    endContent={<IconTrash />}
+                    onClick={onOpen}
+                >
+                    Delete My Account
+                </Button>
+            </section>
+
+            {/* Modal for account deletion confirmation */}
+            <Modal isOpen={isOpen} onOpenChange={onOpenChange} placement="center">
+                <ModalContent>
+                    {(onClose) => (
+                        <>
+                            <ModalHeader className="flex flex-col gap-1">Delete my account</ModalHeader>
+                            <ModalBody>
+                                <p className='text-sm text-gray-600'>
+                                    Are you sure you want to delete your account? This action is irreversible.
+                                </p>
+                                <p className='text-sm text-gray-600 font-semibold mt-4'>
+                                    Please type <span className="text-red-600">delete</span> to confirm:
+                                </p>
+                                <Input
+                                    className='mt-2'
+                                    value={confirmText}
+                                    onChange={(e) => setConfirmText(e.target.value)}
+                                    placeholder='Type delete here...'
+                                />
+                            </ModalBody>
+                            <ModalFooter>
+                                <Button color="danger" variant="light" onPress={onClose}>
+                                    Close
+                                </Button>
+                                <Button color="danger" onPress={handleDeleteAccount} isLoading={isDeleting} disabled={confirmText !== "delete"} className="disabled:opacity-70 disabled:cursor-not-allowed">
+                                    Delete
+                                </Button>
+                            </ModalFooter>
+                        </>
+                    )}
+                </ModalContent>
+            </Modal>
+        </>
+    );
 };
 
 function PasswordInput(props: InputProps) {
@@ -133,6 +246,7 @@ function PasswordInput(props: InputProps) {
             radius='sm'
             labelPlacement='outside'
             type={isVisible ? 'text' : 'password'}
+            className="z-0"
             endContent={
                 <Button
                     isIconOnly
@@ -152,6 +266,8 @@ function PasswordInput(props: InputProps) {
         />
     );
 }
+
+
 
 function ListingDeleter({ listing }: { listing: any }) {
     const router = useRouter();
