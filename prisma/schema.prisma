@@ -81,20 +81,6 @@ model Listing {
   comments     Comment[]
 }
 
-// model Reservation {
-//   id         String   @id @default(auto()) @map("_id") @db.ObjectId
-//   userId     String   @db.ObjectId
-//   listingId  String   @db.ObjectId
-//   startDate  DateTime
-//   endDate    DateTime
-//   totalPrice Int
-//   createdAt  DateTime @default(now())
-//   approved   Boolean? @default(false)
-
-//   user     User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-//   listings Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
-// }
-
 // updated reservations table
 model Reservation {
   id                    String   @id @default(auto()) @map("_id") @db.ObjectId
@@ -129,8 +115,8 @@ model Comment {
 
 model Subscription {
   id                   String   @id @default(auto()) @map("_id") @db.ObjectId
-  stripeCustomerId     String   @unique
-  stripeSubscriptionId String   @unique
+  stripeCustomerId     String?
+  stripeSubscriptionId String?
   userId               String   @db.ObjectId
   status               String
   plan                 String

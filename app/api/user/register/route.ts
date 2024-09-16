@@ -1,4 +1,4 @@
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import Email from "@/app/utils/email";
 import prisma from "@/app/libs/prismadb";
 import { NextResponse } from "next/server";

@@ -81,10 +81,10 @@ const RentModal = () => {
     });
   };
 
-  useEffect(() => {
-    console.log("Current Country: ", location);
-    console.log("Current Location: ", locationCoords);
-  }, [locationCoords, location]);
+  // useEffect(() => {
+  //   console.log("Current Country: ", location);
+  //   console.log("Current Location: ", locationCoords);
+  // }, [locationCoords, location]);
 
   const onBack = () => {
     setStep(value => value - 1);
