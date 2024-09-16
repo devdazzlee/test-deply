@@ -40,8 +40,10 @@ export async function DELETE(
     return new NextResponse('Reservation not found', { status: 404 });
   }
 
+  const stripeFee = (res.totalPrice * 0.03) * 100 + 30;
+
   const transfer = await stripe.transfers.create({
-    amount: res.totalPrice * 100,
+    amount: res.totalPrice * 100 + stripeFee,
     currency: 'usd',
     destination: res.userAccount,
     description: `Refund for rejected reservation ${res.id}`,

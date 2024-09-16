@@ -92,10 +92,3 @@ async function handlePostNewReservation(session: Stripe.Checkout.Session){
         return new NextResponse('Internal Server Error', { status: 500 });
     }
 }
-
-// Disable body parser for Stripe security
-// export const config = {
-//     api: {
-//       bodyParser: false,
-//     },
-//   };
