@@ -21,19 +21,23 @@ export async function PATCH(request: Request) {
       updateData.name = name;
     }
 
-    if (email && email.toLowerCase() !== currentUser.email.toLowerCase()) {
+    if (email) {
       const lowercasedEmail = email.toLowerCase();
-      const existingUser = await prisma.user.findUnique({
-        where: {
-          email: lowercasedEmail,
-        },
-      });
+      const currentEmail = currentUser.email?.toLowerCase() || '';
 
-      if (existingUser) {
-        return NextResponse.json({ error: 'Email is already in use' }, { status: 422 });
+      if (lowercasedEmail !== currentEmail) {
+        const existingUser = await prisma.user.findUnique({
+          where: {
+            email: lowercasedEmail,
+          },
+        });
+
+        if (existingUser) {
+          return NextResponse.json({ error: 'Email is already in use' }, { status: 422 });
+        }
+
+        updateData.email = lowercasedEmail;
       }
-
-      updateData.email = lowercasedEmail;
     }
 
     if (password) {
