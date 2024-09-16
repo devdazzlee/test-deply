@@ -35,29 +35,29 @@ const SettingsClient: React.FC<SettingsClientProps> = ({
     const [newPassword, setNewPassword] = useState("");
     const [confirmNewPassword, setConfirmNewPassword] = useState("");
 
-    // Handle form submission
     const handleSaveChanges = () => {
-        // Validate form if necessary
-        if (newPassword !== confirmNewPassword)
-            return toast.error("New password and confirm password do not match")
-        // Prepare the payload with user inputs
+        if (newPassword !== confirmNewPassword) {
+            return toast.error("New password and confirm password do not match");
+        }
+
         const payload = {
             name: username,
             email,
-            // location,
-            newPassword,
-            confirmNewPassword,
+            password: newPassword, 
         };
 
-        // Make the API request to update the user details
         axios
-            .post('/api/user/update', payload)
+            .patch('/api/user/update', payload)
             .then(() => {
                 toast.success('Changes saved successfully');
-                router.refresh(); // Optional: Refresh the page to reflect changes
+                router.refresh();
             })
-            .catch(error => {
-                toast.error(error?.response?.data?.error || 'Failed to save changes');
+            .catch((error: unknown) => { 
+                if (error instanceof Error) {
+                    toast.error(error.message || 'Failed to save changes');
+                } else {
+                    toast.error('Failed to save changes');
+                }
             });
     };
 
