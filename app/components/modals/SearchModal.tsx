@@ -7,6 +7,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { Range } from "react-date-range";
 import dynamic from "next/dynamic";
 import CountrySelect, { CountrySelectValue } from "../inputs/CountrySelect";
+import CitySelect, { CitySelectValue } from "../inputs/CitySelect";
 import qs from "query-string";
 import { formatISO } from "date-fns";
 import Heading from "../Heading";
@@ -27,7 +28,8 @@ const SearchModal = () => {
   const params = useSearchParams();
   const searchModal = useSearchModal();
 
-  const [location, setLocation] = useState<CountrySelectValue>();
+  const [country, setCountry] = useState<CountrySelectValue>();
+  const [location, setLocation] = useState<CitySelectValue>();
   const [category, setCategory] = useState<string[]>([]);
   const [step, setStep] = useState(STEPS.LOCATION);
   const [experience, setExperience] = useState(1);
@@ -196,11 +198,21 @@ const SearchModal = () => {
         subtitle='Find creators near you!'
       />
       <CountrySelect
-        value={location}
+        value={country}
         onChange={value => {
-          setLocation(value as CountrySelectValue);
+          setCountry(value as CountrySelectValue);
         }}
       />
+      {country && (
+        <CitySelect
+          value={location}
+          countryCode={country.value}
+          onChange={value => {
+            setLocation(value as CitySelectValue);
+          }}
+        />
+      )}
+
       <hr />
       <Map position={location?.latlng} />
     </div>

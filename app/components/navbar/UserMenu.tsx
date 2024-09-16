@@ -14,6 +14,7 @@ import { AiOutlineMessage } from "react-icons/ai";
 import { useRouter } from "next/navigation";
 import type { SubStatus } from "@/app/actions/getSubscriptionStatus";
 import clsx from "clsx";
+import { toast } from "react-hot-toast";
 
 interface UserMenuProps {
   currentUser?: SafeUser | null;
@@ -38,14 +39,22 @@ const UserMenu: React.FC<UserMenuProps> = ({ currentUser, subStatus }) => {
     console.log(subStatus);
 
 
-    if (!process.env.NEXT_PUBLIC_ALLOW_WITHOUT_SUB) {
-      if (!subStatus) {
-        router.push("/subscribe");
-        return;
-      }
+    if (!currentUser.subscriptionOption) {
+      router.push("/subscribe");
+      return;
     }
 
-    rentModal.onOpen();
+    if (
+      currentUser.subscriptionOption === "booking_fee" ||
+      currentUser.subscriptionOption === "flat_fee"
+    ) {
+      rentModal.onOpen();
+    } else {
+      toast.error(
+        "Invalid Subscription Option. Please subscribe again or contact support"
+      );
+      router.push("/subscribe");
+    }
   }, [currentUser, loginModal, rentModal]);
 
   const menuRef = useRef<any>(null);
@@ -103,7 +112,7 @@ const UserMenu: React.FC<UserMenuProps> = ({ currentUser, subStatus }) => {
             {/* Gold trim here */}
             <Avatar
               src={currentUser?.image}
-              isSubscribed={Boolean(subStatus)}
+              isSubscribed={currentUser?.subscriptionOption ? true : false}
             />
             {/* /Gold trim here */}
             {/* ======================= */}

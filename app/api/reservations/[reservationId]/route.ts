@@ -40,8 +40,10 @@ export async function DELETE(
     return new NextResponse('Reservation not found', { status: 404 });
   }
 
+  const stripeFee = (res.totalPrice * 0.03) * 100 + 30;
+
   const transfer = await stripe.transfers.create({
-    amount: res.totalPrice * 100,
+    amount: res.totalPrice * 100 + stripeFee,
     currency: 'usd',
     destination: res.userAccount,
     description: `Refund for rejected reservation ${res.id}`,
@@ -86,7 +88,7 @@ export async function PUT(request: Request, { params }: { params: IParams }) {
   }
 
   if (reservation.listings.userId !== currentUser.id) {
-    return NextResponse.rewrite("/unauthorised"); // Checks if the current user is the owner of the listing
+      return new NextResponse('User not authorised', { status: 504 });
   }
 
   // Update the reservation to mark it as approved

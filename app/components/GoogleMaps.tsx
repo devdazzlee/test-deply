@@ -1,18 +1,16 @@
 "use client";
 
-import {
-  APIProvider,
-  Map,
-  AdvancedMarker,
-  Pin
-} from "@vis.gl/react-google-maps";
+import { APIProvider, Map } from "@vis.gl/react-google-maps";
+import { Circle } from "./GoogleMaps/Circle";
 
 interface GoogleMapsProps {
-  position?: number[];
+  position?: string[];
 }
 
 export default function GoogleMaps({ position }: GoogleMapsProps) {
-  const marker = position ? { lat: position[0], lng: position[1] } : null;
+  const marker = position
+    ? { lat: Number(position[0]), lng: Number(position[1]) }
+    : null;
 
   const usaBounds = {
     north: 49.384358,
@@ -25,15 +23,14 @@ export default function GoogleMaps({ position }: GoogleMapsProps) {
     <APIProvider apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API!}>
       <div className='h-[35vh] w-full'>
         <Map
+          defaultZoom={8}
           minZoom={marker ? 7 : 4}
           defaultBounds={usaBounds}
-          defaultZoom={7}
+          gestureHandling={"greedy"}
           {...(marker && { center: marker })}
           mapId={process.env.NEXT_PUBLIC_GOOGLE_MAP_ID}
         >
-          <AdvancedMarker position={marker}>
-            <Pin />
-          </AdvancedMarker>
+          {marker && <Circle center={marker} />}
         </Map>
       </div>
     </APIProvider>

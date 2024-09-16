@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "react-hot-toast";
 import axios from "axios";
 import { useRouter } from "next/navigation";
@@ -27,6 +27,7 @@ export default function SubscribePage() {
       })
       .catch((error: any) => {
         toast.error(error?.response?.data?.error || "Something went wrong.");
+        router.refresh();
       })
       .finally(() => {
         setLoading(false);
@@ -187,4 +188,3 @@ export default function SubscribePage() {
     </>
   );
 }
-

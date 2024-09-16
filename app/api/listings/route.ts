@@ -40,6 +40,7 @@ export async function POST(request: Request) {
     maxDays,
     minDays,
     location,
+    locationCoords,
     price
   } = body;
 
@@ -55,6 +56,7 @@ export async function POST(request: Request) {
       maxDays,
       minDays,
       locationValue: location.value,
+      locationCoordinates: locationCoords.latlng,
       price: parseInt(price, 10),
       userId: currentUser.id
     }

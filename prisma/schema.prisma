@@ -59,40 +59,27 @@ model Account {
 }
 
 model Listing {
-  id              String   @id @default(auto()) @map("_id") @db.ObjectId
-  title           String
-  description     String
-  imageSrc        String[]
-  createdAt       DateTime @default(now())
-  category        String[]
-  experience      Int
-  maxDays         Int
-  minDays         Int
-  locationValue   String
-  userId          String   @db.ObjectId
-  price           Int
-  averageRating   Float?   @default(0.0)
-  numberOfRatings Int?     @default(0)
-  approved        Boolean  @default(false)
+  id                  String   @id @default(auto()) @map("_id") @db.ObjectId
+  title               String
+  description         String
+  imageSrc            String[]
+  createdAt           DateTime @default(now())
+  category            String[]
+  experience          Int
+  maxDays             Int
+  minDays             Int
+  locationValue       String
+  locationCoordinates String[]
+  userId              String   @db.ObjectId
+  price               Int
+  averageRating       Float?   @default(0.0)
+  numberOfRatings     Int?     @default(0)
+  approved            Boolean  @default(false)
 
   user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   reservations Reservation[]
   comments     Comment[]
 }
-
-// model Reservation {
-//   id         String   @id @default(auto()) @map("_id") @db.ObjectId
-//   userId     String   @db.ObjectId
-//   listingId  String   @db.ObjectId
-//   startDate  DateTime
-//   endDate    DateTime
-//   totalPrice Int
-//   createdAt  DateTime @default(now())
-//   approved   Boolean? @default(false)
-
-//   user     User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-//   listings Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
-// }
 
 // updated reservations table
 model Reservation {
@@ -128,8 +115,8 @@ model Comment {
 
 model Subscription {
   id                   String   @id @default(auto()) @map("_id") @db.ObjectId
-  stripeCustomerId     String   @unique
-  stripeSubscriptionId String   @unique
+  stripeCustomerId     String?
+  stripeSubscriptionId String?  @unique
   userId               String   @db.ObjectId
   status               String
   plan                 String

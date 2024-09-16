@@ -34,23 +34,17 @@ export async function POST(request: Request) {
         payment_method_types: ['card'],
         line_items: [
           {
-            price_data: {
-              currency: 'usd',
-              product_data: {
-                name: 'Annual Subscription',
-                description: 'One-time payment of $299 for one year of no booking fees.',
-              },
-              unit_amount: 29900, // $299 in cents
-            },
+            price: 'price_1PzRjQLdp37JTmQX7QKZ5CXY',
             quantity: 1,
           }
         ],
-        mode: 'payment',
+        mode: 'subscription',
         success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/payment-success`,
         cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/subscribe`,
         metadata: {
           userId: currentUser.id, // Pass user ID as metadata
-          subscriptionOption: option // Pass subscription option as metadata
+          subscriptionOption: option, // Pass subscription option as metadata
+          paymentType: "subscription"
         },
       });
 
@@ -78,8 +72,6 @@ export async function POST(request: Request) {
       await prisma.subscription.create({
         data: {
           userId: currentUser.id,
-          stripeCustomerId: currentUser.stripeAccountId || "",
-          stripeSubscriptionId: "", // No Stripe subscription ID for "booking_fee"
           status: 'active',
           plan: 'booking_fee',
           currentPeriodEnd: oneYearFromNow,

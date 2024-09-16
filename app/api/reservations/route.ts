@@ -39,7 +39,7 @@ export async function POST(request: Request) {
   }
 
   const userFee = (totalPrice * 0.03) * 100 + 30;
-  console.log("User Fee Calculated:", userFee);  
+  // console.log("User Fee Calculated:", userFee);  
 
   try {
     const session = await stripe.checkout.sessions.create({

@@ -122,6 +122,7 @@ const ListingClient: React.FC<ListingClientProps> = ({
               experience={listing.experience}
               minDays={listing.minDays}
               locationValue={listing.locationValue}
+              locationCoords={listing.locationCoordinates}
               averageRating={listing.averageRating}
               numberOfRatings={listing.numberOfRatings}
             />
