@@ -27,7 +27,7 @@ export async function POST(request: Request) {
     }
 
     // Cancel the subscription in Stripe
-    await stripe.subscriptions.cancel(subscription.stripeSubscriptionId);
+    await stripe.subscriptions.cancel(subscription.stripeSubscriptionId!);
 
     // No need to update the database, as stripe webhook handles it
     return NextResponse.json({ message: 'Subscription cancellation initiated successfully' });

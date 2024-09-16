@@ -18,7 +18,7 @@ function useCircle({ center, radius = 40000 }: CircleProps) {
     if (radius && radius !== circle.getRadius()) {
       circle.setRadius(radius);
     }
-  }, [center, radius]);
+  }, [center, radius, circle]);
 
   const map = useContext(GoogleMapsContext)?.map;
 
@@ -45,11 +45,12 @@ function useCircle({ center, radius = 40000 }: CircleProps) {
     return () => {
       circle.setMap(null);
     };
-  }, [map]);
+  }, [map, circle]);
 
   return circle;
 }
 
+/* eslint-disable-next-line react/display-name */
 export const Circle = forwardRef((props: CircleProps, ref: CircleRef) => {
   const circle = useCircle(props);
 

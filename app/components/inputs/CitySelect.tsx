@@ -5,11 +5,11 @@ import axios from "axios";
 export type CitySelectValue = {
   label: string;
   value: string;
-  latlng: [number, number];
+  latlng: [string, string];
 };
 
 interface CitySelectProps {
-  countryCode: string; // Country code like 'US', 'PK'
+  countryCode: string;
   value?: CitySelectValue;
   onChange: (value: CitySelectValue) => void;
 }
@@ -33,7 +33,7 @@ const CitySelect: React.FC<CitySelectProps> = ({
           const cityData = response.data.geonames.map((city: any) => ({
             label: city.name,
             value: city.geonameId,
-            latlng: [city.lat, city.lng]
+            latlng: [city.lat as string, city.lng as string]
           }));
           setCities(cityData);
         })

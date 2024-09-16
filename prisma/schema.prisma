@@ -116,7 +116,7 @@ model Comment {
 model Subscription {
   id                   String   @id @default(auto()) @map("_id") @db.ObjectId
   stripeCustomerId     String?
-  stripeSubscriptionId String?
+  stripeSubscriptionId String?  @unique
   userId               String   @db.ObjectId
   status               String
   plan                 String

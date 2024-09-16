@@ -4,7 +4,7 @@ import { APIProvider, Map } from "@vis.gl/react-google-maps";
 import { Circle } from "./GoogleMaps/Circle";
 
 interface GoogleMapsProps {
-  position?: number[];
+  position?: string[];
 }
 
 export default function GoogleMaps({ position }: GoogleMapsProps) {
