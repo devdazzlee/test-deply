@@ -29,10 +29,6 @@ export async function PUT(request: NextRequest, { params }: { params: IParams })
       return new NextResponse('Reservation not found', { status: 404 });
     }
 
-    if (reservation.userId !== currentUser.id) {
-        return NextResponse.rewrite("/unauthorised");
-    }
-
     const receiver = await prisma.user.findUnique({
       where: {id: reservation.receiverId},
     })

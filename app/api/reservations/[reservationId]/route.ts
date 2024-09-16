@@ -88,7 +88,7 @@ export async function PUT(request: Request, { params }: { params: IParams }) {
   }
 
   if (reservation.listings.userId !== currentUser.id) {
-    return NextResponse.rewrite("/unauthorised"); // Checks if the current user is the owner of the listing
+      return new NextResponse('User not authorised', { status: 504 });
   }
 
   // Update the reservation to mark it as approved

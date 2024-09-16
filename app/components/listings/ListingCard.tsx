@@ -4,7 +4,7 @@ import useCountries from "@/app/hooks/useCountries";
 import { SafeListing, SafeReservation, SafeUser } from "@/app/types";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
-import { format } from "date-fns";
+import { format, differenceInDays } from "date-fns";
 import Image from "next/image";
 import HeartButton from "../HeartButton";
 import Button from "../Button";
@@ -117,7 +117,9 @@ const ListingCard: React.FC<ListingCardProps> = ({
     } catch (error) {
       setDisableCompleteBtn(false);
       console.error("Error approving reservation:", error);
-      alert("An error occurred while approving the reservation.");
+      toast.error(
+        `An error occurred while approving the reservation: ${error}`
+      );
     }
   };
 
@@ -169,6 +171,18 @@ const ListingCard: React.FC<ListingCardProps> = ({
     const end = new Date(reservation.endDate);
 
     return `${format(start, "PP")} - ${format(end, "PP")}`;
+  }, [reservation]);
+
+  const jobCompletionTimePeriod = useMemo(() => {
+    if (!reservation || !reservation.startDate) {
+      return true;
+    }
+
+    const startDate = new Date(reservation.startDate);
+    const currentDate = new Date();
+    const daysDifference = differenceInDays(currentDate, startDate);
+
+    return daysDifference > 14;
   }, [reservation]);
 
   return (
@@ -254,6 +268,26 @@ const ListingCard: React.FC<ListingCardProps> = ({
               onClick={handleRefund}
             />
           </>
+        )}
+
+        {type === "your-jobs" && (
+          <div className='relative group'>
+            <Button
+              disabled={!jobCompletionTimePeriod}
+              small
+              label={
+                disableCompleteBtn ? "Completing ..." : "Complete Reservation"
+              }
+              onClick={handleCompleted}
+            />
+
+            {!jobCompletionTimePeriod && (
+              <div className='absolute left-1/2 w-[200px] text-center transform -translate-x-1/2 top-full mt-2 hidden group-hover:block bg-gray-700 text-white text-xs rounded px-2 py-1 z-10'>
+                Creators can complete the reservation after 14 days of
+                reservation start date
+              </div>
+            )}
+          </div>
         )}
       </div>
     </Link>

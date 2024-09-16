@@ -30,7 +30,7 @@ export async function PUT(request: NextRequest, { params }: { params: IParams })
     }
 
     if (reservation.userId !== currentUser.id) {
-        return NextResponse.rewrite("/unauthorised");
+      return new NextResponse('User not authorised for this action', { status: 500 });
     }
 
     // const transfer = await stripe.transfers.create({
