@@ -29,15 +29,16 @@ export async function POST(request: Request) {
   const hashedPassword = await bcrypt.hash(password, 12);
   const token = generateVerificationToken();
 
+  const lowercasedEmail = email.toLowerCase();
   const user = await prisma.user.create({
     data: {
-      email,
+      email: lowercasedEmail,
       name,
       hashedPassword,
       verificationToken: token,
     }
   });
-  new Email({ email, name }).sendWelcome(token);
+  new Email({ email: lowercasedEmail, name }).sendWelcome(token);
 
   return NextResponse.json(user);
 }

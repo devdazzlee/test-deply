@@ -21,10 +21,11 @@ export async function PATCH(request: Request) {
       updateData.name = name;
     }
 
-    if (email && email !== currentUser.email) {
+    if (email && email.toLowerCase() !== currentUser.email.toLowerCase()) {
+      const lowercasedEmail = email.toLowerCase();
       const existingUser = await prisma.user.findUnique({
         where: {
-          email,
+          email: lowercasedEmail,
         },
       });
 
@@ -32,7 +33,7 @@ export async function PATCH(request: Request) {
         return NextResponse.json({ error: 'Email is already in use' }, { status: 422 });
       }
 
-      updateData.email = email;
+      updateData.email = lowercasedEmail;
     }
 
     if (password) {
