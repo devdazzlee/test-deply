@@ -27,7 +27,7 @@ const CitySelect: React.FC<CitySelectProps> = ({
       setLoading(true);
       axios
         .get(
-          `http://api.geonames.org/searchJSON?country=${countryCode}&featureClass=P&maxRows=1000&username=${process.env.NEXT_PUBLIC_GEONAMES_USERNAME}`
+          `https://api.geonames.org/searchJSON?country=${countryCode}&featureClass=P&maxRows=1000&username=${process.env.NEXT_PUBLIC_GEONAMES_USERNAME}`
         )
         .then(response => {
           const cityData = response.data.geonames.map((city: any) => ({
