@@ -1,9 +1,14 @@
 "use client";
 
+import { SafeUser } from "@/app/types";
 import Logo from "../navbar/Logo";
 import Link from "next/link";
+interface FooterProps {
+  currentUser?: SafeUser | null;
+}
 
-const Footer: React.FC = ({ }) => {
+
+const Footer: React.FC<FooterProps> = ({ currentUser }) => {
   return (
     <footer className='bg-[#F7F7F7] border-t border'>
       <div className='mx-auto w-full  p-4 py-6 lg:py-8'>
@@ -13,26 +18,25 @@ const Footer: React.FC = ({ }) => {
           </div>
           <div className='ml-1 sm:ml-0 grid grid-cols-2 gap-8 sm:gap-6 sm:grid-cols-3'>
             <div>
-              {/* <h2 className='mb-6 text-sm font-semibold text-gray-900 uppercase '>
-                Resources
-              </h2> */}
-              <ul className='text-gray-500 font-medium'>
-                <li className='mb-4'>
-                  <Link href='/profile' className='hover:underline'>
-                    My Profile
-                  </Link>
-                </li>
-                <li className="mb-4">
-                  <Link href='/subscribe' className='hover:underline'>
-                    Subscriptions
-                  </Link>
-                </li>
-                <li>
-                  <Link href='/favorites' className='hover:underline'>
-                    Favourites
-                  </Link>
-                </li>
-              </ul>
+              {currentUser &&
+                <ul className='text-gray-500 font-medium'>
+                  <li className='mb-4'>
+                    <Link href='/profile' className='hover:underline'>
+                      My Profile
+                    </Link>
+                  </li>
+                  <li className="mb-4">
+                    <Link href='/subscribe' className='hover:underline'>
+                      Subscriptions
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href='/account-settings' className='hover:underline'>
+                      Favourites
+                    </Link>
+                  </li>
+                </ul>
+              }
             </div>
             <div>
               {/* <h2 className='mb-6 text-sm font-semibold text-gray-900 uppercase '>
@@ -62,7 +66,7 @@ const Footer: React.FC = ({ }) => {
                   </Link>
                 </li>
                 <li>
-                  <Link href='#' className='hover:underline'>
+                  <Link href='/terms-and-conditions' className='hover:underline'>
                     Terms &amp; Conditions
                   </Link>
                 </li>

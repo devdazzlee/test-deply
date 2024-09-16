@@ -35,6 +35,8 @@ const UserMenu: React.FC<UserMenuProps> = ({ currentUser, subStatus }) => {
     if (!currentUser) {
       return loginModal.onOpen();
     }
+    console.log(subStatus);
+
 
     if (!process.env.NEXT_PUBLIC_ALLOW_WITHOUT_SUB) {
       if (!subStatus) {
@@ -145,7 +147,7 @@ const UserMenu: React.FC<UserMenuProps> = ({ currentUser, subStatus }) => {
                   <MenuItem label='Admin Approvals' href='/admin-approvals' />
                 )}
                 <MenuItem label='Reservations' href='/reservations' />
-                <MenuItem label='Account Settings' href='#' />
+                <MenuItem label='Account Settings' href='/account-settings' />
 
                 <hr />
 

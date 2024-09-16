@@ -40,7 +40,7 @@ export default async function RootLayout({
         <Providers>
           <div className='pb-20 pt-28'>{children}</div>
         </Providers>
-        <Footer />
+        <Footer currentUser={currentUser} />
       </body>
     </html>
   );

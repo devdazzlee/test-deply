@@ -26,61 +26,100 @@ interface BillingClientProps {
     currentUser?: SafeUser | null;
 }
 
+interface creatorPayments {
+
+}
+
 const BillingClient: React.FC<BillingClientProps> = ({ currentUser }) => {
     const [loading, setLoading] = useState(false);
-    console.log(currentUser);
+
+    const [totalEarnings, setTotalEarnings] = useState<number | null>(null);
+    const [creatorPayments, setCreatorPayments] = useState<any | null>(null);
+
+    // Fetch earnings and payments when the component mounts
+    const getCreatorPayments = async () => {
+        try {
+            const response = await axios.get('/api/stripe/payments');
+            return response.data.payments;
+        } catch (error: any) {
+            toast.error(error.response?.data?.error ?? "Failed to retrieve payments.");
+            return null;
+        }
+    };
+
+    const getTotalEarnings = async () => {
+        try {
+            const response = await axios.get('/api/stripe/total-earnings');
+            return response.data.totalEarnings;
+        } catch (error: any) {
+            toast.error(error.response?.data?.error ?? "Failed to retrieve total earnings.");
+            return null;
+        }
+    };
+
+    useEffect(() => {
+        const fetchEarningsAndPayments = async () => {
+            const earnings = await getTotalEarnings();
+            const payments = await getCreatorPayments();
+
+            if (earnings !== null) {
+                setTotalEarnings(earnings);
+            }
+            if (payments !== null) {
+                setCreatorPayments(payments);
+            }
+        };
+
+        if (currentUser?.stripeOnboardingComplete) {
+            fetchEarningsAndPayments();
+        }
+    }, [currentUser]);
 
     const onboardAction = useCallback(() => {
         setLoading(true);
+        if (currentUser?.stripeOnboardingComplete) {
+            // Navigate to the user's Stripe dashboard if onboarding is complete
+            axios
+                .get("/api/stripe/dashboard-link")
+                .then((response: any) => {
+                    if (response.data?.url) {
+                        window.location.href = response.data.url;
+                    } else {
+                        toast.error("Failed to retrieve Stripe dashboard link.");
+                    }
+                })
+                .catch((error: any) => {
+                    toast.error(error.response?.data?.error ?? "Something went wrong.");
+                })
+                .finally(() => {
+                    setLoading(false);
+                });
+        }
+        else {
+            axios
+                .post("/api/stripe/onboard")
+                .then((response: any) => {
+                    if (response.data?.url) {
+                        window.location.href = response.data.url;
+                    } else {
+                        toast.error("Onboarding failed. No URL returned.");
+                    }
+                })
+                .catch((error: any) => {
+                    console.error(error);
+                    toast.error("Failed to initiate onboarding process.");
+                })
+                .finally(() => {
+                    setLoading(false);
+                });
+        }
+    }, [currentUser]);
 
-        axios
-            .post("/api/stripe/onboard")
-            .then((response: any) => {
-                if (response.data?.url) {
-                    window.location.href = response.data.url;
-                } else {
-                    toast.error("Onboarding failed. No URL returned.");
-                }
-            })
-            .catch((error: any) => {
-                console.error(error);
-                toast.error("Failed to initiate onboarding process.");
-            })
-            .finally(() => {
-                setLoading(false);
-            });
-    }, []);
+    console.log(creatorPayments);
+
 
     return (
         <div className='px-6 md:pt-0 pt-12  min-h-[50vh]'>
-            {/* <div className='bg-[#101727] rounded-xl shadow-lg p-6 text-white'>
-        <h3 className='font-semibold text-xl'>Payment Method</h3>
-        <div className='bg-[#28303D] rounded p-4 mt-4 font-semibold flex items-center'>
-          <div className='self-start mr-4 bg-white rounded p-0.5'>
-            <Visa width={38} height='auto' />
-          </div>
-          <div>
-            <p>
-              Visa
-              <pre className='inline ml-2'>
-                <code>**** **** **** 3354</code>
-              </pre>
-            </p>
-            <p className='text-[#cacaca] text-sm mt-0'>Alfred Nobel</p>
-            <p className='text-[#adadad] text-sm mt-1'>
-              Expires on 16 Feb 2027
-            </p>
-          </div>
-          <div className='ml-auto'>
-            <Button
-              onClick={onboardAction}
-              label={loading ? "Loading..." : "Stripe Onboard"}
-              outline
-              disabled={loading}
-            />
-          </div>
-        </div>
-      </div> */}
             <div className="mx-auto shadow rounded-xl  p-6">
                 <h2 className="text-2xl font-semibold mb-2">Billing</h2>
                 <p className="text-gray-600 mb-4">
@@ -146,11 +185,10 @@ const BillingClient: React.FC<BillingClientProps> = ({ currentUser }) => {
                 <>
                     <div className="w-full flex items-center">
                         <div className="container mx-auto my-16">
-                            <div className="grid gap-7 sm:grid-cols-2 lg:grid-cols-4">
-                                <StatisticCard heading={"Total Sales"} mainContent={"$123.912"} subContent={"1.8%"} />
-                                <StatisticCard heading={"Total Sales"} mainContent={"$123.912"} subContent={"1.8%"} />
-                                <StatisticCard heading={"Total Sales"} mainContent={"$123.912"} subContent={"1.8%"} />
-                                <StatisticCard heading={"Total Sales"} mainContent={"$123.912"} subContent={"1.8%"} />
+                            <div className="grid gap-7 sm:grid-cols-2">
+                                <StatisticCard heading={"Total Earnings"} mainContent={`$${totalEarnings ?? 'Loading...'}`} />
+                                <StatisticCard heading={"Total creator payments"} mainContent={`${(creatorPayments && creatorPayments.data && creatorPayments.data.length) ?? 'Loading...'}`} />
+
                             </div>
                         </div>
                     </div>
@@ -172,16 +210,14 @@ interface StatisticCardProps {
     subContent?: string | null;
 }
 
-const StatisticCard: React.FC<StatisticCardProps> = ({ heading, mainContent, subContent }) => {
+const StatisticCard: React.FC<StatisticCardProps> = ({ heading, mainContent }) => {
 
     return (
         <div className="p-5 bg-white rounded-xl shadow">
             <div className="text-base text-gray-400 ">{heading}</div>
             <div className="flex items-center pt-1">
                 <div className="text-2xl font-bold text-gray-900 ">{mainContent}</div>
-                <span className="flex items-center px-2 py-0.5 mx-2 text-sm text-green-600 bg-theme2 rounded-full">
-                    <span>{subContent}</span>
-                </span>
+
             </div>
         </div>
     )
@@ -306,7 +342,7 @@ const RecentActivity: React.FC<RecentItemProps> = ({ }) => {
     return (
         <div className="md:w-1/3 rounded-xl shadow flex flex-col bg-white">
             <nav className="px-5 py-4 border-b">
-                <ul className="flex space-x-1 lg:space-x-2 overflow-clip">
+                {/* <ul className="flex space-x-1 lg:space-x-2 overflow-clip">
                     <RecentTab
                         title="Today"
                         active={active === 0}
@@ -321,8 +357,10 @@ const RecentActivity: React.FC<RecentItemProps> = ({ }) => {
                         title="This Month"
                         active={active === 2}
                         onClick={() => setActive(2)}
-                    />
-                </ul>
+                    /> 
+
+                {/* </ul> */}
+                <h1 className="font-semibold">Creator Payments</h1>
             </nav>
             <ul className="flex flex-col overflow-y-auto divide-y">
                 {recents.map((d, i) => (
@@ -339,27 +377,27 @@ const RecentActivity: React.FC<RecentItemProps> = ({ }) => {
         </div>
     );
 
-    interface RecentTabProps {
-        title: string;
-        active: boolean;
-        onClick: MouseEventHandler<HTMLButtonElement>;
-    }
+    // interface RecentTabProps {
+    //     title: string;
+    //     active: boolean;
+    //     onClick: MouseEventHandler<HTMLButtonElement>;
+    // }
 
-    function RecentTab({ title, active, onClick }: RecentTabProps) {
-        let itemClass = " text-gray-500";
+    // function RecentTab({ title, active, onClick }: RecentTabProps) {
+    //     let itemClass = " text-gray-500";
 
-        if (active) {
-            itemClass = " bg-indigo-100 text-indigo-700";
-        }
+    //     if (active) {
+    //         itemClass = " bg-indigo-100 text-indigo-700";
+    //     }
 
-        return (
-            <li className={"font-secondry px-4 py-2 rounded-md truncate" + itemClass}>
-                <button onClick={onClick} className="focus:outline-none">
-                    {title}
-                </button>
-            </li>
-        );
-    }
+    //     return (
+    //         <li className={"font-secondry px-4 py-2 rounded-md truncate" + itemClass}>
+    //             <button onClick={onClick} className="focus:outline-none">
+    //                 {title}
+    //             </button>
+    //         </li>
+    //     );
+    // }
 
     interface RecentItemProps {
         title: string;
