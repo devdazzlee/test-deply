@@ -173,7 +173,9 @@ const SettingsClient: React.FC<SettingsClientProps> = ({
                 <p className='text-sm text-gray-600'>Drag to move photos around</p>
 
                 {listings.map((listing: any) =>
-                    <PhotoSection listing={listing} />
+                    <div key={listing.id}>
+                        <PhotoSection listing={listing} />
+                    </div>
                 )}
                 <section className='pt-6'>
                     <Button
