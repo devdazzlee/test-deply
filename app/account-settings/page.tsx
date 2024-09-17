@@ -5,9 +5,10 @@ import EmptyState from "../components/EmptyState";
 import FavoriteClient from "./FavoriteClient";
 import { Suspense } from "react";
 import SettingsClient from "./SettingsClient";
+import getListings from "../actions/getListings";
 
 const AccountSettingsPage = async () => {
-    const listings = await getFavoriteListings();
+    const favouriteListings = await getFavoriteListings();
     const currentUser = await getCurrentUser();
 
     if (!currentUser) {
@@ -17,14 +18,16 @@ const AccountSettingsPage = async () => {
             </ClientOnly>
         );
     }
+    const listings = await getListings({ userId: currentUser.id });
+    console.log(listings);
 
 
 
     return (
         <Suspense>
             <ClientOnly>
-                <SettingsClient listing={listings[0]} currentUser={currentUser} />
-                <FavoriteClient listings={listings} currentUser={currentUser} />
+                <SettingsClient listings={listings} currentUser={currentUser} />
+                <FavoriteClient listings={favouriteListings} currentUser={currentUser} />
             </ClientOnly>
         </Suspense>
     );

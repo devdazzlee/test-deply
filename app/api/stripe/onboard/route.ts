@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import prisma from '@/app/libs/prismadb';
 import getCurrentUser from '@/app/actions/getCurrentUser';
+import Email from '@/app/utils/email';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2024-06-20',
@@ -60,6 +61,17 @@ export async function POST() {
       return_url: `${process.env.NEXT_PUBLIC_BASE_URL}/billing`, // URL to redirect upon successful onboarding
       type: 'account_onboarding',
     });
+
+    if (currentUser.email && currentUser.name) {
+      try {
+        new Email({
+          name: currentUser.name,
+          email: currentUser.email
+        }).sendStripeOnBoarding()
+      } catch (error) {
+        console.log(error);
+      }
+    }
 
     return NextResponse.json({ url: accountLink.url });
   } catch (error: any) {

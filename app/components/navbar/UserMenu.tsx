@@ -73,16 +73,6 @@ const UserMenu: React.FC<UserMenuProps> = ({ currentUser, subStatus }) => {
     };
   }, []);
 
-  // let planName = currentUser?.subscriptionOption
-  let planName: string | null = null;
-
-  switch (currentUser?.subscriptionOption) {
-    case "booking_fee":
-      planName = "Basic";
-    case "flat_fee":
-      planName = "Pro";
-  }
-
   return (
     <div className='relative'>
       <div className='flex flex-row items-center gap-3'>
@@ -125,14 +115,7 @@ const UserMenu: React.FC<UserMenuProps> = ({ currentUser, subStatus }) => {
           <div className='flex flex-col cursor-pointer'>
             {currentUser ? (
               <>
-                <div
-                  onClick={onRent}
-                  className='md:hidden block text-sm font-semibold py-3 px-4 hover:bg-neutral-100 transition cursor-pointer'
-                >
-                  Get Started
-                </div>
-
-                {planName && (
+                {currentUser?.subscriptionOption && (
                   <>
                     <div className='flex py-2 p-2 justify-center'>
                       <h1
@@ -142,12 +125,19 @@ const UserMenu: React.FC<UserMenuProps> = ({ currentUser, subStatus }) => {
                           "bg-gradient-to-r from-amber-600 via-red-400 to-amber-400 bg-clip-text text-transparent"
                         )}
                       >
-                        {planName} Plan
+                        Creator
                       </h1>
                     </div>
                     <hr />
                   </>
                 )}
+                <div
+                  onClick={onRent}
+                  className='md:hidden block text-sm font-semibold py-3 px-4 hover:bg-neutral-100 transition cursor-pointer'
+                >
+                  Get Started
+                </div>
+
 
                 <MenuItem label='My Profile' href='/profile' />
                 <MenuItem label='Approvals and Bookings' href='/bookings' />
