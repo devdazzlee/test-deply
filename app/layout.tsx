@@ -11,6 +11,7 @@ import RentModal from "./components/modals/RentModal";
 import SearchModal from "./components/modals/SearchModal";
 import { Providers } from "./providers";
 import getSubscriptionStatus from "./actions/getSubscriptionStatus";
+import { SessionProvider } from "next-auth/react";
 
 const inter = Inter({ subsets: ["latin"] });
 

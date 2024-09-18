@@ -1,14 +1,28 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FiMenu, FiX } from "react-icons/fi";
 import SearchComponent from "./SearchComponent";
 import ContactsComponent from "./ContactsComponent";
 import MessageBoxComponent from "./MessageBoxComponent";
+import io, { Socket } from "socket.io-client";
 
-const ChatLayout: React.FC = () => {
+let socket: Socket;
+
+const ChatLayout: React.FC = ({ currentUser }: { currentUser: any }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
+
+  useEffect(() => {
+    console.log({ currentUser });
+    // Connect to Socket.IO server
+    socket = io();
+
+    // Cleanup the socket when the component unmounts
+    return () => {
+      socket.disconnect();
+    };
+  }, []);
 
   return (
     <div className='flex flex-col sm:flex-row mt-10 sm:-mt-6 h-[82vh] sm:h-[90vh] bg-white'>

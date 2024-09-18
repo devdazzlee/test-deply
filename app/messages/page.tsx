@@ -9,5 +9,5 @@ export default async function ProfilePage() {
     return <EmptyState title='Unauthorised' subtitle='Please login' />;
   }
 
-  return <ChatLayout />;
+  return <ChatLayout currentUser={currentUser} />;
 }

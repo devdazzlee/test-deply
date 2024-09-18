@@ -34,7 +34,7 @@ const MessageBoxComponent: React.FC = () => {
             placeholder='Type Your Message'
             className='flex-1'
           />
-          <button className='p-2 bg-black text-white rounded-md'>
+          <button className='p-2.5 bg-black text-white rounded-md'>
             <FiSend size={20} />
           </button>
         </div>
