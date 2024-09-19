@@ -18,6 +18,7 @@ interface ListingReservationProps {
   disabled?: boolean;
   disabledDates: Date[];
   listingOwner: SafeUser;
+  currentUser: SafeUser;
 }
 
 const ListingReservation: React.FC<ListingReservationProps> = ({
@@ -28,7 +29,8 @@ const ListingReservation: React.FC<ListingReservationProps> = ({
   onSubmit,
   disabled,
   disabledDates,
-  listingOwner
+  listingOwner,
+  currentUser
 }) => {
   const [user, setUser] = useState<any>(null);
   const router = useRouter();
@@ -37,7 +39,7 @@ const ListingReservation: React.FC<ListingReservationProps> = ({
 
   const authStatusChange = async () => {
     if (status === "authenticated") {
-      setUser(true);
+      setUser(currentUser);
     } else setUser(null);
   };
 
@@ -62,18 +64,18 @@ const ListingReservation: React.FC<ListingReservationProps> = ({
       <div className='p-4'>
         <Button disabled={disabled} label='Reserve' onClick={onSubmit} />
         <div className='mt-2'>
-          {user ? (
+          {user && user?.id !== listingOwner.id ? (
             <Button
               label='Chat Now'
               onClick={() =>
                 router.push(`/messages?owner_id=${listingOwner.id}`)
               }
             />
-          ) : (
+          ) : user?.id !== listingOwner.id ? (
             <div className='opacity-50'>
               <Button disabled={disabled} label='Login To Chat' />
             </div>
-          )}
+          ) : null}
         </div>
       </div>
 

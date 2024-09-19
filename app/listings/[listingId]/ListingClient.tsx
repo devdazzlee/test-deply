@@ -138,6 +138,7 @@ const ListingClient: React.FC<ListingClientProps> = ({
                   disabled={isLoading}
                   disabledDates={disabledDates}
                   listingOwner={listing.user}
+                  currentUser={currentUser}
                 />
               </SessionProvider>
             </div>

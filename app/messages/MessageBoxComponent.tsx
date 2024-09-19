@@ -259,13 +259,13 @@ const MessageBoxComponent: React.FC<MessageBoxComponentProps> = ({
             </span>
           </div>
         </div>
-        <button
+        {/* <button
           onClick={handleDeleteRoom}
           className='p-2 hover:bg-gray-100 rounded-full mr-10 xl:mr-0'
           title='Delete Room'
         >
           <FiTrash2 size={20} />
-        </button>
+        </button> */}
       </div>
 
       <div
