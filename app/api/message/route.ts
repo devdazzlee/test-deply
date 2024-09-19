@@ -2,6 +2,14 @@ import { NextResponse } from "next/server";
 import getCurrentUser from "@/app/actions/getCurrentUser";
 import prisma from "@/app/libs/prismadb";
 
+import cloudinary from "cloudinary";
+
+// Configure Cloudinary with your account details
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET
+});
 export async function POST(request: Request) {
   const currentUser = await getCurrentUser();
 
@@ -16,15 +24,31 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid Data" }, { status: 400 });
   }
 
+  let fileUrl = fileData;
+
   try {
+    if (fileData) {
+      const res = await cloudinary.v2.uploader.upload(fileData, {
+        folder: "/messages/attachments" // Optional folder in Cloudinary
+      });
+
+      fileUrl = res.secure_url;
+    }
+
     const message = await prisma.message.create({
       data: {
-        senderId: currentUser.id,
+        // senderId: currentUser.id,
         content: content || null,
-        roomId: roomId,
+        // roomId: roomId,
         fileName: fileName || null,
         fileType: fileType || null,
-        fileData: fileData || null
+        fileData: fileUrl || null,
+        sender: {
+          connect: { id: currentUser.id } // Connecting to existing User by ID
+        },
+        room: {
+          connect: { id: roomId } // Connecting to existing User by ID
+        }
       }
     });
 

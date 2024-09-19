@@ -5,6 +5,7 @@ import { FiPaperclip, FiSend, FiTrash2 } from "react-icons/fi";
 import { Socket } from "socket.io-client";
 import axios from "axios";
 import toast from "react-hot-toast";
+import { BeatLoader } from "react-spinners";
 
 interface Message {
   id: string;
@@ -49,6 +50,7 @@ const MessageBoxComponent: React.FC<MessageBoxComponentProps> = ({
   const [newMessage, setNewMessage] = useState("");
   const [isOnline, setIsOnline] = useState<boolean | null>(null);
   const [selectedFile, setSelectedFile] = useState(null);
+  const [isSendingMessage, setIsSendingMessage] = useState<boolean>(false);
 
   const messageContainerRef = useRef();
 
@@ -67,6 +69,7 @@ const MessageBoxComponent: React.FC<MessageBoxComponentProps> = ({
       const reader = new FileReader();
 
       reader.onloadend = async () => {
+        setIsSendingMessage(true);
         const base64File = reader.result; // This is base64-encoded file data
 
         const message = {
@@ -82,30 +85,7 @@ const MessageBoxComponent: React.FC<MessageBoxComponentProps> = ({
           fileData: base64File
         };
 
-        // Emit the message to the server
-        socketInstance.emit("message", {
-          roomId: selectedRoom.id,
-          message
-        });
-
-        // Update the selectedRoom if it matches the roomId
-        setSelectedRoom(prevRoom => ({
-          ...prevRoom,
-          messages: [...(prevRoom.messages || []), message] // Append the entire message object
-        }));
-
-        // Update the messages in the specific room in the rooms array
-        setRooms(prevRooms =>
-          prevRooms.map(room =>
-            room.id === selectedRoom.id
-              ? { ...room, messages: [...(room.messages || []), message] } // Append the entire message object
-              : room
-          )
-        );
-
-        setNewMessage("");
-
-        const response = await axios.post(`/api/message`, {
+        const res = await axios.post(`/api/message`, {
           senderId: currentUserId,
           content: newMessage || null,
           roomId: selectedRoom.id,
@@ -113,6 +93,32 @@ const MessageBoxComponent: React.FC<MessageBoxComponentProps> = ({
           fileType: file.type,
           fileData: base64File
         });
+
+        if (res.status === 200) {
+          // Emit the message to the server
+          socketInstance.emit("message", {
+            roomId: selectedRoom.id,
+            message
+          });
+
+          // Update the selectedRoom if it matches the roomId
+          setSelectedRoom(prevRoom => ({
+            ...prevRoom,
+            messages: [...(prevRoom.messages || []), message] // Append the entire message object
+          }));
+
+          // Update the messages in the specific room in the rooms array
+          setRooms(prevRooms =>
+            prevRooms.map(room =>
+              room.id === selectedRoom.id
+                ? { ...room, messages: [...(room.messages || []), message] } // Append the entire message object
+                : room
+            )
+          );
+
+          setNewMessage("");
+          setIsSendingMessage(false);
+        }
       };
 
       reader.readAsDataURL(file); // Convert the file to base64 format
@@ -349,10 +355,15 @@ const MessageBoxComponent: React.FC<MessageBoxComponentProps> = ({
             }}
           />
           <button
-            className='p-2.5 bg-black text-white rounded-md'
+            className='p-2.5 bg-black disabled:opacity-60 text-white rounded-md'
             onClick={handleSendMessage}
+            disabled={isSendingMessage}
           >
-            <FiSend size={20} />
+            {isSendingMessage ? (
+              <BeatLoader color='white' />
+            ) : (
+              <FiSend size={20} />
+            )}
           </button>
         </div>
       </div>

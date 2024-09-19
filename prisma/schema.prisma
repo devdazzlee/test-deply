@@ -150,7 +150,7 @@ model Message {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   sender    User     @relation(fields: [senderId], references: [id])
   senderId  String   @db.ObjectId
-  content   String
+  content   String?
   createdAt DateTime @default(now())
   room      Room     @relation(name: "RoomMessages", fields: [roomId], references: [id])
   roomId    String   @db.ObjectId
