@@ -6,6 +6,7 @@ import Heading from "../components/Heading";
 import ListingCard from "../components/listings/ListingCard";
 import { SafeListing, SafeUser } from "../types";
 import type { CurrentUser } from "../actions/getCurrentUser";
+import { signOut } from "next-auth/react";
 
 import { Button, Input, InputProps, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, useDisclosure } from "@nextui-org/react";
 import { IconAlertTriangle, IconCircleDashedCheck, IconEyeClosed, IconEyeFilled, IconTrash } from "@tabler/icons-react";
@@ -18,41 +19,56 @@ import clsx from "clsx";
 import Image from "next/image";
 
 interface SettingsClientProps {
-    listing: any;
+    listings: any;
     currentUser: CurrentUser;
 }
 
 const SettingsClient: React.FC<SettingsClientProps> = ({
-    listing,
+    listings,
     currentUser
 }) => {
     const router = useRouter();
 
     // Define state to store input values
-    const [username, setUsername] = useState(currentUser?.name ?? "");
-    const [email, setEmail] = useState(currentUser?.email ?? "");
-    // const [location, setLocation] = useState("");
-    const [newPassword, setNewPassword] = useState("");
-    const [confirmNewPassword, setConfirmNewPassword] = useState("");
+    const [formState, setFormState] = useState({
+        name: currentUser?.name ?? "",
+        email: currentUser?.email ?? "",
+        newPassword: "",
+        confirmNewPassword: "",
+    });
+
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+        setFormState((prevState) => ({
+            ...prevState,
+            [name]: value, // Update the specific field by name
+        }));
+    };
+    const [loading, setIsLoading] = useState(false);
 
     const handleSaveChanges = () => {
-        if (newPassword !== confirmNewPassword) {
+        if (formState.newPassword !== formState.confirmNewPassword) {
             return toast.error("New password and confirm password do not match");
         }
+        setIsLoading(true)
+        const payload: { name?: string; email?: string; password?: string } = {};
 
-        const payload = {
-            name: username,
-            email,
-            password: newPassword, 
-        };
+        if (formState.name !== currentUser?.name)
+            payload.name = formState.name;
+        if (formState.email !== currentUser?.email)
+            payload.email = formState.email;
+        if (formState.newPassword !== "")
+            payload.password = formState.newPassword;
 
         axios
             .patch('/api/user/update', payload)
             .then(() => {
                 toast.success('Changes saved successfully');
+                setIsLoading(false)
                 router.refresh();
             })
-            .catch((error: unknown) => { 
+            .catch((error: unknown) => {
+                setIsLoading(false)
                 if (error instanceof Error) {
                     toast.error(error.message || 'Failed to save changes');
                 } else {
@@ -77,11 +93,13 @@ const SettingsClient: React.FC<SettingsClientProps> = ({
                         variant='flat'
                         radius='sm'
                         labelPlacement='outside'
-                        label='Your username'
+                        label='Your name'
                         className='z-0'
-                        placeholder='Enter your username'
-                        value={username}
-                        onChange={(e) => setUsername(e.target.value)}  // Capture input value
+                        name="name"
+                        placeholder='Enter your name'
+                        value={formState.name}
+                        onChange={handleInputChange}
+                    // Capture input value
                     />
                     <Input
                         variant='flat'
@@ -89,9 +107,10 @@ const SettingsClient: React.FC<SettingsClientProps> = ({
                         className='z-0'
                         labelPlacement='outside'
                         label='Your email'
+                        name="email"
                         placeholder='Enter your email'
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}  // Capture input value
+                        value={formState.email}
+                        onChange={handleInputChange}  // Capture input value
                     />
                     {/* <Input
                         variant='flat'
@@ -120,14 +139,16 @@ const SettingsClient: React.FC<SettingsClientProps> = ({
                     <PasswordInput
                         label='New Password'
                         placeholder='Enter new password'
-                        value={newPassword}
-                        onChange={(e) => setNewPassword(e.target.value)}  // Capture input value
+                        name="newPassword"
+                        value={formState.newPassword}
+                        onChange={handleInputChange}  // Capture input value
                     />
                     <PasswordInput
                         label='Confirm New Password'
                         placeholder='Enter new password again'
-                        value={confirmNewPassword}
-                        onChange={(e) => setConfirmNewPassword(e.target.value)}  // Capture input value
+                        name="confirmNewPassword"
+                        value={formState.confirmNewPassword}
+                        onChange={handleInputChange} // Capture input value
                     />
                 </div>
             </section>
@@ -137,8 +158,9 @@ const SettingsClient: React.FC<SettingsClientProps> = ({
                 <Button
                     color='success'
                     variant='solid'
-                    className='!font-bold'
+                    className='!font-bold disabled:cursor-not-allowed w-48'
                     endContent={<IconCircleDashedCheck />}
+                    disabled={loading}
                     onClick={handleSaveChanges}  // Handle form submission
                 >
                     Save Changes
@@ -146,7 +168,29 @@ const SettingsClient: React.FC<SettingsClientProps> = ({
             </section>
             <DeleteAccountButton />
 
-            <section className='mx-6 md:mx-16 flex max-md:flex-col md:items-start gap-x-12 gap-y-6 border-b-2 py-6'>
+            <section className='mx-6 md:mx-16 py-6 border-b-2'>
+                <h4 className='font-semibold'>Your listings</h4>
+                <p className='text-sm text-gray-600'>Drag to move photos around</p>
+
+                {listings.map((listing: any) =>
+                    <div key={listing.id}>
+                        <PhotoSection listing={listing} />
+                    </div>
+                )}
+                <section className='pt-6'>
+                    <Button
+                        color='success'
+                        variant='solid'
+                        className='!font-bold disabled:cursor-not-allowed w-48'
+                        endContent={<IconCircleDashedCheck />}
+                        disabled={loading}
+                    // onClick={handleSaveChanges}  // Handle form submission
+                    >
+                        Save Changes
+                    </Button>
+                </section>
+            </section>
+            <section className='mx-6 md:mx-16 flex max-md:flex-col md:items-start gap-x-12 gap-y-6 border-b-2 py-4'>
                 <Heading title="Reviews you got on your listings" />
             </section>
         </>
@@ -173,7 +217,7 @@ const DeleteAccountButton = () => {
             .delete("/api/user/delete") // Replace with your actual delete API endpoint
             .then(() => {
                 toast.success("Account deleted successfully");
-                router.push("/goodbye"); // Redirect the user or refresh the page
+                signOut() // Redirect the user or refresh the page
             })
             .catch((error) => {
                 toast.error(error || "Failed to delete account");
@@ -187,11 +231,11 @@ const DeleteAccountButton = () => {
     return (
         <>
             {/* Button to open the modal */}
-            <section className='mx-6 md:mx-16 py-6 border-b-2'>
+            <section className='mx-6 md:mx-16 py-6 border-b-2 '>
                 <Button
                     color='danger'
                     variant='solid'
-                    className='!font-bold'
+                    className='!font-bold w-48'
                     endContent={<IconTrash />}
                     onClick={onOpen}
                 >
@@ -325,48 +369,52 @@ function PhotoSection({ listing }: any) {
     }
 
     return (
-        <SortableList
-            onSortEnd={onSortEnd}
-            className={clsx(
-                "mt-6 select-none",
-                "grid gap-4",
-                "md:max-w-lg grid-cols-[repeat(2,1fr)] ph:grid-cols-[repeat(3,1fr)]"
-            )}
-            draggedItemClassName='dragged'
-        >
-            {items.map(item => (
-                <SortableItem key={item.id}>
-                    <div className='aspect-square rounded-xl relative overflow-hidden'>
-                        <div className='relative w-full h-full'>
-                            <Image
-                                src={item.url}
-                                className='object-cover'
-                                alt=''
-                                layout='fill'
-                            />
-                        </div>
-                        <div
-                            className={clsx(
-                                //
-                                "absolute inset-0 cursor-grab bg-black/70",
-                                "hover:opacity-100 opacity-0 transition-opacity",
-                                "p-1.5 dark"
-                            )}
-                        >
-                            <Button
-                                isIconOnly
-                                variant='ghost'
-                                color='danger'
-                                size='sm'
-                                radius='sm'
+        <div className="border-b p-4">
+            <h1 className="font-semibold text-lg">{listing.title}</h1>
+            <SortableList
+                onSortEnd={onSortEnd}
+                className={clsx(
+                    "mt-6 select-none",
+                    "grid gap-4",
+                    "md:max-w-lg grid-cols-[repeat(2,1fr)] ph:grid-cols-[repeat(3,1fr)]"
+                )}
+                draggedItemClassName='dragged'
+            >
+                {items.map(item => (
+                    <SortableItem key={item.id}>
+                        <div className='aspect-square rounded-xl relative overflow-hidden'>
+                            <div className='relative w-full h-full'>
+                                <Image
+                                    src={item.url}
+                                    className='object-cover'
+                                    alt=''
+                                    layout='fill'
+                                />
+                            </div>
+                            <div
+                                className={clsx(
+                                    //
+                                    "absolute inset-0 cursor-grab bg-black/70",
+                                    "hover:opacity-100 opacity-0 transition-opacity",
+                                    "p-1.5 dark"
+                                )}
                             >
-                                <IconTrash size={20} />
-                            </Button>
+                                <Button
+                                    isIconOnly
+                                    variant='ghost'
+                                    color='danger'
+                                    size='sm'
+                                    radius='sm'
+                                >
+                                    <IconTrash size={20} />
+                                </Button>
+                            </div>
                         </div>
-                    </div>
-                </SortableItem>
-            ))}
-        </SortableList>
+                    </SortableItem>
+                ))}
+            </SortableList>
+        </div>
+
     );
 }
 export default SettingsClient;

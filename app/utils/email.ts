@@ -188,6 +188,26 @@ class Email {
             )
     }
 
+    async sendStripeOnBoarding(): Promise<void> {
+        await this.send(
+            `Congratulations! Your stripe onboarding has been completed!"`,
+            `<section style="max-width: 640px; padding: 24px 48px; margin: 0 auto; background-color: #ffffff; color: #1f2937;">
+<main style="margin-top: 32px;">
+    <h2 style="color: #374151;">Hi ${this.name}</h2>
+    <p style="margin-top: 8px; line-height: 1.75; color: #4b5563;">
+        Your stripe onboarding has been <b>completed</b>. You can now see your report on the <span><a href="${process.env.NEXT_PUBLIC_BASE_URL}/billing" style="font-weight: 600;">Billings</a></span>.
+    
+    <p style="margin-top: 32px; color: #4b5563;">
+        Thanks, <br>
+        Shutter Guide Team
+    </p>
+</main>
+<footer style="margin-top: 32px;">
+    <p style="margin-top: 12px; color: #9ca3af;">© ${new Date().getFullYear()} Shutter Guide. All Rights Reserved.</p>
+</footer>
+</section>`
+        )
+    }
     async sendResetPassword(resetUrl: string): Promise<void> {
         await this.send(
             "Password Reset",

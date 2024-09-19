@@ -62,10 +62,16 @@ export async function POST(request: Request) {
     }
   });
   if (currentUser.email && currentUser.name) {
-    new Email({
-      name: currentUser.name,
-      email: currentUser.email
-    }).sendNewListing();
+    try {
+
+      new Email({
+        name: currentUser.name,
+        email: currentUser.email
+      }).sendNewListing();
+    }
+    catch (error) {
+      console.log(error);
+    }
   }
   return NextResponse.json(listing);
 }

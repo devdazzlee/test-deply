@@ -59,12 +59,12 @@ const LoginModal = () => {
     loginModal.onClose();
     registerModal.onOpen();
   }, [loginModal, registerModal]);
-  
+
   const inputKeyDown = useCallback((event: KeyboardEvent) => {
     if (event.key === "Enter") {
       handleSubmit(onSubmit)();
     }
-  } , []);
+  }, []);
 
   const bodyContent = (
     <div className='flex flex-col gap-4'>
