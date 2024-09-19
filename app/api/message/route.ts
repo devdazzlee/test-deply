@@ -10,9 +10,9 @@ export async function POST(request: Request) {
   }
 
   const body = await request.json();
-  const { senderId, content, roomId } = body;
+  const { content, roomId, fileName, fileType, fileData } = body;
 
-  if (!senderId || !content || !roomId) {
+  if (!roomId) {
     return NextResponse.json({ error: "Invalid Data" }, { status: 400 });
   }
 
@@ -20,8 +20,11 @@ export async function POST(request: Request) {
     const message = await prisma.message.create({
       data: {
         senderId: currentUser.id,
-        content: content,
-        roomId: roomId
+        content: content || null,
+        roomId: roomId,
+        fileName: fileName || null,
+        fileType: fileType || null,
+        fileData: fileData || null
       }
     });
 

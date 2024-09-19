@@ -154,4 +154,8 @@ model Message {
   createdAt DateTime @default(now())
   room      Room     @relation(name: "RoomMessages", fields: [roomId], references: [id])
   roomId    String   @db.ObjectId
+
+  fileName String? // Name of the file
+  fileType String? // MIME type of the file
+  fileData String? // Base64-encoded file data
 }

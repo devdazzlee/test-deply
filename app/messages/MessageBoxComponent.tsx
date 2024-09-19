@@ -48,6 +48,7 @@ const MessageBoxComponent: React.FC<MessageBoxComponentProps> = ({
 }) => {
   const [newMessage, setNewMessage] = useState("");
   const [isOnline, setIsOnline] = useState<boolean | null>(null);
+  const [selectedFile, setSelectedFile] = useState(null);
 
   const messageContainerRef = useRef();
 
@@ -60,6 +61,64 @@ const MessageBoxComponent: React.FC<MessageBoxComponentProps> = ({
         : selectedRoom.user1;
   }
 
+  const handleFileChange = async e => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+
+      reader.onloadend = async () => {
+        const base64File = reader.result; // This is base64-encoded file data
+
+        const message = {
+          id: Date.now().toString(), // Unique ID for the message
+          content: newMessage || null, // If there's text content along with the file
+          createdAt: new Date().toISOString(),
+          senderId: currentUserId,
+          receiverId: contact.id,
+          roomId: selectedRoom.id, // Include roomId in the message
+
+          fileName: file.name,
+          fileType: file.type,
+          fileData: base64File
+        };
+
+        // Emit the message to the server
+        socketInstance.emit("message", {
+          roomId: selectedRoom.id,
+          message
+        });
+
+        // Update the selectedRoom if it matches the roomId
+        setSelectedRoom(prevRoom => ({
+          ...prevRoom,
+          messages: [...(prevRoom.messages || []), message] // Append the entire message object
+        }));
+
+        // Update the messages in the specific room in the rooms array
+        setRooms(prevRooms =>
+          prevRooms.map(room =>
+            room.id === selectedRoom.id
+              ? { ...room, messages: [...(room.messages || []), message] } // Append the entire message object
+              : room
+          )
+        );
+
+        setNewMessage("");
+
+        const response = await axios.post(`/api/message`, {
+          senderId: currentUserId,
+          content: newMessage || null,
+          roomId: selectedRoom.id,
+          fileName: file.name,
+          fileType: file.type,
+          fileData: base64File
+        });
+      };
+
+      reader.readAsDataURL(file); // Convert the file to base64 format
+    }
+  };
+
   const handleSendMessage = async () => {
     if (newMessage.trim() === "" || !selectedRoom || !contact) return;
 
@@ -69,7 +128,14 @@ const MessageBoxComponent: React.FC<MessageBoxComponentProps> = ({
       createdAt: new Date().toISOString(),
       senderId: currentUserId,
       receiverId: contact.id,
-      roomId: selectedRoom.id // Include roomId in the message
+      roomId: selectedRoom.id, // Include roomId in the message
+      file: selectedFile
+        ? {
+            name: selectedFile.name,
+            type: selectedFile.type,
+            data: selectedFile.data // Base64-encoded file data
+          }
+        : null // Only include if a file is selected
     };
 
     // Emit the message to the server
@@ -100,7 +166,6 @@ const MessageBoxComponent: React.FC<MessageBoxComponentProps> = ({
       content: newMessage,
       roomId: selectedRoom.id
     });
-    console.log(response.status);
   };
   useEffect(() => {
     if (socketInstance && selectedRoom) {
@@ -201,35 +266,73 @@ const MessageBoxComponent: React.FC<MessageBoxComponentProps> = ({
         className='flex-1 overflow-y-auto p-4 scroll-smooth'
         ref={messageContainerRef}
       >
-        {selectedRoom.messages.map(message => (
-          <div
-            key={message.id}
-            className={`mb-4 ${
-              message?.senderId === currentUserId ? "text-right" : "text-left"
-            }`}
-          >
+        {selectedRoom.messages.map(message => {
+          return (
             <div
-              className={`inline-block p-2 rounded-lg ${
-                message?.senderId === currentUserId
-                  ? "bg-black text-white"
-                  : "bg-gray-200"
+              key={message.id}
+              className={`mb-4 ${
+                message?.senderId === currentUserId ? "text-right" : "text-left"
               }`}
             >
-              {message.content}
+              <div
+                className={`inline-block p-2 rounded-lg ${
+                  message?.senderId === currentUserId
+                    ? "bg-black text-white"
+                    : "bg-gray-200"
+                }`}
+              >
+                {message.content && <div>{message.content}</div>}
+
+                {message.fileData && (
+                  <div className='mt-2'>
+                    <a
+                      href={message.fileData}
+                      target='_blank'
+                      className='text-blue-500 text-sm'
+                      rel='noopener noreferrer'
+                      download={message.fileName}
+                    >
+                      {message.fileName}
+                    </a>
+
+                    {/* Render based on file type */}
+                    {message.fileType.startsWith("image/") && (
+                      <img
+                        src={message.fileData}
+                        alt={message.fileName}
+                        className='max-w-xs max-h-xs'
+                      />
+                    )}
+                  </div>
+                )}
+              </div>
+              <div className='text-xs text-gray-500 mt-1'>
+                {new Date(message.createdAt).toLocaleTimeString([], {
+                  hour: "2-digit",
+                  minute: "2-digit"
+                })}{" "}
+              </div>
             </div>
-            <div className='text-xs text-gray-500 mt-1'>
-              {new Date(message.createdAt).toLocaleTimeString([], {
-                hour: "2-digit",
-                minute: "2-digit"
-              })}{" "}
-            </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       <div className='border-t border-gray-200 p-4'>
         <div className='flex items-center space-x-2'>
-          <button className='p-2 hover:bg-gray-100 rounded-full'>
+          {/* Hidden file input */}
+          <input
+            type='file'
+            id='file-input'
+            accept='image/*'
+            style={{ display: "none" }}
+            onChange={handleFileChange}
+          />
+
+          {/* Attachment button */}
+          <button
+            className='p-2 hover:bg-gray-100 rounded-full'
+            onClick={() => document.getElementById("file-input").click()}
+          >
             <FiPaperclip size={20} />
           </button>
           <Input
