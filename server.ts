@@ -16,19 +16,56 @@ app.prepare().then(() => {
   // Initialize Socket.IO server
   const io = new SocketIOServer(server);
 
+  // Data structure to keep track of online users
+  let onlineUsers: { [userId: string]: string } = {};
+
   io.on("connection", socket => {
-    console.log("A user connected", socket.id);
+    const userId = socket.handshake.query.userId as string;
 
-    // Listen for custom events
-    socket.on("message", message => {
+    // Add the connected user to the onlineUsers list
+    if (userId) {
+      onlineUsers[userId] = socket.id;
+      console.log(`User connected: ${userId}`);
+
+      // Emit the online status to all clients
+      io.emit("updateOnlineStatus", userId, true);
+    }
+
+    // Handle incoming messages
+    socket.on("message", ({ roomId, message }) => {
       console.log("Message received:", message);
-      // Broadcast the message to all clients
-      io.emit("message", message);
+
+      // Emit the message to the specific user if they are online
+      const receiverSocketId = onlineUsers[message.receiverId];
+      if (receiverSocketId) {
+        io.to(receiverSocketId).emit("message", {
+          roomId,
+          message
+        });
+      }
     });
 
+    // Handle disconnection
     socket.on("disconnect", () => {
-      console.log("User disconnected", socket.id);
+      if (userId) {
+        console.log(`User disconnected: ${userId}`);
+
+        // Remove the user from the onlineUsers list
+        delete onlineUsers[userId];
+
+        // Optionally broadcast the updated online users list
+        io.emit("updateOnlineStatus", userId, false);
+      }
     });
+
+    // Custom event to check if a user is online
+    socket.on(
+      "checkUserOnline",
+      (userId: string, callback: (isOnline: boolean) => void) => {
+        const isOnline = !!onlineUsers[userId];
+        callback(isOnline);
+      }
+    );
   });
 
   const port = process.env.PORT || 3000;

@@ -19,6 +19,7 @@ import { useMemo, useState, useCallback, useEffect } from "react";
 import { Range } from "react-date-range";
 import toast from "react-hot-toast";
 import { loadStripe } from "@stripe/stripe-js";
+import { SessionProvider } from "next-auth/react";
 
 const initialDateRange = {
   startDate: new Date(),
@@ -127,15 +128,18 @@ const ListingClient: React.FC<ListingClientProps> = ({
               numberOfRatings={listing.numberOfRatings}
             />
             <div className='order-first mb-10 md:order-last md:col-span-3'>
-              <ListingReservation
-                price={listing.price}
-                totalPrice={totalPrice}
-                onChangeDate={value => setDateRange(value)}
-                dateRange={dateRange}
-                onSubmit={onCreateReservation}
-                disabled={isLoading}
-                disabledDates={disabledDates}
-              />
+              <SessionProvider>
+                <ListingReservation
+                  price={listing.price}
+                  totalPrice={totalPrice}
+                  onChangeDate={value => setDateRange(value)}
+                  dateRange={dateRange}
+                  onSubmit={onCreateReservation}
+                  disabled={isLoading}
+                  disabledDates={disabledDates}
+                  listingOwner={listing.user}
+                />
+              </SessionProvider>
             </div>
           </div>
         </div>

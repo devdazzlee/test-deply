@@ -6,6 +6,8 @@ import Button from "../Button";
 import getCurrentUser from "@/app/actions/getCurrentUser";
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { SafeUser } from "@/app/types";
 
 interface ListingReservationProps {
   price: number;
@@ -15,6 +17,7 @@ interface ListingReservationProps {
   onSubmit: () => void;
   disabled?: boolean;
   disabledDates: Date[];
+  listingOwner: SafeUser;
 }
 
 const ListingReservation: React.FC<ListingReservationProps> = ({
@@ -24,9 +27,23 @@ const ListingReservation: React.FC<ListingReservationProps> = ({
   onChangeDate,
   onSubmit,
   disabled,
-  disabledDates
+  disabledDates,
+  listingOwner
 }) => {
-  const [user, setUser] = useState<any>(false);
+  const [user, setUser] = useState<any>(null);
+  const router = useRouter();
+
+  const { status } = useSession();
+
+  const authStatusChange = async () => {
+    if (status === "authenticated") {
+      setUser(true);
+    } else setUser(null);
+  };
+
+  useEffect(() => {
+    authStatusChange();
+  }, [status]);
 
   return (
     <div className='bg-white rounded-xl border-[1px]border-neutral-200 overflow-hidden'>
@@ -45,10 +62,18 @@ const ListingReservation: React.FC<ListingReservationProps> = ({
       <div className='p-4'>
         <Button disabled={disabled} label='Reserve' onClick={onSubmit} />
         <div className='mt-2'>
-          {/* <Button disabled={disabled} label='Chat Now' onClick={onSubmit} /> */}
-          <div className='opacity-50'>
-            <Button disabled={disabled} label='Login To Chat' />
-          </div>
+          {user ? (
+            <Button
+              label='Chat Now'
+              onClick={() =>
+                router.push(`/messages?owner_id=${listingOwner.id}`)
+              }
+            />
+          ) : (
+            <div className='opacity-50'>
+              <Button disabled={disabled} label='Login To Chat' />
+            </div>
+          )}
         </div>
       </div>
 
