@@ -1,7 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Input } from "@nextui-org/react";
-import { FiPaperclip, FiSend } from "react-icons/fi";
+import { FiPaperclip, FiSend, FiTrash2 } from "react-icons/fi";
+
 import { Socket } from "socket.io-client";
+import axios from "axios";
+import toast from "react-hot-toast";
 
 interface Message {
   id: string;
@@ -32,6 +35,7 @@ interface MessageBoxComponentProps {
   socketInstance: Socket;
   setSelectedRoom: () => void;
   setRooms: Room[];
+  onRoomDelete: (roomId: string) => void;
 }
 
 const MessageBoxComponent: React.FC<MessageBoxComponentProps> = ({
@@ -39,10 +43,13 @@ const MessageBoxComponent: React.FC<MessageBoxComponentProps> = ({
   currentUserId,
   socketInstance,
   setSelectedRoom,
-  setRooms
+  setRooms,
+  onRoomDelete
 }) => {
   const [newMessage, setNewMessage] = useState("");
   const [isOnline, setIsOnline] = useState<boolean | null>(null);
+
+  const messageContainerRef = useRef();
 
   let contact;
 
@@ -53,7 +60,7 @@ const MessageBoxComponent: React.FC<MessageBoxComponentProps> = ({
         : selectedRoom.user1;
   }
 
-  const handleSendMessage = () => {
+  const handleSendMessage = async () => {
     if (newMessage.trim() === "" || !selectedRoom || !contact) return;
 
     const message = {
@@ -87,6 +94,13 @@ const MessageBoxComponent: React.FC<MessageBoxComponentProps> = ({
     );
 
     setNewMessage("");
+
+    const response = await axios.post(`/api/message`, {
+      senderId: currentUserId,
+      content: newMessage,
+      roomId: selectedRoom.id
+    });
+    console.log(response.status);
   };
   useEffect(() => {
     if (socketInstance && selectedRoom) {
@@ -120,6 +134,34 @@ const MessageBoxComponent: React.FC<MessageBoxComponentProps> = ({
     }
   }, [socketInstance, selectedRoom, currentUserId]);
 
+  const scrollToBottom = () => {
+    if (messageContainerRef.current) {
+      messageContainerRef.current.scrollTop =
+        messageContainerRef.current.scrollHeight;
+    }
+  };
+
+  const handleDeleteRoom = async () => {
+    if (window.confirm("Are you sure you want to delete this room?")) {
+      socketInstance.emit("deleteRoom", selectedRoom.id);
+      onRoomDelete(selectedRoom.id);
+      setSelectedRoom(null);
+
+      const response = await axios.delete(`/api/room/${selectedRoom.id}`);
+
+      if (response.status === 200) {
+        window.location.href = "/messages";
+        toast.success("Room Deleted!");
+      } else {
+        toast.error("Room Not Deleted!");
+      }
+    }
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [selectedRoom?.messages]);
+
   if (!selectedRoom) {
     return (
       <div className='flex-1 h-[80vh] w-full flex items-center justify-center'>
@@ -133,9 +175,7 @@ const MessageBoxComponent: React.FC<MessageBoxComponentProps> = ({
       <div className='p-4 border-b border-gray-200 flex justify-between items-center'>
         <div className='flex items-center space-x-3'>
           <div className='size-12 bg-gray-300 flex items-center justify-center rounded-full'>
-            {
-              contact.name.charAt(0).toUpperCase() // Display the first letter as uppercase
-            }
+            {contact.name.charAt(0).toUpperCase()}
           </div>
           <div>
             <h2 className='font-semibold'>{contact.name}</h2>
@@ -148,9 +188,19 @@ const MessageBoxComponent: React.FC<MessageBoxComponentProps> = ({
             </span>
           </div>
         </div>
+        <button
+          onClick={handleDeleteRoom}
+          className='p-2 hover:bg-gray-100 rounded-full mr-10 xl:mr-0'
+          title='Delete Room'
+        >
+          <FiTrash2 size={20} />
+        </button>
       </div>
 
-      <div className='flex-1 overflow-y-auto p-4'>
+      <div
+        className='flex-1 overflow-y-auto p-4 scroll-smooth'
+        ref={messageContainerRef}
+      >
         {selectedRoom.messages.map(message => (
           <div
             key={message.id}

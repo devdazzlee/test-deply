@@ -5,7 +5,7 @@ import SearchComponent from "./SearchComponent";
 import ContactsComponent from "./ContactsComponent";
 import MessageBoxComponent from "./MessageBoxComponent";
 import io, { Socket } from "socket.io-client";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import toast from "react-hot-toast";
 import axios from "axios";
 import Loader from "../components/Loader";
@@ -21,6 +21,8 @@ const ChatLayout: React.FC = ({ currentUser }: { currentUser: any }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [socketInstance, setSocketInstance] = useState(null);
 
+  const router = useRouter();
+
   const searchParams = useSearchParams();
 
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
@@ -31,10 +33,19 @@ const ChatLayout: React.FC = ({ currentUser }: { currentUser: any }) => {
     const response = await axios.get(`/api/room`);
 
     if (response.status === 200) {
-      setRooms(response.data);
-      setFilteredRooms(response.data);
+      const fetchedRooms = response.data;
+      setRooms(fetchedRooms);
+      setFilteredRooms(fetchedRooms);
 
-      const room = response.data.find(
+      // Emit createRoom event for each fetched room
+      fetchedRooms.forEach(room => {
+        socketInstance.emit("createRoom", {
+          roomId: room.id,
+          participants: [room.user1.id, room.user2.id]
+        });
+      });
+
+      const room = fetchedRooms.find(
         room => room.user1.id === addRequest || room.user2.id === addRequest
       );
       if (room) {
@@ -52,10 +63,16 @@ const ChatLayout: React.FC = ({ currentUser }: { currentUser: any }) => {
     }
 
     setIsLoading(true);
+
     const response = await axios.post(`/api/room`, { userId2: addRequest });
 
     if (response.status === 200) {
-      getRooms();
+      const newRoom = response.data;
+      socketInstance.emit("createRoom", {
+        roomId: newRoom.id,
+        participants: [currentUser.id, addRequest]
+      });
+      await getRooms();
     }
   };
 
@@ -65,6 +82,7 @@ const ChatLayout: React.FC = ({ currentUser }: { currentUser: any }) => {
 
   const handleRoomSelect = room => {
     setSelectedRoom(room);
+    setIsSidebarOpen(false);
   };
 
   // Helper function to check if a room exists in a list
@@ -84,22 +102,13 @@ const ChatLayout: React.FC = ({ currentUser }: { currentUser: any }) => {
     );
   };
 
-  // Helper function to add a new room and fetch its details
-  const addNewRoom = async (rooms, roomId, message) => {
-    try {
-      const response = await axios.get(`/api/room/${roomId}`);
-      if (response.status === 200) {
-        return [
-          ...rooms,
-          {
-            ...response.data,
-            messages: [message] // Initialize with the incoming message
-          }
-        ];
-      }
-    } catch (error) {
-      console.error("Error fetching room data:", error);
-      return rooms;
+  const handleRoomDelete = (roomId: string) => {
+    setRooms(prevRooms => prevRooms.filter(room => room.id !== roomId));
+    setFilteredRooms(prevFilteredRooms =>
+      prevFilteredRooms.filter(room => room.id !== roomId)
+    );
+    if (selectedRoom?.id === roomId) {
+      setSelectedRoom(null);
     }
   };
 
@@ -154,11 +163,6 @@ const ChatLayout: React.FC = ({ currentUser }: { currentUser: any }) => {
   };
 
   useEffect(() => {
-    if (addRequest) addToContacts();
-    else getRooms();
-  }, [searchParams]);
-
-  useEffect(() => {
     socket = io({
       query: {
         userId: currentUser.id
@@ -174,17 +178,30 @@ const ChatLayout: React.FC = ({ currentUser }: { currentUser: any }) => {
 
   useEffect(() => {
     if (socketInstance) {
+      if (addRequest) addToContacts();
+      else getRooms();
+    }
+  }, [searchParams, socketInstance]);
+
+  useEffect(() => {
+    if (socketInstance) {
       // Handler function for incoming messages
       const handleMessage = message => {
         updateRoomMessages(message);
       };
 
+      const handleRoomDeleted = (roomId: string) => {
+        handleRoomDelete(roomId);
+      };
+
       // Attach the listener
       socketInstance.on("message", handleMessage);
+      socketInstance.on("roomDeleted", handleRoomDeleted);
 
       // Cleanup the listener on component unmount or when socketInstance changes
       return () => {
         socketInstance.off("message", handleMessage);
+        socketInstance.off("roomDeleted", handleRoomDeleted);
       };
     }
   }, [socketInstance, selectedRoom]);
@@ -224,6 +241,7 @@ const ChatLayout: React.FC = ({ currentUser }: { currentUser: any }) => {
             socketInstance={socketInstance}
             setSelectedRoom={setSelectedRoom}
             setRooms={setRooms}
+            onRoomDelete={handleRoomDelete}
           />
         </>
       )}

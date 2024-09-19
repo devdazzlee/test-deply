@@ -73,3 +73,67 @@ export async function GET(request: Request, { params }: { params: IParams }) {
     );
   }
 }
+
+export async function DELETE(
+  request: Request,
+  { params }: { params: IParams }
+) {
+  try {
+    const currentUser = await getCurrentUser();
+
+    if (!currentUser) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const { id: roomId } = params;
+
+    if (!roomId) {
+      return NextResponse.json(
+        { error: "Room ID is required" },
+        { status: 400 }
+      );
+    }
+
+    // Fetch the room to check if the current user is authorized to delete it
+    const room = await prisma.room.findUnique({
+      where: { id: roomId },
+      select: {
+        id: true,
+        user1Id: true,
+        user2Id: true
+      }
+    });
+
+    if (!room) {
+      return NextResponse.json({ error: "Room not found" }, { status: 404 });
+    }
+
+    // Check if the current user is either user1 or user2 of the room
+    if (room.user1Id !== currentUser.id && room.user2Id !== currentUser.id) {
+      return NextResponse.json(
+        { error: "You are not authorized to delete this room" },
+        { status: 403 }
+      );
+    }
+
+    // First, delete all messages related to the room
+    await prisma.message.deleteMany({
+      where: {
+        roomId: roomId
+      }
+    });
+
+    // Then, delete the room
+    await prisma.room.delete({
+      where: { id: roomId }
+    });
+
+    return NextResponse.json("Room and related messages deleted successfully");
+  } catch (error) {
+    console.error("Error deleting room:", error);
+    return NextResponse.json(
+      { error: "An error occurred while deleting the room" },
+      { status: 500 }
+    );
+  }
+}
