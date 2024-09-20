@@ -348,7 +348,7 @@ const MessageBoxComponent: React.FC<MessageBoxComponentProps> = ({
 
           {/* Attachment button */}
           <button
-            className='p-2 hover:bg-gray-100 rounded-full'
+            className='p-2 !-ml-2 hover:bg-gray-100 rounded-full'
             onClick={() => document.getElementById("file-input").click()}
           >
             <FiPaperclip size={20} />
