@@ -2,7 +2,7 @@
 
 import { AiOutlineMenu } from "react-icons/ai";
 import Avatar from "../Avatar";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import MenuItem from "./MenuItem";
 import useRegisterModal from "@/app/hooks/useRegisterModal";
 import useLoginModal from "@/app/hooks/useLoginModal";
@@ -15,6 +15,7 @@ import { useRouter } from "next/navigation";
 import type { SubStatus } from "@/app/actions/getSubscriptionStatus";
 import clsx from "clsx";
 import { toast } from "react-hot-toast";
+import { SocketContext } from "@/app/context/SocketContext";
 
 interface UserMenuProps {
   currentUser?: SafeUser | null;
@@ -28,6 +29,8 @@ const UserMenu: React.FC<UserMenuProps> = ({ currentUser, subStatus }) => {
   const [isOpen, setIsOpen] = useState(false);
   const router = useRouter();
 
+  const { unreadRooms } = useContext(SocketContext);
+
   const toggleOpen = useCallback(() => {
     setIsOpen(value => !value);
   }, []);
@@ -37,7 +40,6 @@ const UserMenu: React.FC<UserMenuProps> = ({ currentUser, subStatus }) => {
       return loginModal.onOpen();
     }
     console.log(subStatus);
-
 
     if (!currentUser.subscriptionOption) {
       router.push("/subscribe");
@@ -89,9 +91,12 @@ const UserMenu: React.FC<UserMenuProps> = ({ currentUser, subStatus }) => {
         {currentUser && (
           <Link
             href='/messages'
-            className='py-2 px-3 rounded-full hover:bg-neutral-100 transition cursor-pointer'
+            className='py-2 px-3 relative rounded-full hover:bg-neutral-100 transition cursor-pointer'
           >
             <AiOutlineMessage size={27} />
+            <div className='bg-black text-white text-center rounded-full size-6 absolute top-0 right-0 flex items-center justify-center text-xs'>
+              {unreadRooms}
+            </div>
           </Link>
         )}
         <div

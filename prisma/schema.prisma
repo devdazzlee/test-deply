@@ -150,10 +150,12 @@ model Message {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
   sender    User     @relation(fields: [senderId], references: [id])
   senderId  String   @db.ObjectId
+  uuid      String   @unique
   content   String?
   createdAt DateTime @default(now())
   room      Room     @relation(name: "RoomMessages", fields: [roomId], references: [id])
   roomId    String   @db.ObjectId
+  read      Boolean  @default(false) // New field to track read status
 
   fileName String? // Name of the file
   fileType String? // MIME type of the file

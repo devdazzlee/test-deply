@@ -1,5 +1,13 @@
 import React from "react";
 
+interface Message {
+  id: string;
+  content: string;
+  createdAt: string;
+  read: boolean;
+  senderId: string;
+}
+
 interface Room {
   id: string;
   user1: {
@@ -12,10 +20,7 @@ interface Room {
     name: string;
     image: string | null;
   };
-  messages: Array<{
-    content: string;
-    createdAt: string;
-  }>;
+  messages: Message[];
   updatedAt: string;
 }
 
@@ -50,6 +55,12 @@ const ContactsComponent: React.FC<ContactsComponentProps> = ({
     }
   };
 
+  const getUnreadCount = (room: Room): number => {
+    return room.messages.filter(
+      message => !message.read && message.senderId !== currentUserId
+    ).length;
+  };
+
   return (
     <div className={`overflow-y-auto h-[calc(100vh-140px)] xl:h-[80vh]`}>
       {rooms?.length > 0 &&
@@ -58,6 +69,7 @@ const ContactsComponent: React.FC<ContactsComponentProps> = ({
             room.user1.id === currentUserId ? room.user2 : room.user1;
 
           const lastMessage = room.messages[room.messages.length - 1];
+          const unreadCount = getUnreadCount(room);
 
           return (
             <div
@@ -71,9 +83,7 @@ const ContactsComponent: React.FC<ContactsComponentProps> = ({
             >
               <div className='flex items-center space-x-3'>
                 <div className='size-12 bg-gray-300 flex items-center justify-center rounded-full'>
-                  {
-                    contact.name.charAt(0).toUpperCase() // Display the first letter as uppercase
-                  }
+                  {contact.name.charAt(0).toUpperCase()}
                 </div>
                 <div className='flex-1'>
                   <div className='flex justify-between items-center'>
@@ -82,10 +92,19 @@ const ContactsComponent: React.FC<ContactsComponentProps> = ({
                       {lastMessage ? formatDate(lastMessage?.createdAt) : ""}
                     </span>
                   </div>
-                  <p className='text-sm text-gray-600 truncate'>
+                  <p
+                    className={`text-sm text-gray-600 truncate ${
+                      unreadCount > 0 ? "font-bold" : ""
+                    }`}
+                  >
                     {lastMessage ? lastMessage?.content : "No messages yet"}
                   </p>
                 </div>
+                {unreadCount > 0 && (
+                  <div className='bg-blue-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs'>
+                    {unreadCount}
+                  </div>
+                )}
               </div>
             </div>
           );

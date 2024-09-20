@@ -1,17 +1,15 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { FiMenu, FiX } from "react-icons/fi";
 import SearchComponent from "./SearchComponent";
 import ContactsComponent from "./ContactsComponent";
 import MessageBoxComponent from "./MessageBoxComponent";
-import io, { Socket } from "socket.io-client";
 import { useRouter, useSearchParams } from "next/navigation";
 import toast from "react-hot-toast";
 import axios from "axios";
 import Loader from "../components/Loader";
 import { SessionContext, SessionProvider } from "next-auth/react";
-
-let socket: Socket;
+import { SocketContext } from "../context/SocketContext";
 
 const ChatLayout: React.FC = ({ currentUser }: { currentUser: any }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -19,7 +17,9 @@ const ChatLayout: React.FC = ({ currentUser }: { currentUser: any }) => {
   const [filteredRooms, setFilteredRooms] = useState([]);
   const [selectedRoom, setSelectedRoom] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [socketInstance, setSocketInstance] = useState(null);
+  const [unreadCount, setUnreadCount] = useState(0); // Track unread messages count
+  const { setUnreadRooms, socketInstance, setSocketInstance } =
+    useContext(SocketContext);
 
   const router = useRouter();
 
@@ -51,8 +51,19 @@ const ChatLayout: React.FC = ({ currentUser }: { currentUser: any }) => {
       if (room) {
         setSelectedRoom(room);
       }
+      calculateUnreadMessages(fetchedRooms);
       setIsLoading(false);
     }
+  };
+
+  const calculateUnreadMessages = rooms => {
+    const totalUnread = rooms.reduce((count, room) => {
+      const unreadMessages = room.messages.filter(
+        msg => !msg.read && msg.senderId !== currentUser.id
+      ).length;
+      return count + unreadMessages;
+    }, 0);
+    setUnreadCount(totalUnread);
   };
 
   const addToContacts = async () => {
@@ -80,9 +91,39 @@ const ChatLayout: React.FC = ({ currentUser }: { currentUser: any }) => {
     setFilteredRooms(searchedRooms);
   };
 
-  const handleRoomSelect = room => {
+  // Handle room selection and update unread count
+  const handleRoomSelect = async room => {
     setSelectedRoom(room);
     setIsSidebarOpen(false);
+
+    // Find unread messages that are not sent by the current user
+    const unreadMessages = room.messages.filter(
+      msg => !msg.read && msg.senderId !== currentUser.id
+    );
+
+    // Only decrease unread count if there are unread messages
+    if (unreadMessages.length > 0) {
+      setUnreadCount(prevCount => prevCount - unreadMessages.length);
+    }
+
+    // Mark unread messages as read and update in the database
+    for (const message of unreadMessages) {
+      await axios.put("/api/message", { uuid: message.uuid });
+    }
+
+    // Update the room's messages to mark as read in the state
+    setRooms(prevRooms =>
+      prevRooms.map(r =>
+        r.id === room.id
+          ? {
+              ...r,
+              messages: r.messages.map(msg =>
+                msg.senderId !== currentUser.id ? { ...msg, read: true } : msg
+              )
+            }
+          : r
+      )
+    );
   };
 
   // Helper function to check if a room exists in a list
@@ -112,16 +153,39 @@ const ChatLayout: React.FC = ({ currentUser }: { currentUser: any }) => {
     }
   };
 
-  // Main function to update room messages
   const updateRoomMessages = async message => {
     if (!message || !message.roomId) return;
 
     // Update the selectedRoom if it matches the roomId
+    setUnreadCount(prevCount => prevCount + 1);
     if (selectedRoom?.id === message.roomId) {
       setSelectedRoom(prevSelectedRoom => ({
         ...prevSelectedRoom,
-        messages: [...(prevSelectedRoom.messages || []), message.message]
+        messages: [
+          ...(prevSelectedRoom.messages || []),
+          { ...message.message, read: true }
+        ]
       }));
+
+      // Mark the message as read in the database
+      await axios.put("/api/message", { uuid: message.message.uuid });
+    } else {
+      // Increase unread count only for rooms that are not selected
+
+      // Update rooms with unread message
+      setRooms(prevRooms =>
+        prevRooms.map(room =>
+          room.id === message.roomId
+            ? {
+                ...room,
+                messages: [
+                  ...(room.messages || []),
+                  { ...message.message, read: false }
+                ]
+              }
+            : room
+        )
+      );
     }
 
     // Update rooms and filteredRooms asynchronously
@@ -163,20 +227,6 @@ const ChatLayout: React.FC = ({ currentUser }: { currentUser: any }) => {
   };
 
   useEffect(() => {
-    socket = io({
-      query: {
-        userId: currentUser.id
-      }
-    });
-
-    setSocketInstance(socket);
-
-    return () => {
-      socket.disconnect();
-    };
-  }, []);
-
-  useEffect(() => {
     if (socketInstance) {
       if (addRequest) addToContacts();
       else getRooms();
@@ -206,6 +256,13 @@ const ChatLayout: React.FC = ({ currentUser }: { currentUser: any }) => {
     }
   }, [socketInstance, selectedRoom]);
 
+  useEffect(() => {
+    // Count how many rooms have unread messages
+    const roomsWithUnreadMessages = rooms.filter(room =>
+      room.messages.some(msg => !msg.read && msg.senderId !== currentUser.id)
+    ).length;
+    setUnreadRooms(roomsWithUnreadMessages);
+  }, [unreadCount, rooms]);
   return (
     <div className='flex flex-col justify-center items-start xl:flex-row mt-10 xl:mt-0  h-[82vh] xl:h-[90vh] bg-white'>
       {isLoading ? (

@@ -12,6 +12,7 @@ import SearchModal from "./components/modals/SearchModal";
 import { Providers } from "./providers";
 import getSubscriptionStatus from "./actions/getSubscriptionStatus";
 import { SessionProvider } from "next-auth/react";
+import BasicLayout from "./BasicLayout";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -31,17 +32,9 @@ export default async function RootLayout({
   return (
     <html lang='en'>
       <body className={inter.className}>
-        <ToasterProvider />
-        <SearchModal />
-        <RentModal />
-        <LoginModal />
-        <RegisterModal />
-        <Navbar currentUser={currentUser} subStatus={subStatus} />
-
-        <Providers>
-          <div className='pb-20 pt-28'>{children}</div>
-        </Providers>
-        <Footer currentUser={currentUser} />
+        <BasicLayout currentUser={currentUser} subStatus={subStatus}>
+          {children}
+        </BasicLayout>
       </body>
     </html>
   );

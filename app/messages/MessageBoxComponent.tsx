@@ -6,12 +6,14 @@ import { Socket } from "socket.io-client";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { BeatLoader } from "react-spinners";
+import { v4 as uuidv4 } from "uuid";
 
 interface Message {
   id: string;
   content: string;
   createdAt: string;
   senderId: string;
+  read: boolean; // New property to track read status
 }
 
 interface Room {
@@ -72,8 +74,9 @@ const MessageBoxComponent: React.FC<MessageBoxComponentProps> = ({
         setIsSendingMessage(true);
         const base64File = reader.result; // This is base64-encoded file data
 
+        const uuid = uuidv4();
         const message = {
-          id: Date.now().toString(), // Unique ID for the message
+          uuid: uuid, // Generate a unique ID for the message
           content: newMessage || null, // If there's text content along with the file
           createdAt: new Date().toISOString(),
           senderId: currentUserId,
@@ -91,7 +94,8 @@ const MessageBoxComponent: React.FC<MessageBoxComponentProps> = ({
           roomId: selectedRoom.id,
           fileName: file.name,
           fileType: file.type,
-          fileData: base64File
+          fileData: base64File,
+          uuid
         });
 
         if (res.status === 200) {
@@ -128,8 +132,12 @@ const MessageBoxComponent: React.FC<MessageBoxComponentProps> = ({
   const handleSendMessage = async () => {
     if (newMessage.trim() === "" || !selectedRoom || !contact) return;
 
+    const uuid = uuidv4();
+
+    setIsSendingMessage(true);
+
     const message = {
-      id: Date.now().toString(), // Generate a unique ID for the message
+      uuid: uuid, // Generate a unique ID for the message
       content: newMessage,
       createdAt: new Date().toISOString(),
       senderId: currentUserId,
@@ -144,34 +152,38 @@ const MessageBoxComponent: React.FC<MessageBoxComponentProps> = ({
         : null // Only include if a file is selected
     };
 
-    // Emit the message to the server
-    socketInstance.emit("message", {
-      roomId: selectedRoom.id,
-      message
-    });
-
-    // Update the selectedRoom if it matches the roomId
-    setSelectedRoom(prevRoom => ({
-      ...prevRoom,
-      messages: [...(prevRoom.messages || []), message] // Append the entire message object
-    }));
-
-    // Update the messages in the specific room in the rooms array
-    setRooms(prevRooms =>
-      prevRooms.map(room =>
-        room.id === selectedRoom.id
-          ? { ...room, messages: [...(room.messages || []), message] } // Append the entire message object
-          : room
-      )
-    );
-
-    setNewMessage("");
-
     const response = await axios.post(`/api/message`, {
       senderId: currentUserId,
       content: newMessage,
-      roomId: selectedRoom.id
+      roomId: selectedRoom.id,
+      uuid
     });
+
+    if (response.status === 200) {
+      // Emit the message to the server
+      socketInstance.emit("message", {
+        roomId: selectedRoom.id,
+        message
+      });
+
+      // Update the selectedRoom if it matches the roomId
+      setSelectedRoom(prevRoom => ({
+        ...prevRoom,
+        messages: [...(prevRoom.messages || []), message] // Append the entire message object
+      }));
+
+      // Update the messages in the specific room in the rooms array
+      setRooms(prevRooms =>
+        prevRooms.map(room =>
+          room.id === selectedRoom.id
+            ? { ...room, messages: [...(room.messages || []), message] } // Append the entire message object
+            : room
+        )
+      );
+
+      setNewMessage("");
+      setIsSendingMessage(false);
+    }
   };
   useEffect(() => {
     if (socketInstance && selectedRoom) {
