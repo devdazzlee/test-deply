@@ -25,8 +25,21 @@ const ChatLayout: React.FC = ({ currentUser }: { currentUser: any }) => {
     socketInstance,
     toggleSidebar,
     setSelectedRoom,
-    setRooms
+    setRooms,
+    getRooms,
+    addToContacts
   } = useContext(SocketContext);
+
+  const searchParams = useSearchParams();
+
+  const addRequest = searchParams.get("owner_id");
+
+  useEffect(() => {
+    if (socketInstance) {
+      if (addRequest) addToContacts(addRequest);
+      else getRooms();
+    }
+  }, [searchParams, socketInstance]);
 
   return (
     <div className='flex flex-col justify-center items-start xl:flex-row mt-10 xl:mt-0  h-[82vh] xl:h-[90vh] bg-white'>

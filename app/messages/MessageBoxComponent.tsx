@@ -366,17 +366,17 @@ const MessageBoxComponent: React.FC<MessageBoxComponentProps> = ({
               }
             }}
           />
-          <button
-            className='p-2.5 bg-black disabled:opacity-60 text-white rounded-md'
-            onClick={handleSendMessage}
-            disabled={isSendingMessage}
-          >
-            {isSendingMessage ? (
-              <BeatLoader color='white' />
-            ) : (
+          {isSendingMessage ? (
+            <BeatLoader color='black' />
+          ) : (
+            <button
+              className='p-2.5 bg-black disabled:opacity-60 text-white rounded-md'
+              onClick={handleSendMessage}
+              disabled={isSendingMessage}
+            >
               <FiSend size={20} />
-            )}
-          </button>
+            </button>
+          )}
         </div>
       </div>
     </div>

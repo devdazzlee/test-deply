@@ -5,6 +5,7 @@ import { useSession } from "next-auth/react";
 import io from "socket.io-client";
 import axios from "axios";
 import toast from "react-hot-toast";
+import { useSearchParams } from "next/navigation";
 
 export const SocketContext = createContext();
 
@@ -62,7 +63,7 @@ export default function SocketState({ children, currentUser }) {
     setUnreadRooms(roomsWithUnreadMessages);
   }, [unreadCount, rooms, currentUser]);
 
-  const getRooms = async () => {
+  const getRooms = async addRequest => {
     const response = await axios.get(`/api/room`);
 
     if (response.status === 200) {
@@ -76,6 +77,13 @@ export default function SocketState({ children, currentUser }) {
           participants: [room.user1.id, room.user2.id]
         });
       });
+
+      const room = fetchedRooms.find(
+        room => room.user1.id === addRequest || room.user2.id === addRequest
+      );
+      if (room) {
+        setSelectedRoom(room);
+      }
 
       calculateUnreadMessages(fetchedRooms);
       setIsLoading(false);
@@ -109,7 +117,7 @@ export default function SocketState({ children, currentUser }) {
         roomId: newRoom.id,
         participants: [currentUser.id, addRequest]
       });
-      await getRooms();
+      await getRooms(addRequest);
     }
   };
 
