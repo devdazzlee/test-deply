@@ -7,6 +7,7 @@ interface User {
   id: string;
   name: string;
   image: string | null;
+  email: string | null;
 }
 
 interface Room {
@@ -31,11 +32,12 @@ const SearchComponent: React.FC<SearchComponentProps> = ({
 }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const { data: session } = useSession();
-  const currentUserId = session?.user?.id;
+  const currentUserId = session?.user?.email;
 
   useEffect(() => {
     const filteredRooms = rooms.filter(room => {
-      const contact = room.user1.id === currentUserId ? room.user2 : room.user1;
+      const contact =
+        room.user1.email === currentUserId ? room.user2 : room.user1;
       return contact.name.toLowerCase().includes(searchTerm.toLowerCase());
     });
 

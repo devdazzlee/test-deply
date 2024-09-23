@@ -10,8 +10,13 @@ import axios from "axios";
 import Loader from "../components/Loader";
 import { SessionContext, SessionProvider } from "next-auth/react";
 import { SocketContext } from "../context/SocketContext";
+import { SafeUser } from "../types";
 
-const ChatLayout: React.FC = ({ currentUser }: { currentUser: any }) => {
+interface ChatLayoutProps {
+  currentUser: SafeUser | null | undefined;
+}
+
+const ChatLayout: React.FC<ChatLayoutProps> = ({ currentUser }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0); // Track unread messages count
   const {
@@ -32,7 +37,10 @@ const ChatLayout: React.FC = ({ currentUser }: { currentUser: any }) => {
 
   const searchParams = useSearchParams();
 
-  const addRequest = searchParams.get("owner_id");
+  let addRequest: string | null = null;
+  if (searchParams) {
+    addRequest = searchParams.get("owner_id");
+  }
 
   useEffect(() => {
     if (socketInstance) {
@@ -65,14 +73,14 @@ const ChatLayout: React.FC = ({ currentUser }: { currentUser: any }) => {
               <ContactsComponent
                 rooms={filteredRooms}
                 onRoomSelect={handleRoomSelect}
-                currentUserId={currentUser.id}
+                currentUserId={currentUser ? currentUser.id : null}
                 selectedRoom={selectedRoom}
               />
             </SessionProvider>
           </div>
           <MessageBoxComponent
             selectedRoom={selectedRoom}
-            currentUserId={currentUser.id}
+            currentUserId={currentUser ? currentUser.id : null}
             socketInstance={socketInstance}
             setSelectedRoom={setSelectedRoom}
             setRooms={setRooms}

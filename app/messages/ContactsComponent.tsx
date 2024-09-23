@@ -28,7 +28,7 @@ interface ContactsComponentProps {
   rooms: Room[];
   selectedRoom: Room;
   onRoomSelect: (room: Room) => void;
-  currentUserId: string;
+  currentUserId: string | null | undefined;
 }
 
 const ContactsComponent: React.FC<ContactsComponentProps> = ({

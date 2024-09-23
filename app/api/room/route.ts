@@ -89,7 +89,8 @@ export async function GET(request: Request) {
           select: {
             id: true,
             name: true,
-            image: true
+            image: true,
+            email: true
             // Add any other user fields you want to include
           }
         },
@@ -97,7 +98,8 @@ export async function GET(request: Request) {
           select: {
             id: true,
             name: true,
-            image: true
+            image: true,
+            email: true
             // Add any other user fields you want to include
           }
         },

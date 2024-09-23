@@ -14,6 +14,9 @@ interface Message {
   createdAt: string;
   senderId: string;
   read: boolean; // New property to track read status
+  fileData?: string; // Base64 or URL for file
+  fileName?: string; // Name of the file
+  fileType?: string; // Type of the file (e.g., image/jpeg, application/pdf)
 }
 
 interface Room {
@@ -34,10 +37,10 @@ interface Room {
 
 interface MessageBoxComponentProps {
   selectedRoom: Room | null;
-  currentUserId: string;
+  currentUserId: string | null | undefined;
   socketInstance: Socket;
-  setSelectedRoom: () => void;
-  setRooms: Room[];
+  setSelectedRoom: React.Dispatch<React.SetStateAction<Room | null>>; // Corrected type for state setter
+  setRooms: React.Dispatch<React.SetStateAction<Room[]>>; // Corrected type for state setter
   onRoomDelete: (roomId: string) => void;
 }
 
@@ -54,9 +57,9 @@ const MessageBoxComponent: React.FC<MessageBoxComponentProps> = ({
   const [selectedFile, setSelectedFile] = useState(null);
   const [isSendingMessage, setIsSendingMessage] = useState<boolean>(false);
 
-  const messageContainerRef = useRef();
+  const messageContainerRef = useRef<HTMLDivElement | null>(null);
 
-  let contact;
+  let contact: any;
 
   if (selectedRoom) {
     contact =
@@ -65,9 +68,9 @@ const MessageBoxComponent: React.FC<MessageBoxComponentProps> = ({
         : selectedRoom.user1;
   }
 
-  const handleFileChange = async e => {
+  const handleFileChange = async (e: any) => {
     const file = e.target.files[0];
-    if (file) {
+    if (file && selectedRoom) {
       const reader = new FileReader();
 
       reader.onloadend = async () => {
@@ -106,14 +109,13 @@ const MessageBoxComponent: React.FC<MessageBoxComponentProps> = ({
           });
 
           // Update the selectedRoom if it matches the roomId
-          setSelectedRoom(prevRoom => ({
+          setSelectedRoom((prevRoom: any) => ({
             ...prevRoom,
-            messages: [...(prevRoom.messages || []), message] // Append the entire message object
+            messages: [...(prevRoom?.messages || []), message] // Append the message object
           }));
-
           // Update the messages in the specific room in the rooms array
-          setRooms(prevRooms =>
-            prevRooms.map(room =>
+          setRooms((prevRooms: any) =>
+            prevRooms.map((room: any) =>
               room.id === selectedRoom.id
                 ? { ...room, messages: [...(room.messages || []), message] } // Append the entire message object
                 : room
@@ -142,14 +144,7 @@ const MessageBoxComponent: React.FC<MessageBoxComponentProps> = ({
       createdAt: new Date().toISOString(),
       senderId: currentUserId,
       receiverId: contact.id,
-      roomId: selectedRoom.id, // Include roomId in the message
-      file: selectedFile
-        ? {
-            name: selectedFile.name,
-            type: selectedFile.type,
-            data: selectedFile.data // Base64-encoded file data
-          }
-        : null // Only include if a file is selected
+      roomId: selectedRoom.id // Include roomId in the message
     };
 
     const response = await axios.post(`/api/message`, {
@@ -167,14 +162,14 @@ const MessageBoxComponent: React.FC<MessageBoxComponentProps> = ({
       });
 
       // Update the selectedRoom if it matches the roomId
-      setSelectedRoom(prevRoom => ({
+      setSelectedRoom((prevRoom: any) => ({
         ...prevRoom,
         messages: [...(prevRoom.messages || []), message] // Append the entire message object
       }));
 
       // Update the messages in the specific room in the rooms array
-      setRooms(prevRooms =>
-        prevRooms.map(room =>
+      setRooms((prevRooms: any) =>
+        prevRooms.map((room: any) =>
           room.id === selectedRoom.id
             ? { ...room, messages: [...(room.messages || []), message] } // Append the entire message object
             : room
@@ -224,22 +219,22 @@ const MessageBoxComponent: React.FC<MessageBoxComponentProps> = ({
     }
   };
 
-  const handleDeleteRoom = async () => {
-    if (window.confirm("Are you sure you want to delete this room?")) {
-      socketInstance.emit("deleteRoom", selectedRoom.id);
-      onRoomDelete(selectedRoom.id);
-      setSelectedRoom(null);
+  // const handleDeleteRoom = async () => {
+  //   if (window.confirm("Are you sure you want to delete this room?")) {
+  //     socketInstance.emit("deleteRoom", selectedRoom.id);
+  //     onRoomDelete(selectedRoom.id);
+  //     setSelectedRoom(null);
 
-      const response = await axios.delete(`/api/room/${selectedRoom.id}`);
+  //     const response = await axios.delete(`/api/room/${selectedRoom.id}`);
 
-      if (response.status === 200) {
-        window.location.href = "/messages";
-        toast.success("Room Deleted!");
-      } else {
-        toast.error("Room Not Deleted!");
-      }
-    }
-  };
+  //     if (response.status === 200) {
+  //       window.location.href = "/messages";
+  //       toast.success("Room Deleted!");
+  //     } else {
+  //       toast.error("Room Not Deleted!");
+  //     }
+  //   }
+  // };
 
   useEffect(() => {
     scrollToBottom();
@@ -314,7 +309,7 @@ const MessageBoxComponent: React.FC<MessageBoxComponentProps> = ({
                     </a>
 
                     {/* Render based on file type */}
-                    {message.fileType.startsWith("image/") && (
+                    {message.fileType?.startsWith("image/") && (
                       <img
                         src={message.fileData}
                         alt={message.fileName}
@@ -349,7 +344,12 @@ const MessageBoxComponent: React.FC<MessageBoxComponentProps> = ({
           {/* Attachment button */}
           <button
             className='p-2 !-ml-2 hover:bg-gray-100 rounded-full'
-            onClick={() => document.getElementById("file-input").click()}
+            onClick={() => {
+              const fileInput = document.getElementById("file-input");
+              if (fileInput) {
+                fileInput.click();
+              }
+            }}
           >
             <FiPaperclip size={20} />
           </button>

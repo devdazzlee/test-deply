@@ -18,7 +18,7 @@ export default function BasicLayout({
   subStatus
 }: Readonly<{
   children: React.ReactNode;
-  currentUser: SafeUser;
+  currentUser: SafeUser | null;
   subStatus: any;
 }>) {
   return (

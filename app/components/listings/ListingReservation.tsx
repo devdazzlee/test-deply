@@ -18,7 +18,7 @@ interface ListingReservationProps {
   disabled?: boolean;
   disabledDates: Date[];
   listingOwner: SafeUser;
-  currentUser: SafeUser;
+  currentUser: SafeUser | null | undefined;
 }
 
 const ListingReservation: React.FC<ListingReservationProps> = ({
