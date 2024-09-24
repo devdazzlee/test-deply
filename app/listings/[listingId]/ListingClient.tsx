@@ -19,6 +19,7 @@ import { useMemo, useState, useCallback, useEffect } from "react";
 import { Range } from "react-date-range";
 import toast from "react-hot-toast";
 import { loadStripe } from "@stripe/stripe-js";
+import { SessionProvider } from "next-auth/react";
 
 const initialDateRange = {
   startDate: new Date(),
@@ -31,7 +32,7 @@ interface ListingClientProps {
   listing: SafeListing & {
     user: SafeUser;
   };
-  currentUser?: SafeUser | null;
+  currentUser: SafeUser | null | undefined;
   comments?: SafeComment[];
 }
 
@@ -135,6 +136,8 @@ const ListingClient: React.FC<ListingClientProps> = ({
                 onSubmit={onCreateReservation}
                 disabled={isLoading}
                 disabledDates={disabledDates}
+                listingOwner={listing.user}
+                currentUser={currentUser}
               />
             </div>
           </div>

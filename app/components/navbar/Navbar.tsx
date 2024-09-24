@@ -7,15 +7,14 @@ import Logo from "./Logo";
 import Search from "./Search";
 import UserMenu from "./UserMenu";
 import { SafeUser } from "@/app/types";
+import SocketState from "@/app/context/SocketContext";
 
 interface NavbarProps {
   currentUser?: SafeUser | null;
   subStatus?: SubStatus | null;
 }
 
-
 const Navbar: React.FC<NavbarProps> = ({ currentUser, subStatus }) => {
-
   return (
     <div className='fixed w-full bg-white z-20 shadow-sm'>
       <div
