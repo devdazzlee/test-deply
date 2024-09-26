@@ -53,45 +53,52 @@ const ListingCard: React.FC<ListingCardProps> = ({
   const location = getByValue(data.locationValue);
 
   // for photographer
-  const handleApprove = async () => {
-    if (!reservation || !reservation.id) return;
+  const handleApprove = async (event: any) => {
+    event.preventDefault()
+
+    if (!data || !data.id) return;
     setDisableApproveBtn(true);
 
     axios
-      .put(`/api/reservations/${reservation.id}`)
+      .post(`/api/listings/${data.id}/approve`)
       .then(() => {
         toast.success("Request approved");
         setDisableApproveBtn(false);
         router.refresh();
       })
-      .catch(() => {
+      .catch((error) => {
+        console.log(error);
+
         toast.error("Something went wrong when approving request");
         setDisableApproveBtn(false);
       });
   };
 
   // for photographer
-  const handleReject = async () => {
-    if (!reservation || !reservation.id) return;
+  const handleReject = async (event: any) => {
+    event.preventDefault()
+    if (!data || !data.id) return;
 
     setDisableRejectBtn(true);
 
     axios
-      .delete(`/api/reservations/${reservation.id}`)
+      .delete(`/api/listings/${data.id}`)
       .then(() => {
-        toast.success("Request cancelled");
+        toast.success("Request rejected");
+
         setDisableRejectBtn(false);
         router.refresh();
       })
       .catch(() => {
         setDisableRejectBtn(false);
-        toast.error("Something went wrong when cancelling request");
+        toast.error("Something went wrong when rejecting request");
       })
-      .finally(() => {});
+
   };
 
   // for user who booked
   const handleCompleted = async () => {
+
     if (!reservation || !reservation.id) return;
     setDisableCompleteBtn(true);
 
