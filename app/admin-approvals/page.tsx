@@ -23,8 +23,8 @@ export default async function AdminApprovals({ searchParams }: HomeProps) {
     <Container>
       <div
         className='
-        pt-36
-        sm:pt-24
+        pt-16
+        sm:pt-12
         grid
         grid-cols-1
         sm:grid-cols-1

@@ -107,6 +107,8 @@ export default async function getListings(
         };
         break;
     }
+    console.log(filter);
+
 
     const listings = await prisma.listing.findMany({
       where: {
@@ -133,7 +135,7 @@ export default async function getListings(
 
     return safeListings;
   } catch (error: any) {
-    throw new Error(error);
     console.log(error);
+    throw new Error(error);
   }
 }

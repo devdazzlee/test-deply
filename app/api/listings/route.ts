@@ -11,6 +11,7 @@ export async function POST(request: Request) {
     return NextResponse.error();
   }
 
+
   if (!process.env.NEXT_PUBLIC_ALLOW_WITHOUT_SUB) {
     const activeSubscription = await prisma.subscription.findFirst({
       where: {

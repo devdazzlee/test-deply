@@ -144,11 +144,11 @@ export default function SocketState({ children, currentUser }) {
       prevRooms.map(r =>
         r.id === room.id
           ? {
-              ...r,
-              messages: r.messages.map(msg =>
-                msg.senderId !== currentUser.id ? { ...msg, read: true } : msg
-              )
-            }
+            ...r,
+            messages: r.messages.map(msg =>
+              msg.senderId !== currentUser.id ? { ...msg, read: true } : msg
+            )
+          }
           : r
       )
     );
@@ -183,12 +183,12 @@ export default function SocketState({ children, currentUser }) {
         prevRooms.map(room =>
           room.id === message.roomId
             ? {
-                ...room,
-                messages: [
-                  ...(room.messages || []),
-                  { ...message.message, read: false }
-                ]
-              }
+              ...room,
+              messages: [
+                ...(room.messages || []),
+                { ...message.message, read: false }
+              ]
+            }
             : room
         )
       );
@@ -215,9 +215,9 @@ export default function SocketState({ children, currentUser }) {
       return roomList.map(room =>
         room.id === message.roomId
           ? {
-              ...room,
-              messages: [...(room.messages || []), message.message]
-            }
+            ...room,
+            messages: [...(room.messages || []), message.message]
+          }
           : room
       );
     }
