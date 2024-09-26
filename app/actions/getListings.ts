@@ -107,8 +107,6 @@ export default async function getListings(
         };
         break;
     }
-    console.log(filter);
-
 
     const listings = await prisma.listing.findMany({
       where: {
