@@ -14,6 +14,7 @@ export const config = {
     "/billing",
     "/payment-success",
     "/subscribe",
+    "/admin-approvals"
   ]
 
 };
