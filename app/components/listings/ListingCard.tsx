@@ -210,11 +210,12 @@ const ListingCard: React.FC<ListingCardProps> = ({
           </div>
         </div>
         <div className='font-semibold text-lg'>
-          {location?.region}, {location?.label}
+          {listingUserName}
+
         </div>
         {listingUserName && (
           <div className='text-md flex flex-row items-center justify-between gap-2'>
-            <small>Hosted by {listingUserName}</small>
+            <small>{location?.region}, {location?.label}</small>
             <Avatar src={listingUserImage} />
           </div>
         )}

@@ -16,7 +16,7 @@ export default async function AdminApprovals({ searchParams }: HomeProps) {
   });
 
   if (listings.length == 0) {
-    return <EmptyState showReset />;
+    return <EmptyState title="No listings to approve!" subtitle="Wohoo! You have no listings to approve" />;
   }
 
   return (

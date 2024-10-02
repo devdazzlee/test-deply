@@ -20,6 +20,7 @@ import { Range } from "react-date-range";
 import toast from "react-hot-toast";
 import { loadStripe } from "@stripe/stripe-js";
 import { SessionProvider } from "next-auth/react";
+import getReservations from "@/app/actions/getReservations";
 
 const initialDateRange = {
   startDate: new Date(),
@@ -34,13 +35,15 @@ interface ListingClientProps {
   };
   currentUser: SafeUser | null | undefined;
   comments?: SafeComment[];
+  hasReservation: boolean
 }
 
 const ListingClient: React.FC<ListingClientProps> = ({
   listing,
   reservations = [],
   currentUser,
-  comments = []
+  comments = [],
+  hasReservation
 }) => {
   const loginModal = useLoginModal();
   const router = useRouter();
@@ -96,6 +99,8 @@ const ListingClient: React.FC<ListingClientProps> = ({
     }
   }, [totalPrice, dateRange, listing?.id, router, currentUser, loginModal]);
 
+
+
   // const category = useMemo(() => {
   //     return categories.filter((item) => item.label == listing.category);
   // }, [listing.category]);
@@ -148,6 +153,7 @@ const ListingClient: React.FC<ListingClientProps> = ({
             listingId={listing.id}
             comments={comments}
             currentUser={currentUser}
+            hasReservation={hasReservation}
           />
         </div>
       </div>

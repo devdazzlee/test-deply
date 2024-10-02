@@ -13,7 +13,13 @@ interface IParams {
 const ListingPage = async ({ params }: { params: IParams }) => {
   const listing = await getListingById(params);
   const reservations = await getReservations(params);
+
   const currentUser = await getCurrentUser();
+  let hasReservation = false
+  if (currentUser && reservations) {
+    hasReservation = reservations.some(reservation => reservation.userId === currentUser?.id);
+
+  }
   const comments = await getComments(params);
 
   if (!listing) {
@@ -31,6 +37,7 @@ const ListingPage = async ({ params }: { params: IParams }) => {
         listing={listing}
         reservations={reservations}
         currentUser={currentUser}
+        hasReservation={hasReservation}
       />
     </ClientOnly>
   );
