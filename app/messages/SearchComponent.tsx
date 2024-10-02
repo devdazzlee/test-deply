@@ -42,7 +42,7 @@ const SearchComponent: React.FC<SearchComponentProps> = ({
     });
 
     onSearch(filteredRooms);
-  }, [searchTerm, rooms, currentUserId, onSearch]);
+  }, [searchTerm, rooms, currentUserId]);
 
   return (
     <div className='p-4 mt-12 xl:mt-0'>
