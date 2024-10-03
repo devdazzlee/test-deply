@@ -298,7 +298,7 @@ const MessageBoxComponent: React.FC<MessageBoxComponentProps> = ({
 
                 {message.fileData && (
                   <div className='mt-2'>
-                    <a
+                    {/* <a
                       href={message.fileData}
                       target='_blank'
                       className='text-blue-500 text-sm'
@@ -306,7 +306,7 @@ const MessageBoxComponent: React.FC<MessageBoxComponentProps> = ({
                       download={message.fileName}
                     >
                       {message.fileName}
-                    </a>
+                    </a> */}
 
                     {/* Render based on file type */}
                     {message.fileType?.startsWith("image/") && (
