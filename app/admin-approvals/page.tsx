@@ -16,7 +16,7 @@ export default async function AdminApprovals({ searchParams }: HomeProps) {
   });
 
   if (listings.length == 0) {
-    return <EmptyState showReset />;
+    return <EmptyState title="No listings to approve!" subtitle="Wohoo! You have no listings to approve" />;
   }
 
   return (
@@ -39,7 +39,7 @@ export default async function AdminApprovals({ searchParams }: HomeProps) {
             <ListingCard
               currentUser={currentUser}
               key={listing.id}
-              type='approval'
+              type='adminApproval'
               listingUserName={listing?.user?.name}
               listingUserImage={listing?.user?.image}
               data={listing}

@@ -93,7 +93,7 @@ const UserMenu: React.FC<UserMenuProps> = ({ currentUser, subStatus }) => {
           onClick={onRent}
           className='hidden md:block text-sm font-semibold py-3 px-4 rounded-full hover:bg-neutral-100 transition cursor-pointer'
         >
-          Get Started
+          Create Listing
         </div>
         <div
           onClick={toggleOpen}
@@ -140,7 +140,7 @@ const UserMenu: React.FC<UserMenuProps> = ({ currentUser, subStatus }) => {
                   onClick={onRent}
                   className='md:hidden block text-sm font-semibold py-3 px-4 hover:bg-neutral-100 transition cursor-pointer'
                 >
-                  Get Started
+                  Create Listing
                 </div>
 
 
@@ -151,6 +151,7 @@ const UserMenu: React.FC<UserMenuProps> = ({ currentUser, subStatus }) => {
                   <MenuItem label='Admin Approvals' href='/admin-approvals' />
                 )}
                 <MenuItem label='Reservations' href='/reservations' />
+                <MenuItem label='Pricing' href='/subscribe' />
                 <MenuItem label='Account Settings' href='/account-settings' />
 
                 <hr />

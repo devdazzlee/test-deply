@@ -12,12 +12,14 @@ interface CommentProps {
   listingId?: string;
   comments?: SafeComment[];
   currentUser?: SafeUser | null;
+  hasReservation: boolean
 }
 
 const CommentSection: React.FC<CommentProps> = ({
   listingId,
   comments = [],
-  currentUser
+  currentUser,
+  hasReservation
 }) => {
   const {
     register,
@@ -32,6 +34,8 @@ const CommentSection: React.FC<CommentProps> = ({
       rating: 3
     }
   });
+  console.log(hasReservation);
+
 
   const router = useRouter();
   const onSubmit: SubmitHandler<FieldValues> = data => {
@@ -61,6 +65,8 @@ const CommentSection: React.FC<CommentProps> = ({
     setHoverRating(0);
   };
 
+
+
   const handleClick = (index: any) => {
     setRating(index + 1);
     setValue("rating", index + 1); // Update the rating in the form data
@@ -73,7 +79,7 @@ const CommentSection: React.FC<CommentProps> = ({
             Reviews({comments.length})
           </h2>
         </div>
-        {currentUser && (
+        {currentUser && hasReservation && (
           <form className='mb-6' onSubmit={handleSubmit(onSubmit)}>
             <div className='py-2 px-4 mb-4 bg-white rounded-lg rounded-t-lg border border-gray-200'>
               <label htmlFor='comment' className='sr-only'>

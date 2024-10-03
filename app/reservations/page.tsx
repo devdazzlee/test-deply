@@ -10,7 +10,7 @@ const ReservationsPage = async () => {
   if (!currentUser) {
     return (
       <ClientOnly>
-        <EmptyState title='Unauthorised' subtitle='PLease login' />
+        <EmptyState title='Unauthorised' subtitle='Please login' />
       </ClientOnly>
     );
   }
