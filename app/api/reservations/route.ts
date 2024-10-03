@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import Stripe from 'stripe';
 import prisma from "@/app/libs/prismadb";
 import getCurrentUser from "@/app/actions/getCurrentUser";
+import Email from "@/app/utils/email";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2024-06-20',
@@ -81,6 +82,18 @@ export async function POST(request: Request) {
         userFee: userFee.toString(),
       },
     });
+
+    if (listing.user.email && listing.user.name) {
+      try {
+        new Email({
+          name: listing.user.name,
+          email: listing.user.email
+        }).sendNewBooking();
+      }
+      catch (error) {
+        console.log(error);
+      }
+    }
 
     return NextResponse.json({ sessionId: session.id });
   } catch (error) {

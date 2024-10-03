@@ -37,7 +37,7 @@ const BookingClient: React.FC<BookingClientProps> = ({
 
   return (
     <Container>
-      <Heading title='Reservations' subtitle='Your booking with creators!' />
+      <Heading title='Bookings' subtitle='Your booking with creators!' />
       <div
         className='
           my-10

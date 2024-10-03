@@ -39,7 +39,7 @@ export default async function AdminApprovals({ searchParams }: HomeProps) {
             <ListingCard
               currentUser={currentUser}
               key={listing.id}
-              type='approval'
+              type='adminApproval'
               listingUserName={listing?.user?.name}
               listingUserImage={listing?.user?.image}
               data={listing}

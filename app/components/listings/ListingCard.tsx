@@ -52,8 +52,46 @@ const ListingCard: React.FC<ListingCardProps> = ({
 
   const location = getByValue(data.locationValue);
 
+  const handleApprove = async () => {
+    if (!reservation || !reservation.id) return;
+    setDisableApproveBtn(true);
+
+    axios
+      .put(`/api/reservations/${reservation.id}`)
+      .then(() => {
+        toast.success("Request approved");
+        setDisableApproveBtn(false);
+        router.refresh();
+      })
+      .catch(() => {
+        toast.error("Something went wrong when approving request");
+        setDisableApproveBtn(false);
+      });
+  };
+
   // for photographer
-  const handleApprove = async (event: any) => {
+  const handleReject = async () => {
+    if (!reservation || !reservation.id) return;
+
+    setDisableRejectBtn(true);
+
+    axios
+      .delete(`/api/reservations/${reservation.id}`)
+      .then(() => {
+        toast.success("Request cancelled");
+        setDisableRejectBtn(false);
+        router.refresh();
+      })
+      .catch(() => {
+        setDisableRejectBtn(false);
+        toast.error("Something went wrong when cancelling request");
+      })
+      .finally(() => { });
+  };
+
+
+  // for admin
+  const handleApproveByAdmin = async (event: any) => {
     event.preventDefault()
 
     if (!data || !data.id) return;
@@ -74,8 +112,8 @@ const ListingCard: React.FC<ListingCardProps> = ({
       });
   };
 
-  // for photographer
-  const handleReject = async (event: any) => {
+  // for admin
+  const handleRejectByAdmin = async (event: any) => {
     event.preventDefault()
     if (!data || !data.id) return;
 
@@ -255,6 +293,26 @@ const ListingCard: React.FC<ListingCardProps> = ({
               small
               label={disableRejectBtn ? "Rejecting ..." : "Reject Reservation"}
               onClick={handleReject}
+            />
+          </>
+        )}
+        {type === "adminApproval" && (
+          <>
+            <Button
+              disabled={disableApproveBtn}
+              small
+              label={
+                disableApproveBtn ? "Approving ..." : "Approve Reservation"
+              }
+              onClick={handleApproveByAdmin}
+            />
+            <hr />
+            <Button
+              disabled={disableRejectBtn}
+              outline
+              small
+              label={disableRejectBtn ? "Rejecting ..." : "Reject Reservation"}
+              onClick={handleRejectByAdmin}
             />
           </>
         )}
