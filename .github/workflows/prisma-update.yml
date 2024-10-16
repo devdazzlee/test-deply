@@ -1,7 +1,11 @@
 name: Prisma Migrate and Generate Client
 
 on:
-  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - 'prisma/schema.prisma'
 
 jobs:
   migrate:
