@@ -1,13 +1,11 @@
 import { NextResponse } from "next/server";
 import prisma from "@/app/libs/prismadb";
 import getCurrentUser from "@/app/actions/getCurrentUser";
-import getReservations from "@/app/actions/getReservations";
+import getUnreviewedReservations from "@/app/actions/getUnreviewedReservations";
 
 interface IParams {
   listingId?: string;
 }
-
-// /api/comments/[listingId]
 
 export async function POST(request: Request, { params }: { params: IParams }) {
   try {
@@ -23,17 +21,16 @@ export async function POST(request: Request, { params }: { params: IParams }) {
       return NextResponse.json({ message: "Invalid ID" }, { status: 400 });
     }
 
-    // Fetch all reservations for the current user
-    const reservations = await getReservations({ userId: currentUser.id });
+    // Fetch unreviewed reservations for the current user and listing
+    const unreviewedReservations = await getUnreviewedReservations({
+      userId: currentUser.id,
+      listingId,
+    });
 
-    // Check if the user has a reservation for the listing
-    const hasReservation = reservations.some(
-      reservation => reservation.listingId === listingId
-    );
-
-    if (!hasReservation) {
+    // If the user has no unreviewed reservations, prevent them from commenting
+    if (unreviewedReservations.length === 0) {
       return NextResponse.json(
-        { message: "You can only comment on listings you have reserved." },
+        { message: "You have already reviewed all your bookings for this listing." },
         { status: 403 }
       );
     }
@@ -55,20 +52,26 @@ export async function POST(request: Request, { params }: { params: IParams }) {
       );
     }
 
+    // Use the first unreviewed reservation for this comment
+    const reservationId = unreviewedReservations[0].id;
+
     const comment = await prisma.comment.create({
       data: {
         text: text || null,
         rating: rating || null,
         userId: currentUser.id,
         listingId,
-        createdAt: new Date()
-      }
+        reservationId,
+        createdAt: new Date(),
+      },
     });
 
+    // Update the listing's average rating and number of ratings
     if (rating) {
       const listing = await prisma.listing.findUnique({
-        where: { id: listingId }
+        where: { id: listingId },
       });
+
       if (listing) {
         const newNumberOfRatings = (listing.numberOfRatings || 0) + 1;
         const newAverageRating =
@@ -80,8 +83,8 @@ export async function POST(request: Request, { params }: { params: IParams }) {
           where: { id: listingId },
           data: {
             averageRating: newAverageRating,
-            numberOfRatings: newNumberOfRatings
-          }
+            numberOfRatings: newNumberOfRatings,
+          },
         });
       }
     }

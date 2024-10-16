@@ -103,6 +103,7 @@ model Reservation {
 
   user     User    @relation(fields: [userId], references: [id], onDelete: Cascade)
   listings Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  comments    Comment[]
 }
 
 model Comment {
@@ -111,10 +112,12 @@ model Comment {
   createdAt DateTime @default(now())
   userId    String   @db.ObjectId
   listingId String   @db.ObjectId
+  reservationId String   @db.ObjectId
   rating    Int?
 
   user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
   listing Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  reservation Reservation @relation(fields: [reservationId], references: [id], onDelete: Cascade)
 }
 
 model Subscription {
