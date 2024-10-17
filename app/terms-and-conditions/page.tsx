@@ -11,7 +11,7 @@ export default function Terms() {
                 <section className="mb-6">
                     <h2 className="text-xl md:text-2xl font-semibold mb-2">Welcome to ShutterGuide LLC</h2>
                     <p className="text-theme1">
-                        Welcome to ShutterGuide LLC. These Terms and Conditions ("Terms") govern your access to and use of our website located at <span className="text-blue-600"><Link href={'/'}>
+                        Welcome to ShutterGuide LLC. These Terms and Conditions (&quot;Terms&quot;) govern your access to and use of our website located at <span className="text-blue-600"><Link href={'/'}>
                             shutterguide.io
                         </Link>
                         </span> (the &quot;Site&quot;) and any services provided by ShutterGuide LLC (&quot;we&quot;, &quot;us&quot;, or &quot;our&quot;). By accessing or using our Site, you agree to be bound by these Terms. If you do not agree to these Terms, please do not use our Site.
