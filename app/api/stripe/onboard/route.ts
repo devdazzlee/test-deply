@@ -64,7 +64,7 @@ export async function POST() {
 
     if (currentUser.email && currentUser.name) {
       try {
-        new Email({
+        await new Email({
           name: currentUser.name,
           email: currentUser.email
         }).sendStripeOnBoarding()

@@ -42,7 +42,7 @@ export async function DELETE(
   if (currentUser.role === 'admin') {
     if (oldListing && oldListing.user.email && oldListing.user.name) {
       try {
-        new Email({
+        await new Email({
           name: oldListing.user.name,
           email: oldListing.user.email
         }).sendListingStatus(false);

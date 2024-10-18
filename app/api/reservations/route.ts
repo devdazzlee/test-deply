@@ -85,7 +85,7 @@ export async function POST(request: Request) {
 
     if (listing.user.email && listing.user.name) {
       try {
-        new Email({
+        await new Email({
           name: listing.user.name,
           email: listing.user.email
         }).sendNewBooking();

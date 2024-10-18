@@ -40,7 +40,7 @@ export async function POST(request: Request, { params }: { params: IParams }) {
 
   if (listing.user.email && listing.user.name) {
     try {
-      new Email({
+      await new Email({
         name: listing.user.name,
         email: listing.user.email
       }).sendListingStatus(true);

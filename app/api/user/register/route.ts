@@ -12,9 +12,9 @@ function generateVerificationToken(): string {
 export async function POST(request: Request) {
   const body = await request.json();
   const { email, name, password } = body;
-  
+
   let scoreResult = passwordScorer(password);
-  
+
   if (!process.env.ALLOW_WEAK_PASSWORD) {
     if (scoreResult.score < 60) {
       return NextResponse.json(
@@ -38,7 +38,11 @@ export async function POST(request: Request) {
       verificationToken: token,
     }
   });
-  new Email({ email: lowercasedEmail, name }).sendWelcome(token);
+  try {
+    await new Email({ email: lowercasedEmail, name }).sendWelcome(token);
+  } catch (error) {
+    console.log(error);
+  }
 
   return NextResponse.json(user);
 }

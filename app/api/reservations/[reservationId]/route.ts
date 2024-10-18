@@ -35,7 +35,7 @@ export async function DELETE(
     include: { user: true } // Include the user who made the reservation
   });
 
-  
+
   if (!res || res.status !== "escrow") {
     return new NextResponse('Reservation not found', { status: 404 });
   }
@@ -58,7 +58,7 @@ export async function DELETE(
   });
 
   if (res && res.user.email && res.user.name) {
-    new Email({ name: res.user.name, email: res.user.email }).sendBookingStatus(false)
+    await new Email({ name: res.user.name, email: res.user.email }).sendBookingStatus(false)
   }
 
   return NextResponse.json(reservation);
@@ -88,7 +88,7 @@ export async function PUT(request: Request, { params }: { params: IParams }) {
   }
 
   if (reservation.listings.userId !== currentUser.id) {
-      return new NextResponse('User not authorised', { status: 504 });
+    return new NextResponse('User not authorised', { status: 504 });
   }
 
   // Update the reservation to mark it as approved
@@ -99,7 +99,7 @@ export async function PUT(request: Request, { params }: { params: IParams }) {
   });
 
   if (updatedReservation && updatedReservation.user.email && updatedReservation.user.name) {
-    new Email({ name: updatedReservation.user.name, email: updatedReservation.user.email }).sendBookingStatus(true)
+    await new Email({ name: updatedReservation.user.name, email: updatedReservation.user.email }).sendBookingStatus(true)
   }
   return NextResponse.json(updatedReservation);
 }
