@@ -1,6 +1,6 @@
 'use client';
 
-import { Suspense, useState } from "react";
+import { Suspense, useCallback, useState } from "react";
 import Container from "../components/Container";
 import Heading from "../components/Heading";
 import ListingCard from "../components/listings/ListingCard";
@@ -17,6 +17,7 @@ import { arrayMoveImmutable } from "array-move";
 import SortableList, { SortableItem } from "react-easy-sort";
 import clsx from "clsx";
 import Image from "next/image";
+import ImageUpload from "../components/inputs/ImageUpload";
 
 interface SettingsClientProps {
     listings: any;
@@ -76,6 +77,8 @@ const SettingsClient: React.FC<SettingsClientProps> = ({
                 }
             });
     };
+
+
 
     return (
         <>
@@ -174,21 +177,9 @@ const SettingsClient: React.FC<SettingsClientProps> = ({
 
                 {listings.map((listing: any) =>
                     <div key={listing.id}>
-                        <PhotoSection listing={listing} />
+                        <PhotoSection listing={listing} loading={loading} setIsLoading={setIsLoading} />
                     </div>
                 )}
-                <section className='pt-6'>
-                    <Button
-                        color='success'
-                        variant='solid'
-                        className='!font-bold disabled:cursor-not-allowed w-48'
-                        endContent={<IconCircleDashedCheck />}
-                        disabled={loading}
-                    // onClick={handleSaveChanges}  // Handle form submission
-                    >
-                        Save Changes
-                    </Button>
-                </section>
             </section>
             <section className='mx-6 md:mx-16 flex max-md:flex-col md:items-start gap-x-12 gap-y-6 border-b-2 py-4'>
                 <Heading title="Reviews you got on your listings" />
@@ -351,9 +342,29 @@ function ListingDeleter({ listing }: { listing: any }) {
     );
 }
 
-function PhotoSection({ listing }: any) {
-    let images: string[] = listing?.imageSrc || [];
-    const [items, setItems] = useState(
+
+type Item = {
+    id: number;
+    url: string;
+};
+
+type Listing = {
+    id: string;
+    title: string;
+    imageSrc: string[];
+};
+
+interface PhotoSectionProps {
+    listing: Listing;
+    loading: boolean;
+    setIsLoading: (loading: boolean) => void;
+}
+
+function PhotoSection({ listing, loading, setIsLoading }: PhotoSectionProps) {
+    const router = useRouter();
+    const images: string[] = listing?.imageSrc || [];
+
+    const [items, setItems] = useState<Item[]>(
         images.map((url: string, index: number) => ({
             id: index,
             url
@@ -363,6 +374,43 @@ function PhotoSection({ listing }: any) {
     const onSortEnd = (oldIndex: number, newIndex: number) => {
         setItems(array => arrayMoveImmutable(array, oldIndex, newIndex));
     };
+
+    const handleImageChanges = (listingId: string, items: Item[]) => {
+        setIsLoading(true)
+        const imageSrc = items.map(item => item.url);
+
+        axios
+            .patch(`/api/listings/${listingId}/images`, imageSrc)
+            .then(() => {
+                toast.success('Changes saved successfully');
+                setIsLoading(false);
+                router.refresh();
+            })
+            .catch((error: unknown) => {
+                setIsLoading(false);
+                if (error instanceof Error) {
+                    toast.error(error.message || 'Failed to save changes');
+                } else {
+                    toast.error('Failed to save changes');
+                }
+            });
+    };
+
+    const onRemove = (id: number) => {
+        setItems(items => items.filter(item => item.id !== id));
+    };
+
+    const handleImageUpload = useCallback((imageUrl: string) => {
+        setItems(prevItems => {
+            const itemExists = prevItems.some(item => item.url === imageUrl);
+            if (itemExists) {
+                return prevItems.filter(item => item.url !== imageUrl);
+            } else {
+                const newItem: Item = { id: prevItems.length, url: imageUrl };
+                return [...prevItems, newItem];
+            }
+        });
+    }, []);
 
     if (images.length === 0) {
         return null;
@@ -382,7 +430,7 @@ function PhotoSection({ listing }: any) {
             >
                 {items.map(item => (
                     <SortableItem key={item.id}>
-                        <div className='aspect-square rounded-xl relative overflow-hidden'>
+                        <div className='aspect-square rounded-xl relative overflow-hidden w-full h-full'>
                             <div className='relative w-full h-full'>
                                 <Image
                                     src={item.url}
@@ -393,7 +441,6 @@ function PhotoSection({ listing }: any) {
                             </div>
                             <div
                                 className={clsx(
-                                    //
                                     "absolute inset-0 cursor-grab bg-black/70",
                                     "hover:opacity-100 opacity-0 transition-opacity",
                                     "p-1.5 dark"
@@ -405,6 +452,7 @@ function PhotoSection({ listing }: any) {
                                     color='danger'
                                     size='sm'
                                     radius='sm'
+                                    onClick={() => onRemove(item.id)} // Handle image removal
                                 >
                                     <IconTrash size={20} />
                                 </Button>
@@ -412,9 +460,25 @@ function PhotoSection({ listing }: any) {
                         </div>
                     </SortableItem>
                 ))}
-            </SortableList>
-        </div>
+                <div className="aspect-square rounded-xl w-full h-full">
 
+                    <ImageUpload displayImages={false} value={items.map(item => item.url)} onChange={handleImageUpload} />
+                </div>
+            </SortableList>
+            <section className='pt-6'>
+                <Button
+                    color='success'
+                    variant='solid'
+                    className='!font-bold disabled:cursor-not-allowed disabled:bg-opacity-75 w-48'
+                    endContent={<IconCircleDashedCheck />}
+                    disabled={loading}
+                    onClick={() => handleImageChanges(listing.id, items)}  // Handle form submission
+                >
+                    Save Changes
+                </Button>
+            </section>
+        </div>
     );
 }
+
 export default SettingsClient;
