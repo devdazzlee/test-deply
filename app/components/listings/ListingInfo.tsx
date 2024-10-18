@@ -128,8 +128,8 @@ const ListingInfo: React.FC<ListingInfoProps> = ({
         {showAllCategories
           ? category?.map(item => <ListingCategory key={item} label={item} />)
           : category
-              ?.slice(0, 6)
-              .map(item => <ListingCategory key={item} label={item} />)}
+            ?.slice(0, 6)
+            .map(item => <ListingCategory key={item} label={item} />)}
         {/* Show More button */}
         {category?.length && category.length > 6 ? (
           <button

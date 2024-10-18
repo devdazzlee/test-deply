@@ -25,8 +25,8 @@ export async function PATCH(
     );
   }
 
-  const body = await request.json();
-  const { imageSrc } = body;
+  const imageSrc = await request.json();
+
 
   if (!Array.isArray(imageSrc)) {
     return NextResponse.json(

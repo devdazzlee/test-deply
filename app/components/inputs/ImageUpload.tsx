@@ -12,9 +12,10 @@ declare global {
 interface ImageUploadProps {
   onChange: (value: string) => void;
   value: string[];
+  displayImages?: Boolean
 }
 
-const ImageUpload: React.FC<ImageUploadProps> = ({ onChange, value }) => {
+const ImageUpload: React.FC<ImageUploadProps> = ({ onChange, value, displayImages = true }) => {
   const handleUpload = (result: any) => {
     const newImageUrl = result.info.secure_url;
     onChange(newImageUrl);
@@ -36,14 +37,15 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ onChange, value }) => {
         return (
           <div
             onClick={() => open?.()}
-            className='relative cursor-pointer hover:opacity-70 transition border-dashed border-2 p-20 border-neutral-300 flex flex-col justify-center items-center gap-4 text-neutral-600'
+            className={`h-full w-full relative cursor-pointer rounded-xl hover:opacity-70 transition border-dashed border-2 ${displayImages ? 'p-20' : 'p-2 md:p-4'} border-neutral-300 flex flex-col justify-center items-center gap-4 text-neutral-600`}
           >
             <TbPhotoPlus size={50} />
-            <div className='font-semibold text-lg'> Click to upload </div>
-            {/* Display uploaded images */}
-            <div className='flex absolute inset-0 w-full h-full flex-wrap'>
-              {value.length > 0
-                ? value.map((imageUrl, index) => (
+
+            <div className='font-semibold text-lg text-center'> Click to upload </div>
+            {displayImages === true ?
+              <div className='flex absolute inset-0 w-full h-full flex-wrap'>
+                {value.length > 0
+                  ? value.map((imageUrl, index) => (
                     <div key={index} className='relative w-1/2 h-1/2'>
                       <Image
                         alt='Uplaod'
@@ -63,8 +65,11 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ onChange, value }) => {
                       </button>
                     </div>
                   ))
-                : ""}
-            </div>
+                  : ""}
+              </div>
+              :
+              <></>
+            }
           </div>
         );
       }}
