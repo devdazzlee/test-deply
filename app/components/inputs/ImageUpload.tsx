@@ -29,7 +29,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ onChange, value, displayImage
       onSuccess={handleUpload}
       uploadPreset='m0gdgdqb'
       options={{
-        maxFiles: 4,
+        maxFiles: 30,
         multiple: true
       }}
     >
@@ -43,7 +43,7 @@ const ImageUpload: React.FC<ImageUploadProps> = ({ onChange, value, displayImage
 
             <div className='font-semibold text-lg text-center'> Click to upload </div>
             {displayImages === true ?
-              <div className='flex absolute inset-0 w-full h-full flex-wrap'>
+              <div className='flex absolute inset-0 w-full h-full flex-wrap overflow-y-auto'>
                 {value.length > 0
                   ? value.map((imageUrl, index) => (
                     <div key={index} className='relative w-1/2 h-1/2'>
