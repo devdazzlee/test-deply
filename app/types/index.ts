@@ -22,6 +22,7 @@ export type SafeUser = Omit<
   updatedAt: string;
   emailVerified: string | null | Date;
   stripeOnboardingComplete: Boolean
+  listingsCount: number
 };
 
 export type SafeComment = Omit<Comment, "createdAt" | "user" | "listing"> & {

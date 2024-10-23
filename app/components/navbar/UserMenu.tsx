@@ -39,13 +39,21 @@ const UserMenu: React.FC<UserMenuProps> = ({ currentUser, subStatus }) => {
     if (!currentUser) {
       return loginModal.onOpen();
     }
-    console.log(subStatus);
+
 
     if (!currentUser.subscriptionOption) {
       router.push("/subscribe");
       return;
     }
+    console.log(currentUser);
 
+    if (currentUser?.listingsCount > 0) {
+
+      toast.error(
+        "You have already created a listing!"
+      );
+      return;
+    }
     if (
       currentUser.subscriptionOption === "booking_fee" ||
       currentUser.subscriptionOption === "flat_fee"

@@ -1,4 +1,5 @@
 import getCurrentUser from "../actions/getCurrentUser";
+import getListings from "../actions/getListings";
 import EmptyState from "../components/EmptyState";
 import ProfileClient from "./ProfileClient";
 import prisma from "@/app/libs/prismadb";
@@ -10,9 +11,7 @@ export default async function ProfilePage() {
     return <EmptyState title='Unauthorised' subtitle='Please login' />;
   }
 
-  let listing = await prisma?.listing.findFirst({
-    where: { userId: currentUser.id }
-  });
+  const listings = await getListings({ userId: currentUser.id });
 
-  return <ProfileClient currentUser={currentUser} listing={listing} />;
+  return <ProfileClient currentUser={currentUser} listings={listings} />;
 }

@@ -39,3 +39,53 @@ body,
   -ms-overflow-style: none; /* IE and Edge */
   scrollbar-width: none; /* Firefox */
 }
+
+
+.swiper-button-prev {
+  background-image: url(/images/back.png) !important;
+  background-repeat: no-repeat;
+  background-size: 100% auto;
+  background-position: center;
+  opacity: 0;
+  pointer-events: none; /* Disable pointer events when buttons are hidden */
+
+  transition: opacity 0.3s ease; 
+}
+
+
+
+
+.group:hover .swiper-button-next,
+.group:hover .swiper-button-prev {
+  opacity: 1; /* Show buttons on hover */
+  pointer-events: all; /* Enable pointer events on hover */
+}
+
+/* Optional: Keep them hidden even when Swiper's default behavior might show them */
+.swiper-button-prev.swiper-button-disabled,
+.swiper-button-next.swiper-button-disabled {
+  opacity: 0 !important; /* Force hide if disabled */
+  pointer-events: none !important; /* Disable interaction */
+}
+
+.swiper-button-next {
+  background-image: url(/images/next.png) !important;
+  opacity: 0;
+  pointer-events: none; /* Disable pointer events when buttons are hidden */
+
+  transition: opacity 0.3s ease; 
+  background-repeat: no-repeat;
+  background-size: 100% auto;
+  background-position: center;
+}
+
+
+
+.swiper-button-next::after {
+  display: none;
+}
+
+.swiper-button-prev::after {
+  display: none;
+}
+
