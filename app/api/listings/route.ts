@@ -69,6 +69,11 @@ export async function POST(request: Request) {
         name: currentUser.name,
         email: currentUser.email
       }).sendNewListing();
+      if (process.env.ADMIN_EMAIL)
+        await new Email({
+          name: "Admin",
+          email: process.env.ADMIN_EMAIL
+        }).sendAdminApproval()
     }
     catch (error) {
       console.log(error);
