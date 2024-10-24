@@ -12,9 +12,10 @@ import SocketState from "@/app/context/SocketContext";
 interface NavbarProps {
   currentUser?: SafeUser | null;
   subStatus?: SubStatus | null;
+  listingCount: number | undefined
 }
 
-const Navbar: React.FC<NavbarProps> = ({ currentUser, subStatus }) => {
+const Navbar: React.FC<NavbarProps> = ({ currentUser, subStatus, listingCount }) => {
   return (
     <div className='fixed w-full bg-white z-20 shadow-sm'>
       <div
@@ -27,12 +28,12 @@ const Navbar: React.FC<NavbarProps> = ({ currentUser, subStatus }) => {
           <div className='hidden sm:flex flex-row items-center justify-between gap-3 md:gap-0'>
             <Logo />
             <Search />
-            <UserMenu currentUser={currentUser} subStatus={subStatus} />
+            <UserMenu currentUser={currentUser} subStatus={subStatus} listingCount={listingCount} />
           </div>
           <div className='sm:hidden flex flex-col gap-3'>
             <div className='flex flex-row justify-between w-full'>
               <Logo />
-              <UserMenu currentUser={currentUser} subStatus={subStatus} />
+              <UserMenu currentUser={currentUser} subStatus={subStatus} listingCount={listingCount} />
             </div>
             <Search />
           </div>

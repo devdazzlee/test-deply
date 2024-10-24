@@ -1,13 +1,13 @@
-import prisma from "./../libs/prismadb";
+import prisma from "@/app/libs/prismadb";
 
 interface IParams {
     userId?: string;
 }
 
-export default async function getComments(params: IParams) {
+export default async function getListingsCount(userId: string) {
 
     try {
-        const { userId } = params;
+        // const { userId } = userId;
 
         const query: any = {};
 

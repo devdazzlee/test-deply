@@ -13,6 +13,7 @@ import { Providers } from "./providers";
 import getSubscriptionStatus from "./actions/getSubscriptionStatus";
 import { SessionProvider } from "next-auth/react";
 import BasicLayout from "./BasicLayout";
+import getListingsCount from "./actions/getListingsCount";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -28,11 +29,14 @@ export default async function RootLayout({
 }>) {
   const currentUser = await getCurrentUser();
   const subStatus = await getSubscriptionStatus();
-
+  let listingCount
+  if (currentUser) {
+    listingCount = await getListingsCount(currentUser.id)
+  }
   return (
     <html lang='en'>
       <body className={inter.className}>
-        <BasicLayout currentUser={currentUser} subStatus={subStatus}>
+        <BasicLayout currentUser={currentUser} subStatus={subStatus} listingCount={listingCount}>
           {children}
         </BasicLayout>
       </body>

@@ -15,11 +15,13 @@ import { SessionContext, SessionProvider } from "next-auth/react";
 export default function BasicLayout({
   children,
   currentUser,
-  subStatus
+  subStatus,
+  listingCount
 }: Readonly<{
   children: React.ReactNode;
   currentUser: SafeUser | null;
   subStatus: any;
+  listingCount: number | undefined
 }>) {
   return (
     <>
@@ -30,7 +32,7 @@ export default function BasicLayout({
           <RentModal />
           <LoginModal />
           <RegisterModal />
-          <Navbar currentUser={currentUser} subStatus={subStatus} />
+          <Navbar currentUser={currentUser} subStatus={subStatus} listingCount={listingCount} />
 
           <Providers>
             <div className='pb-20 pt-28'>{children}</div>
