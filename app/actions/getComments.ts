@@ -36,7 +36,7 @@ export default async function getComments(params: IParams) {
       user: {
         ...comment.user,
         createdAt: comment.user.createdAt.toISOString(),
-        updatedAt: comment.user.updatedAt.toISOString()
+        updatedAt: comment.user.updatedAt.toISOString(),
       },
       listing: {
         ...comment.listing,

@@ -3,7 +3,7 @@
 import useCountries from "@/app/hooks/useCountries";
 import { SafeListing, SafeReservation, SafeUser } from "@/app/types";
 import { useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { format, differenceInDays } from "date-fns";
 import Image from "next/image";
 import HeartButton from "../HeartButton";
@@ -13,6 +13,12 @@ import RatingStars from "../RatingStars";
 import Link from "next/link";
 import axios from "axios";
 import { toast } from "react-hot-toast";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { A11y, Navigation, Pagination, Scrollbar } from "swiper/modules";
+import 'swiper/css';
+import 'swiper/css/navigation';
+import 'swiper/css/pagination';
+import 'swiper/css/scrollbar';
 
 interface ListingCardProps {
   data: SafeListing;
@@ -230,6 +236,12 @@ const ListingCard: React.FC<ListingCardProps> = ({
     return daysDifference > 14;
   }, [reservation]);
 
+  // const [swiperLoaded, setSwiperLoaded] = useState(false);
+
+  // useEffect(() => {
+  //   setSwiperLoaded(true); // This ensures Swiper is only rendered after the component has mounted on the client side
+  // }, []);
+
   return (
     <Link
       href={`/listings/${data.id}`}
@@ -237,12 +249,27 @@ const ListingCard: React.FC<ListingCardProps> = ({
     >
       <div className='flex flex-col gap-2 w-full'>
         <div className='aspect-square w-full relative overflow-hidden rounded-xl'>
-          <Image
-            fill
-            alt='Listing'
-            src={data.imageSrc[0]}
-            className='object-cover h-full w-full group-hover:scale-110 transition'
-          />
+          {<Swiper
+            navigation={true}
+            slidesPerView={1}
+            className=''
+            key={data.id}
+            modules={[Navigation, Pagination, Scrollbar, A11y]}>
+            {data.imageSrc.map((item, index) => (
+              <SwiperSlide key={index}>
+                <div className="relative aspect-square w-full h-full">
+                  <Image
+                    src={item}
+                    alt='Listing'
+                    layout="fill"
+                    objectFit="cover"
+                    className='object-cover hover:scale-110 transition'
+                  />
+                </div>
+              </SwiperSlide>
+            ))}
+          </Swiper>}
+
           <div className='absolute top-3 right-3'>
             <HeartButton listingId={data.id} currentUser={currentUser} />
           </div>
@@ -272,9 +299,10 @@ const ListingCard: React.FC<ListingCardProps> = ({
         <div className='font-light text-sm flex flex-wrap flex-row-reverse gap-x-2 text-neutral-500'>
           {reservationDate ||
             (Array.isArray(data.category) &&
-              data.category
-                .slice(0, 3)
-                .map((item, index) => <div key={index}>{item}</div>))}
+              (data.category.length === 24 ? <div>All Categories</div> :
+                data.category
+                  .slice(0, 3)
+                  .map((item, index) => <div key={index}>{item}</div>)))}
         </div>
         {type === "approval" && (
           <>

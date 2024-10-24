@@ -41,40 +41,40 @@ const SearchModal = () => {
     key: "selection"
   });
   const [calenderOption, setCalenderOption] = useState<string>("Dates");
-  const [stayOption, setStayOption] = useState<"Weekend" | "Week" | "Month">(
-    "Weekend"
-  );
+  // const [stayOption, setStayOption] = useState<"Weekend" | "Week" | "Month">(
+  //   "Weekend"
+  // );
 
-  const [months, setMonths] = useState<string[]>([]);
-  const [selectedMonths, setSelectedMonths] = useState<string[]>([]);
+  // const [months, setMonths] = useState<string[]>([]);
+  // const [selectedMonths, setSelectedMonths] = useState<string[]>([]);
 
-  useEffect(() => {
-    const currentDate = new Date();
-    const generatedMonths = [];
-    for (let i = 0; i < 12; i++) {
-      const date = new Date(
-        currentDate.getFullYear(),
-        currentDate.getMonth() + i,
-        1
-      );
-      generatedMonths.push(
-        date.toLocaleString("default", { month: "long", year: "numeric" })
-      );
-    }
-    setMonths(generatedMonths);
-  }, []);
+  // useEffect(() => {
+  //   const currentDate = new Date();
+  //   const generatedMonths = [];
+  //   for (let i = 0; i < 12; i++) {
+  //     const date = new Date(
+  //       currentDate.getFullYear(),
+  //       currentDate.getMonth() + i,
+  //       1
+  //     );
+  //     generatedMonths.push(
+  //       date.toLocaleString("default", { month: "long", year: "numeric" })
+  //     );
+  //   }
+  //   setMonths(generatedMonths);
+  // }, []);
 
-  const handleMonthClick = (month: string) => {
-    setSelectedMonths(prevSelectedMonths => {
-      if (prevSelectedMonths.includes(month)) {
-        return prevSelectedMonths.filter(
-          selectedMonth => selectedMonth !== month
-        );
-      } else {
-        return [...prevSelectedMonths, month];
-      }
-    });
-  };
+  // const handleMonthClick = (month: string) => {
+  //   setSelectedMonths(prevSelectedMonths => {
+  //     if (prevSelectedMonths.includes(month)) {
+  //       return prevSelectedMonths.filter(
+  //         selectedMonth => selectedMonth !== month
+  //       );
+  //     } else {
+  //       return [...prevSelectedMonths, month];
+  //     }
+  //   });
+  // };
 
   const handleSelectCat = (selectedCategory: string) => {
     const index = category.includes(selectedCategory);
@@ -89,15 +89,15 @@ const SearchModal = () => {
       setCategory(newCategories);
     }
   };
-  const scroll = (width: any) => {
-    const container = document.getElementById("monthsContainer");
-    if (container) {
-      container.scrollBy({
-        left: width,
-        behavior: "smooth"
-      });
-    }
-  };
+  // const scroll = (width: any) => {
+  //   const container = document.getElementById("monthsContainer");
+  //   if (container) {
+  //     container.scrollBy({
+  //       left: width,
+  //       behavior: "smooth"
+  //     });
+  //   }
+  // };
   const Map = useMemo(
     () =>
       dynamic(() => import("../GoogleMaps"), {
@@ -130,17 +130,22 @@ const SearchModal = () => {
       locationValue: location?.value,
       experience,
       averageRating,
-      //  bathroomCount,
-      category: category.join(",") // Join the categories into a comma-separated string
     };
 
-    if (dateRange.startDate) {
-      updatedQuery.startDate = formatISO(dateRange.startDate);
-    }
+    if (category.length)
+      updatedQuery.category = category.join(",")
 
-    if (dateRange.endDate) {
-      updatedQuery.endDate = formatISO(dateRange.endDate);
+    if (calenderOption === "Dates") {
+      if (dateRange.startDate) {
+        updatedQuery.startDate = formatISO(dateRange.startDate);
+      }
+
+      if (dateRange.endDate) {
+        updatedQuery.endDate = formatISO(dateRange.endDate);
+      }
     }
+    console.log(updatedQuery);
+
 
     const url = qs.stringifyUrl(
       {
@@ -161,7 +166,6 @@ const SearchModal = () => {
     router,
     experience,
     averageRating,
-    //bathroomCount,
     dateRange,
     onNext,
     params,
@@ -229,21 +233,19 @@ const SearchModal = () => {
           className={`flex self-center justify-center w-fit p-2 rounded-full bg-neutral-100 items-center gap-2 }`}
         >
           <button
-            className={`"font-semibold py-1 px-2 rounded-full hover:shadow-md  active:bg-white   ${
-              calenderOption === "Dates" && "bg-white"
-            }`}
+            className={`"font-semibold py-1 px-2 rounded-full hover:shadow-md  active:bg-white   ${calenderOption === "Dates" && "bg-white"
+              }`}
             onClick={() => setCalenderOption("Dates")}
           >
             Dates
           </button>
 
           <button
-            className={`font-semibold py-1 px-2 rounded-full  hover:shadow-md  active:bg-white  ${
-              calenderOption === "Flexible" && "bg-white"
-            }`}
-            onClick={() => setCalenderOption("Flexible")}
+            className={`font-semibold py-1 px-2 rounded-full  hover:shadow-md  active:bg-white  ${calenderOption === "Anytime" && "bg-white"
+              }`}
+            onClick={() => setCalenderOption("Anytime")}
           >
-            Flexible
+            Anytime
           </button>
         </div>
         {calenderOption === "Dates" ? (
@@ -265,30 +267,27 @@ const SearchModal = () => {
           </>
         ) : (
           <>
-            <h2 className='text-xl font-semibold text-center'>
+            {/* <h2 className='text-xl font-semibold text-center'>
               Stay for a {stayOption}
             </h2>
             <div className='flex justify-center w-fit p-2 rounded-full bg-neutral-100 items-center gap-2 self-center'>
               <button
-                className={`font-semibold py-1 px-2 rounded-full ${
-                  stayOption === "Weekend" ? "bg-white" : ""
-                }`}
+                className={`font-semibold py-1 px-2 rounded-full ${stayOption === "Weekend" ? "bg-white" : ""
+                  }`}
                 onClick={() => setStayOption("Weekend")}
               >
                 Weekend
               </button>
               <button
-                className={`font-semibold py-1 px-2 rounded-full ${
-                  stayOption === "Week" ? "bg-white" : ""
-                }`}
+                className={`font-semibold py-1 px-2 rounded-full ${stayOption === "Week" ? "bg-white" : ""
+                  }`}
                 onClick={() => setStayOption("Week")}
               >
                 Week
               </button>
               <button
-                className={`font-semibold py-1 px-2 rounded-full ${
-                  stayOption === "Month" ? "bg-white" : ""
-                }`}
+                className={`font-semibold py-1 px-2 rounded-full ${stayOption === "Month" ? "bg-white" : ""
+                  }`}
                 onClick={() => setStayOption("Month")}
               >
                 Month
@@ -324,12 +323,11 @@ const SearchModal = () => {
                 {months.map((month, index) => (
                   <button
                     key={index}
-                    className={`flex flex-col items-center p-4 border rounded-lg shadow hover:shadow-md min-w-24 h-32 justify-center items-center
-                                                ${
-                                                  selectedMonths.includes(month)
-                                                    ? "border border-gray-700"
-                                                    : ""
-                                                }`}
+                    className={`flex flex-col p-4 border rounded-lg shadow hover:shadow-md min-w-24 h-32 justify-center items-center
+                                                ${selectedMonths.includes(month)
+                        ? "border border-gray-700"
+                        : ""
+                      }`}
                     onClick={() => handleMonthClick(month)}
                   >
                     <SlCalender />
@@ -362,7 +360,10 @@ const SearchModal = () => {
                   />
                 </svg>
               </button>
-            </div>
+            </div> */}
+
+
+            {/* <h1>Flexible</h1> */}
           </>
         )}
       </div>

@@ -19,7 +19,6 @@ const AccountSettingsPage = async () => {
         );
     }
     const listings = await getListings({ userId: currentUser.id });
-    console.log(listings);
 
 
 

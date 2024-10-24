@@ -16,13 +16,16 @@ import type { SubStatus } from "@/app/actions/getSubscriptionStatus";
 import clsx from "clsx";
 import { toast } from "react-hot-toast";
 import { SocketContext } from "@/app/context/SocketContext";
+import getListingsCount from "@/app/actions/getListingsCount";
 
 interface UserMenuProps {
   currentUser?: SafeUser | null;
   subStatus?: SubStatus | null;
+  listingCount: number | undefined
 }
 
-const UserMenu: React.FC<UserMenuProps> = ({ currentUser, subStatus }) => {
+const UserMenu: React.FC<UserMenuProps> = ({ currentUser, subStatus, listingCount }) => {
+
   const registerModal = useRegisterModal();
   const loginModal = useLoginModal();
   const rentModal = useRentModal();
@@ -39,13 +42,21 @@ const UserMenu: React.FC<UserMenuProps> = ({ currentUser, subStatus }) => {
     if (!currentUser) {
       return loginModal.onOpen();
     }
-    console.log(subStatus);
+
 
     if (!currentUser.subscriptionOption) {
       router.push("/subscribe");
       return;
     }
+    console.log(currentUser);
 
+    if (listingCount && listingCount > 0) {
+
+      toast.error(
+        "You have already created a listing!"
+      );
+      return;
+    }
     if (
       currentUser.subscriptionOption === "booking_fee" ||
       currentUser.subscriptionOption === "flat_fee"

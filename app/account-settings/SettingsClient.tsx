@@ -1,10 +1,7 @@
 'use client';
 
-import { Suspense, useCallback, useState } from "react";
-import Container from "../components/Container";
+import { useState } from "react";
 import Heading from "../components/Heading";
-import ListingCard from "../components/listings/ListingCard";
-import { SafeListing, SafeUser } from "../types";
 import type { CurrentUser } from "../actions/getCurrentUser";
 import { signOut } from "next-auth/react";
 
@@ -13,11 +10,7 @@ import { IconAlertTriangle, IconCircleDashedCheck, IconEyeClosed, IconEyeFilled,
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import toast from "react-hot-toast";
-import { arrayMoveImmutable } from "array-move";
-import SortableList, { SortableItem } from "react-easy-sort";
-import clsx from "clsx";
-import Image from "next/image";
-import ImageUpload from "../components/inputs/ImageUpload";
+
 
 interface SettingsClientProps {
     listings: any;
@@ -171,16 +164,7 @@ const SettingsClient: React.FC<SettingsClientProps> = ({
             </section>
             <DeleteAccountButton />
 
-            <section className='mx-6 md:mx-16 py-6 border-b-2'>
-                <h4 className='font-semibold'>Your listings</h4>
-                <p className='text-sm text-gray-600'>Drag to move photos around</p>
 
-                {listings.map((listing: any) =>
-                    <div key={listing.id}>
-                        <PhotoSection listing={listing} loading={loading} setIsLoading={setIsLoading} />
-                    </div>
-                )}
-            </section>
             <section className='mx-6 md:mx-16 flex max-md:flex-col md:items-start gap-x-12 gap-y-6 border-b-2 py-4'>
                 <Heading title="Reviews you got on your listings" />
             </section>
@@ -304,181 +288,5 @@ function PasswordInput(props: InputProps) {
 
 
 
-function ListingDeleter({ listing }: { listing: any }) {
-    const router = useRouter();
-
-    const [isDeleting, setIsDeleting] = useState(false);
-
-    const onDelete = () => {
-        if (!listing) return;
-
-        setIsDeleting(true);
-
-        const id = listing.id;
-        axios
-            .delete(`/api/listings/${id}`)
-            .then(() => {
-                toast.success("Listing deleted");
-                router.refresh();
-            })
-            .catch(error => {
-                toast.error(error?.response?.data?.error);
-            }).finally(() => {
-                setIsDeleting(false);
-            });
-    };
-
-    return (
-        <Button
-            color='danger'
-            variant='solid'
-            className='!font-bold mt-6'
-            endContent={<IconAlertTriangle />}
-            onClick={onDelete}
-            isLoading={isDeleting}
-        >
-            Delete Listing
-        </Button>
-    );
-}
-
-
-type Item = {
-    id: number;
-    url: string;
-};
-
-type Listing = {
-    id: string;
-    title: string;
-    imageSrc: string[];
-};
-
-interface PhotoSectionProps {
-    listing: Listing;
-    loading: boolean;
-    setIsLoading: (loading: boolean) => void;
-}
-
-function PhotoSection({ listing, loading, setIsLoading }: PhotoSectionProps) {
-    const router = useRouter();
-    const images: string[] = listing?.imageSrc || [];
-
-    const [items, setItems] = useState<Item[]>(
-        images.map((url: string, index: number) => ({
-            id: index,
-            url
-        }))
-    );
-
-    const onSortEnd = (oldIndex: number, newIndex: number) => {
-        setItems(array => arrayMoveImmutable(array, oldIndex, newIndex));
-    };
-
-    const handleImageChanges = (listingId: string, items: Item[]) => {
-        setIsLoading(true)
-        const imageSrc = items.map(item => item.url);
-
-        axios
-            .patch(`/api/listings/${listingId}/images`, imageSrc)
-            .then(() => {
-                toast.success('Changes saved successfully');
-                setIsLoading(false);
-                router.refresh();
-            })
-            .catch((error: unknown) => {
-                setIsLoading(false);
-                if (error instanceof Error) {
-                    toast.error(error.message || 'Failed to save changes');
-                } else {
-                    toast.error('Failed to save changes');
-                }
-            });
-    };
-
-    const onRemove = (id: number) => {
-        setItems(items => items.filter(item => item.id !== id));
-    };
-
-    const handleImageUpload = useCallback((imageUrl: string) => {
-        setItems(prevItems => {
-            const itemExists = prevItems.some(item => item.url === imageUrl);
-            if (itemExists) {
-                return prevItems.filter(item => item.url !== imageUrl);
-            } else {
-                const newItem: Item = { id: prevItems.length, url: imageUrl };
-                return [...prevItems, newItem];
-            }
-        });
-    }, []);
-
-    if (images.length === 0) {
-        return null;
-    }
-
-    return (
-        <div className="border-b p-4">
-            <h1 className="font-semibold text-lg">{listing.title}</h1>
-            <SortableList
-                onSortEnd={onSortEnd}
-                className={clsx(
-                    "mt-6 select-none",
-                    "grid gap-4",
-                    "md:max-w-lg grid-cols-[repeat(2,1fr)] ph:grid-cols-[repeat(3,1fr)]"
-                )}
-                draggedItemClassName='dragged'
-            >
-                {items.map(item => (
-                    <SortableItem key={item.id}>
-                        <div className='aspect-square rounded-xl relative overflow-hidden w-full h-full'>
-                            <div className='relative w-full h-full'>
-                                <Image
-                                    src={item.url}
-                                    className='object-cover'
-                                    alt=''
-                                    layout='fill'
-                                />
-                            </div>
-                            <div
-                                className={clsx(
-                                    "absolute inset-0 cursor-grab bg-black/70",
-                                    "hover:opacity-100 opacity-0 transition-opacity",
-                                    "p-1.5 dark"
-                                )}
-                            >
-                                <Button
-                                    isIconOnly
-                                    variant='ghost'
-                                    color='danger'
-                                    size='sm'
-                                    radius='sm'
-                                    onClick={() => onRemove(item.id)} // Handle image removal
-                                >
-                                    <IconTrash size={20} />
-                                </Button>
-                            </div>
-                        </div>
-                    </SortableItem>
-                ))}
-                <div className="aspect-square rounded-xl w-full h-full">
-
-                    <ImageUpload displayImages={false} value={items.map(item => item.url)} onChange={handleImageUpload} />
-                </div>
-            </SortableList>
-            <section className='pt-6'>
-                <Button
-                    color='success'
-                    variant='solid'
-                    className='!font-bold disabled:cursor-not-allowed disabled:bg-opacity-75 w-48'
-                    endContent={<IconCircleDashedCheck />}
-                    disabled={loading}
-                    onClick={() => handleImageChanges(listing.id, items)}  // Handle form submission
-                >
-                    Save Changes
-                </Button>
-            </section>
-        </div>
-    );
-}
 
 export default SettingsClient;

@@ -78,7 +78,7 @@ const ListingImages: React.FC<ListingImagesProps> = ({ imageSrc }) => {
               <div className='bg-gray-200 relative'>
                 <Image
                   // onClick={() => setShowAllPhotos(true)}
-                  className='cursor-pointer object-cover rounded-tr-lg'
+                  className='cursor-pointer object-cover'
                   src={imageSrc[2]}
                   alt='image'
                   fill
@@ -104,13 +104,13 @@ const ListingImages: React.FC<ListingImagesProps> = ({ imageSrc }) => {
               </div>
             )}
 
-            {imageSrc[3] && (
+            {imageSrc[4] && (
               // row 2
               <div className='h-full bg-gray-200 relative'>
                 <Image
                   // onClick={() => setShowAllPhotos(true)}
                   className='cursor-pointer object-cover rounded-br-lg relative'
-                  src={imageSrc[3]}
+                  src={imageSrc[4]}
                   alt='image'
                   fill
                 />
@@ -231,14 +231,14 @@ const Gallery: React.FC<Gallery> = ({
           </div>
 
           <div className='flex flex-col md:mt-8 gap-6 px-8 items-center justify-center py-4'>
-            <Grid imageSrc={imageSrc} setSelectedImage={setSelectedImage} />
-            {imageSrc.length > 0 &&
-              imageSrc.map((photo, index) => (
+            <Grid imageSrc={imageSrc} setSelectedImage={setSelectedImage} imageRefs={imageRefs} />
+            {imageSrc.length > 3 &&
+              imageSrc.slice(3).map((photo, index) => (
                 <div
                   key={index}
                   className='w-full h-[80vw] md:w-[60vw] relative md:h-[45vw]'
                   ref={el => {
-                    imageRefs.current[index] = el;
+                    imageRefs.current[index + 3] = el;
                   }}
                 >
                   <Image
@@ -289,13 +289,17 @@ const Gallery: React.FC<Gallery> = ({
 interface Grid {
   imageSrc: string[];
   setSelectedImage: (value: string) => void;
+  imageRefs: any
 }
 
-const Grid: React.FC<Grid> = ({ imageSrc, setSelectedImage }) => {
+const Grid: React.FC<Grid> = ({ imageSrc, setSelectedImage, imageRefs }) => {
   return (
     <>
       <div className='flex flex-col items-center gap-4 w-full'>
-        <div className='w-full h-[80vw] md:w-[60vw] relative md:h-[45vw]'>
+        <div className='w-full h-[80vw] md:w-[60vw] relative md:h-[45vw]'
+          ref={el => {
+            imageRefs.current[0] = el;
+          }}>
           <Image
             src={imageSrc[0]}
             alt='image'
@@ -305,7 +309,10 @@ const Grid: React.FC<Grid> = ({ imageSrc, setSelectedImage }) => {
           />
         </div>
         <div className='grid grid-cols-2 gap-4 w-full md:w-[60vw]'>
-          <div className='w-full h-[40vw] relative md:h-[20vw]'>
+          <div className='w-full h-[40vw] relative md:h-[20vw]'
+            ref={el => {
+              imageRefs.current[1] = el;
+            }}>
             <Image
               src={imageSrc[1]}
               alt='image'
@@ -314,7 +321,10 @@ const Grid: React.FC<Grid> = ({ imageSrc, setSelectedImage }) => {
               onClick={() => setSelectedImage(imageSrc[1])}
             />
           </div>
-          <div className='w-full h-[40vw] relative md:h-[20vw]'>
+          <div className='w-full h-[40vw] relative md:h-[20vw]'
+            ref={el => {
+              imageRefs.current[2] = el;
+            }}>
             <Image
               src={imageSrc[2]}
               alt='image'

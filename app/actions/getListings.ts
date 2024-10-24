@@ -37,6 +37,7 @@ export default async function getListings(
     }
 
     if (category) {
+
       const catArr = category.split(",");
 
       query.category = {
@@ -62,7 +63,7 @@ export default async function getListings(
       };
     }
     if (averageRating) {
-      query.minDays = {
+      query.averageRating = {
         gte: +averageRating
       };
     }

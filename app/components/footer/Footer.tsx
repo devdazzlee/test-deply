@@ -49,7 +49,7 @@ const Footer: React.FC<FooterProps> = ({ currentUser }) => {
                   </Link>
                 </li>
                 <li>
-                  <Link href='/contact' className='hover:underline'>
+                  <Link href='/contact-us' className='hover:underline'>
                     Contact
                   </Link>
                 </li>
@@ -61,7 +61,7 @@ const Footer: React.FC<FooterProps> = ({ currentUser }) => {
               </h2> */}
               <ul className='text-gray-500 font-medium'>
                 <li className='mb-4'>
-                  <Link href='#' className='hover:underline'>
+                  <Link href='privacy-policy' className='hover:underline'>
                     Privacy Policy
                   </Link>
                 </li>
