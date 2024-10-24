@@ -21,11 +21,7 @@ export default async function getCurrentUser() {
       },
 
     });
-    const listingsCount = await prisma.listing.count({
-      where: {
-        userId: currentUser?.id,
-      },
-    });
+
 
     if (!currentUser) {
       return null;
@@ -37,7 +33,6 @@ export default async function getCurrentUser() {
       createdAt: currentUser.createdAt.toISOString(),
       updatedAt: currentUser.updatedAt.toISOString(),
       emailVerified: currentUser.emailVerified?.toISOString() || null,
-      listingsCount: listingsCount
     };
   } catch (error: any) {
     return null;
