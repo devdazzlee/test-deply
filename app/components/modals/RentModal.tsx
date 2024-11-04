@@ -49,8 +49,6 @@ const RentModal = () => {
       location: null,
       locationCoords: [],
       experience: 1,
-      maxDays: 1,
-      minDays: 1,
       imageSrc: [],
       price: 1,
       title: "",
@@ -61,8 +59,7 @@ const RentModal = () => {
   const category = watch("category");
   const location = watch("location");
   const experience = watch("experience");
-  const maxDays = watch("maxDays");
-  const minDays = watch("minDays");
+
   const locationCoords = watch("locationCoords");
 
   const Map = useMemo(
@@ -254,20 +251,7 @@ const RentModal = () => {
           value={experience}
           onChange={value => setCustomValue("experience", value)}
         />
-        <hr />
-        <Counter
-          title='Maximum'
-          subtitle='How many maximum days your work is available for? Set 0 for no maximum'
-          value={maxDays}
-          onChange={value => setCustomValue("maxDays", value)}
-        />
-        <hr />
-        <Counter
-          title='Minimum'
-          subtitle='How many minimum days your work is available for? Set 0 for no minimum'
-          value={minDays}
-          onChange={value => setCustomValue("minDays", value)}
-        />
+
       </div>
     );
   }

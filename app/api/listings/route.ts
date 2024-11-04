@@ -38,8 +38,6 @@ export async function POST(request: Request) {
     imageSrc,
     category,
     experience,
-    maxDays,
-    minDays,
     location,
     locationCoords,
     price
@@ -54,8 +52,6 @@ export async function POST(request: Request) {
       imageSrc: imageSources,
       category,
       experience,
-      maxDays,
-      minDays,
       locationValue: location.value,
       locationCoordinates: locationCoords.latlng,
       price: parseInt(price, 10),
