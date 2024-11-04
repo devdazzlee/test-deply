@@ -22,7 +22,7 @@ interface ListingInfoProps {
   listingApproved: boolean;
   currentUser: SafeUser | null | undefined;
   user: SafeUser;
-  description: string;
+  bio: string;
   experience: number;
   maxDays: number;
   minDays: number;
@@ -38,7 +38,7 @@ const ListingInfo: React.FC<ListingInfoProps> = ({
   listingApproved,
   currentUser,
   user,
-  description,
+  bio,
   experience,
   maxDays,
   minDays,
@@ -118,7 +118,7 @@ const ListingInfo: React.FC<ListingInfoProps> = ({
       </div>
 
       <hr />
-      <div className='text-lg font-light text-neutral-500'>{description}</div>
+      <div className='text-lg font-light text-neutral-500'>{bio}</div>
       <hr />
       <Map position={coordinates} />
       <hr />

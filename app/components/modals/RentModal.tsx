@@ -24,7 +24,7 @@ enum STEPS {
   LOCATION = 1,
   INFO = 2,
   IMAGES = 3,
-  DESCRIPTION = 4,
+  BIO = 4,
   PRICE = 5
 }
 
@@ -54,7 +54,7 @@ const RentModal = () => {
       imageSrc: [],
       price: 1,
       title: "",
-      description: ""
+      bio: ""
     }
   });
 
@@ -246,7 +246,7 @@ const RentModal = () => {
       <div className='flex flex-col gap-8'>
         <Heading
           title='Share some basic information about your work'
-          subtitle='Description can help potential clients?'
+          subtitle='Bio can help potential clients?'
         />
         <Counter
           title='Experience'
@@ -284,7 +284,7 @@ const RentModal = () => {
     );
   }
 
-  if (step == STEPS.DESCRIPTION) {
+  if (step == STEPS.BIO) {
     bodyContent = (
       <div className='flex flex-col gap-8'>
         <Heading
@@ -301,8 +301,8 @@ const RentModal = () => {
         />
         <hr />
         <Input
-          id='description'
-          label='Description'
+          id='bio'
+          label='Bio'
           disabled={isLoading}
           register={register}
           errors={errors}
