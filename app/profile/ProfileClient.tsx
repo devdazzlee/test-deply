@@ -76,16 +76,22 @@ export default function ProfileClient({
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
+
     if (file) {
       setSelectedFile(file);
       uploadImage(file);
     }
   };
 
-  const uploadImage = async (file: File) => {
+  const uploadImage = (file: File) => {
     setIsLoading(true)
     const formData = new FormData();
     formData.append('file', file);
+    // Verify FormData contents
+    for (let [key, value] of formData.entries()) {
+      console.log(`${key}:`, value); // Should log "file: [object File]"
+    }
+
 
     const response = axios.patch(`/api/user/${currentUser.id}/avatar`, formData, {
       headers: {
@@ -132,6 +138,7 @@ export default function ProfileClient({
               "bg-black/70 text-white absolute inset-0",
               "flex items-center justify-center gap-x-2 font-bold text-sm"
             )}
+            disabled={loading}
           >
             <IconPhotoFilled size={18} /> Change
           </button>
@@ -143,6 +150,7 @@ export default function ProfileClient({
             accept="image/*"
             style={{ display: 'none' }}
             onChange={handleFileChange}
+            disabled={loading}
           />
         </div>
 
