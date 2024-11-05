@@ -87,21 +87,15 @@ export default function ProfileClient({
     setIsLoading(true)
     const formData = new FormData();
     formData.append('file', file);
-    // Verify FormData contents
-    for (let [key, value] of formData.entries()) {
-      console.log(`${key}:`, value); // Should log "file: [object File]"
-    }
 
 
-    const response = axios.patch(`/api/user/${currentUser.id}/avatar`, formData, {
+    axios.patch(`/api/user/${currentUser.id}/avatar`, formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
     }).then(() => {
       router.refresh()
     }).catch((error) => {
-      console.log(error);
-
       toast.error('Error uploading image:');
     }).finally(() => {
       setIsLoading(false)
