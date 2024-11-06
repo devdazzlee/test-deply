@@ -325,7 +325,7 @@ const RentModal = () => {
       actionLabel={actionLabel}
       secondaryActionLabel={secondaryActionLabel}
       secondaryAction={step == STEPS.CATEGORY ? undefined : onBack}
-      title='Shutter giude your creativity!'
+      title='Shutter guide your creativity!'
       body={bodyContent}
     />
   );

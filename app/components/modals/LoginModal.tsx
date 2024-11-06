@@ -5,7 +5,7 @@ import { toast } from "react-hot-toast";
 import { signIn } from "next-auth/react";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import { FcGoogle } from "react-icons/fc";
-import { AiFillGithub } from "react-icons/ai";
+import { AiFillGithub, AiFillEye, AiFillEyeInvisible } from "react-icons/ai";
 import { useRouter } from "next/navigation";
 
 import useRegisterModal from "@/app/hooks/useRegisterModal";
@@ -21,6 +21,7 @@ const LoginModal = () => {
   const loginModal = useLoginModal();
   const registerModal = useRegisterModal();
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const {
     register,
@@ -35,7 +36,6 @@ const LoginModal = () => {
 
   const onSubmit: SubmitHandler<FieldValues> = data => {
     setIsLoading(true);
-    console.log("loggin in");
     signIn("credentials", {
       ...data,
       redirect: false
@@ -43,7 +43,6 @@ const LoginModal = () => {
       setIsLoading(false);
 
       if (callback?.ok) {
-        console.log("logged in from console");
         toast.success("Logged in");
         router.refresh();
         loginModal.onClose();
@@ -66,61 +65,64 @@ const LoginModal = () => {
     }
   }, []);
 
+  const togglePasswordVisibility = () => {
+    setShowPassword(prevState => !prevState);
+  };
+
   const bodyContent = (
-    <div className='flex flex-col gap-4'>
-      <Heading title='Welcome back' subtitle='Login to your account!' />
+    <div className="flex flex-col gap-4">
+      <Heading title="Welcome back" subtitle="Login to your account!" />
       <Input
-        id='email'
-        label='Email'
+        id="email"
+        label="Email"
         disabled={isLoading}
         register={register}
-        // errors={errors}
-        errors={{}}
+        errors={errors}
         onKeyDown={inputKeyDown}
         required
       />
-      <Input
-        id='password'
-        label='Password'
-        type='password'
-        disabled={isLoading}
-        onKeyDown={inputKeyDown}
-        register={register}
-        errors={{}}
-        // errors={errors}
-        required
-      />
+      <div className="relative w-full">
+        <Input
+          id="password"
+          label="Password"
+          type={showPassword ? "text" : "password"}
+          disabled={isLoading}
+          onKeyDown={inputKeyDown}
+          register={register}
+          errors={errors}
+          required
+        />
+        <div
+          onClick={togglePasswordVisibility}
+          className="absolute top-1/2 right-4 transform -translate-y-1/2 cursor-pointer text-neutral-500"
+        >
+          {showPassword ? <AiFillEyeInvisible size={20} /> : <AiFillEye size={20} />}
+        </div>
+      </div>
     </div>
   );
 
   const footerContent = (
-    <div className='flex flex-col gap-4 mt-3'>
+    <div className="flex flex-col gap-4 mt-3">
       <hr />
       <Button
         outline
-        label='Continue with Google'
+        label="Continue with Google"
         icon={FcGoogle}
         onClick={() => signIn("google")}
       />
       <Button
         outline
-        label='Continue with Github'
+        label="Continue with Github"
         icon={AiFillGithub}
         onClick={() => signIn("github")}
       />
-      <div
-        className='
-      text-neutral-500 text-center mt-4 font-light'
-      >
+      <div className="text-neutral-500 text-center mt-4 font-light">
         <p>
           First time using ShutterGuide?
           <span
             onClick={onToggle}
-            className='
-              text-neutral-800
-              cursor-pointer 
-              hover:underline
-            '
+            className="text-neutral-800 cursor-pointer hover:underline"
           >
             {" "}
             Create an account
@@ -134,8 +136,8 @@ const LoginModal = () => {
     <Modal
       disabled={isLoading}
       isOpen={loginModal.isOpen}
-      title='Login'
-      actionLabel='Continue'
+      title="Login"
+      actionLabel="Continue"
       onClose={loginModal.onClose}
       onSubmit={handleSubmit(onSubmit)}
       body={bodyContent}
