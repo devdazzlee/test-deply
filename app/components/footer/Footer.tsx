@@ -32,7 +32,7 @@ const Footer: React.FC<FooterProps> = ({ currentUser }) => {
                   </li>
                   <li>
                     <Link href='/account-settings' className='hover:underline'>
-                      Favourites
+                      Favorites
                     </Link>
                   </li>
                 </ul>
@@ -84,11 +84,7 @@ const Footer: React.FC<FooterProps> = ({ currentUser }) => {
               </Link>
               . All Rights Reserved.
             </span>
-            <div className='text-sm text-gray-500 sm:text-center '>
-              <Link href='/' className='cursor-pointer hover:underline'>
-                Terms
-              </Link>
-            </div>
+
             <div className='text-sm text-gray-500 sm:text-center '>
               <Link href='/' className='cursor-pointer hover:underline'>
                 Sitemap

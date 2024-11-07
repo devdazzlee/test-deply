@@ -59,6 +59,7 @@ const RentModal = () => {
   const category = watch("category");
   const location = watch("location");
   const experience = watch("experience");
+  const title = watch("title");
 
   const locationCoords = watch("locationCoords");
 
@@ -84,6 +85,9 @@ const RentModal = () => {
   // }, [locationCoords, location]);
 
   const onBack = () => {
+    if (step === STEPS.PRICE) {
+      setValue("title", title);
+    }
     setStep(value => value - 1);
   };
 
@@ -308,9 +312,11 @@ const RentModal = () => {
           label='Price'
           formatPrice
           type='number'
+          min={"0"}
           disabled={isLoading}
           register={register}
           errors={errors}
+          pattern={/^\d*\.?\d+$/}
           required
         />
       </div>
@@ -320,7 +326,11 @@ const RentModal = () => {
   return (
     <Modal
       isOpen={rentModal.isOpen}
-      onClose={rentModal.onClose}
+      onClose={() => {
+        rentModal.onClose();
+        setStep(0)
+        reset()
+      }}
       onSubmit={handleSubmit(onSubmit)}
       actionLabel={actionLabel}
       secondaryActionLabel={secondaryActionLabel}

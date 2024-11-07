@@ -17,6 +17,7 @@ import clsx from "clsx";
 import { toast } from "react-hot-toast";
 import { SocketContext } from "@/app/context/SocketContext";
 import getListingsCount from "@/app/actions/getListingsCount";
+import { Button, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, useDisclosure } from "@nextui-org/react";
 
 interface UserMenuProps {
   currentUser?: SafeUser | null;
@@ -48,7 +49,6 @@ const UserMenu: React.FC<UserMenuProps> = ({ currentUser, subStatus, listingCoun
       router.push("/subscribe");
       return;
     }
-    console.log(currentUser);
 
     if (listingCount && listingCount > 0) {
 
@@ -85,6 +85,8 @@ const UserMenu: React.FC<UserMenuProps> = ({ currentUser, subStatus, listingCoun
       document.removeEventListener("click", handleClickOutside);
     };
   }, []);
+  const { isOpen: isModalOpen, onOpen, onOpenChange } = useDisclosure();
+
 
   return (
     <div className='relative'>
@@ -126,7 +128,7 @@ const UserMenu: React.FC<UserMenuProps> = ({ currentUser, subStatus, listingCoun
           </div>
         </div>
       </div>
-      {isOpen && (
+      {(isOpen || isModalOpen) && (
         <div className='absolute rounded-xl shadow-md w-[40vw] md:w-[200px] bg-white overflow-hidden right-0 top-12 text-sm z-20'>
           <div className='flex flex-col cursor-pointer'>
             {currentUser ? (
@@ -167,7 +169,38 @@ const UserMenu: React.FC<UserMenuProps> = ({ currentUser, subStatus, listingCoun
 
                 <hr />
 
-                <MenuItem onClick={() => signOut()} label='Logout' />
+                <Button
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    e.preventDefault()
+                    onOpen()
+                  }}
+                  className='px-4 py-3 flex justify-start hover:bg-neutral-100 bg-white rounded-none transition font-semibold'
+                >
+                  {"Logout"}
+                </Button>
+                <Modal isOpen={isModalOpen} onOpenChange={onOpenChange} placement="center">
+                  <ModalContent>
+                    {(onClose) => (
+                      <>
+                        <ModalBody>
+                          <p className='pt-6 text-sm text-gray-600'>
+                            Are you sure you want to logout?
+                          </p>
+
+                        </ModalBody>
+                        <ModalFooter>
+                          <Button color="danger" variant="light" onPress={onClose}>
+                            No
+                          </Button>
+                          <Button color="danger" onPress={() => signOut()} className="disabled:opacity-70 disabled:cursor-not-allowed">
+                            Yes
+                          </Button>
+                        </ModalFooter>
+                      </>
+                    )}
+                  </ModalContent>
+                </Modal>
 
                 {/* <MenuItem
                   href="/trips"

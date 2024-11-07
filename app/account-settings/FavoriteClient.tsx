@@ -22,7 +22,7 @@ const FavoriteClient: React.FC<FavoriteClientProps> = ({
         <ClientOnly>
           <div className='mx-6 md:mx-16 text-2xl flex items-center gap-2 font-bold py-6'>
             <PiUserListFill />
-            <h1>Your Favourites</h1>
+            <h1>Your Favorites</h1>
           </div>
           <EmptyState
             title='No favorites found'

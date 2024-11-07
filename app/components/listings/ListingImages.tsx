@@ -309,30 +309,35 @@ const Grid: React.FC<Grid> = ({ imageSrc, setSelectedImage, imageRefs }) => {
           />
         </div>
         <div className='grid grid-cols-2 gap-4 w-full md:w-[60vw]'>
-          <div className='w-full h-[40vw] relative md:h-[20vw]'
-            ref={el => {
-              imageRefs.current[1] = el;
-            }}>
-            <Image
-              src={imageSrc[1]}
-              alt='image'
-              fill
-              className='object-cover cursor-pointer rounded-lg'
-              onClick={() => setSelectedImage(imageSrc[1])}
-            />
-          </div>
-          <div className='w-full h-[40vw] relative md:h-[20vw]'
-            ref={el => {
-              imageRefs.current[2] = el;
-            }}>
-            <Image
-              src={imageSrc[2]}
-              alt='image'
-              fill
-              className='object-cover cursor-pointer rounded-lg'
-              onClick={() => setSelectedImage(imageSrc[2])}
-            />
-          </div>
+          {imageSrc.length > 1 &&
+
+            <div className='w-full h-[40vw] relative md:h-[20vw]'
+              ref={el => {
+                imageRefs.current[1] = el;
+              }}>
+              <Image
+                src={imageSrc[1]}
+                alt='image'
+                fill
+                className='object-cover cursor-pointer rounded-lg'
+                onClick={() => setSelectedImage(imageSrc[1])}
+              />
+            </div>
+          }
+          {imageSrc.length > 2 &&
+            <div className='w-full h-[40vw] relative md:h-[20vw]'
+              ref={el => {
+                imageRefs.current[2] = el;
+              }}>
+              <Image
+                src={imageSrc[2]}
+                alt='image'
+                fill
+                className='object-cover cursor-pointer rounded-lg'
+                onClick={() => setSelectedImage(imageSrc[2])}
+              />
+            </div>
+          }
         </div>
       </div>
     </>

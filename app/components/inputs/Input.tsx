@@ -13,6 +13,7 @@ interface InputProps {
   errors: FieldErrors;
   onKeyDown?: KeyboardEventHandler<HTMLInputElement>;
   pattern?: RegExp;
+  min?: string;
 }
 
 const Input: React.FC<InputProps> = ({
@@ -25,7 +26,8 @@ const Input: React.FC<InputProps> = ({
   register,
   errors,
   onKeyDown,
-  pattern
+  pattern,
+  min
 }) => {
   return (
     <div className="w-full relative">
@@ -37,6 +39,7 @@ const Input: React.FC<InputProps> = ({
       )}
       <input
         id={id}
+        min={min}
         disabled={disabled}
         {...register(id, {
           required,
