@@ -62,9 +62,9 @@ const ContactsComponent: React.FC<ContactsComponentProps> = ({
   };
 
   return (
-    <div className={`overflow-y-auto h-[calc(100vh-140px)] xl:h-[80vh]`}>
+    <div className='overflow-y-auto h-[calc(100vh-140px)] xl:h-[80vh]'>
       {rooms?.length > 0 &&
-        rooms?.map(room => {
+        rooms.map(room => {
           const contact =
             room.user1.id === currentUserId ? room.user2 : room.user1;
 
@@ -74,20 +74,22 @@ const ContactsComponent: React.FC<ContactsComponentProps> = ({
           return (
             <div
               key={room.id}
-              className={`p-4${
+              className={`p-4 ${
                 room.id === selectedRoom?.id
-                  ? " bg-gray-100"
-                  : " hover:bg-gray-100"
+                  ? "bg-gray-100"
+                  : "hover:bg-gray-100"
               } cursor-pointer`}
               onClick={() => onRoomSelect(room)}
             >
               <div className='flex items-center space-x-3'>
-                <div className='size-12 bg-gray-300 flex items-center justify-center rounded-full'>
+                <div className='w-12 h-12 bg-gray-300 flex items-center justify-center rounded-full text-lg font-semibold text-white'>
                   {contact.name.charAt(0).toUpperCase()}
                 </div>
-                <div className='flex-1'>
+                <div className='flex-1 overflow-hidden'>
                   <div className='flex justify-between items-center'>
-                    <span className='font-semibold'>{contact.name}</span>
+                    <span className='font-semibold truncate w-3/4'>
+                      {contact.name}
+                    </span>
                     <span className='text-xs text-gray-500'>
                       {lastMessage ? formatDate(lastMessage?.createdAt) : ""}
                     </span>
@@ -97,11 +99,11 @@ const ContactsComponent: React.FC<ContactsComponentProps> = ({
                       unreadCount > 0 ? "font-bold" : ""
                     }`}
                   >
-                    {lastMessage ? lastMessage?.content : "No messages yet"}
+                    {lastMessage ? lastMessage.content : "No messages yet"}
                   </p>
                 </div>
                 {unreadCount > 0 && (
-                  <div className='bg-blue-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs'>
+                  <div className='bg-blue-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-semibold'>
                     {unreadCount}
                   </div>
                 )}
