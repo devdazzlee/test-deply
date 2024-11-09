@@ -2,18 +2,30 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/app/libs/prismadb";
 
 interface IParams {
-    token?: string;
+    email: string;
+    token: string;
 }
 export async function GET(request: NextRequest, { params }: { params: IParams }) {
-    const { token } = params
+    const { email, token } = params
     const user = await prisma.user.findFirst({
         where: {
-            verificationToken: token
+            email: email
+        },
+        select: {
+            verificationToken: true,
+            emailVerified: true,
+            id: true
         }
     })
     if (!user) {
-        throw new Error("Invalid token");
+        return new NextResponse("No user exists for such email");
     }
+    if (user?.emailVerified)
+        return new NextResponse("Email is already verified.")
+
+    if (user?.verificationToken !== token)
+        return new NextResponse("Token is not valid");
+
     await prisma.user.update({
         where: {
             id: user.id

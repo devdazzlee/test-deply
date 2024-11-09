@@ -111,26 +111,29 @@ const Modal: React.FC<ModalProps> = ({
                 <div className="text-lg font-semibold">{title}</div>
               </div>
               {/* BODY */}
-              <div className="p-6 flex-auto overflow-y-auto">{body}</div>
-              {/* FOOTER */}
-              <div className="flex flex-col gap-2 p-6">
-                <div className="flex flex-row items-center gap-4 w-full">
-                  {secondaryAction && secondaryActionLabel && (
-                    <Button
-                      outline
-                      disabled={disabled}
-                      label={secondaryActionLabel}
-                      onClick={handleSecondaryAction}
-                    />
-                  )}
-                  <Button
-                    disabled={disabled || onNextDisabled}
-                    label={actionLabel}
-                    onClick={handleSubmit}
+              <div className="overflow-y-auto">
 
-                  />
+                <div className="p-6 flex-auto overflow-y-hidden">{body}</div>
+                {/* FOOTER */}
+                <div className="flex flex-col gap-2 p-6">
+                  <div className="flex flex-row items-center gap-4 w-full">
+                    {secondaryAction && secondaryActionLabel && (
+                      <Button
+                        outline
+                        disabled={disabled}
+                        label={secondaryActionLabel}
+                        onClick={handleSecondaryAction}
+                      />
+                    )}
+                    <Button
+                      disabled={disabled || onNextDisabled}
+                      label={actionLabel}
+                      onClick={handleSubmit}
+
+                    />
+                  </div>
+                  {footer}
                 </div>
-                {footer}
               </div>
             </div>
           </div>
