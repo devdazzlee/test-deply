@@ -41,6 +41,7 @@ const SearchModal = () => {
     key: "selection"
   });
   const [calenderOption, setCalenderOption] = useState<string>("Dates");
+
   // const [stayOption, setStayOption] = useState<"Weekend" | "Week" | "Month">(
   //   "Weekend"
   // );

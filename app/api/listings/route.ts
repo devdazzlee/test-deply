@@ -34,12 +34,10 @@ export async function POST(request: Request) {
 
   const {
     title,
-    description,
+    bio,
     imageSrc,
     category,
     experience,
-    maxDays,
-    minDays,
     location,
     locationCoords,
     price
@@ -50,12 +48,10 @@ export async function POST(request: Request) {
   const listing = await prisma.listing.create({
     data: {
       title,
-      description,
+      bio,
       imageSrc: imageSources,
       category,
       experience,
-      maxDays,
-      minDays,
       locationValue: location.value,
       locationCoordinates: locationCoords.latlng,
       price: parseInt(price, 10),

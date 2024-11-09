@@ -8,16 +8,19 @@ interface CounterProps {
   subtitle: string;
   value: number;
   onChange: (value: number) => void;
+  maxVal?: number
 }
 
 const Counter: React.FC<CounterProps> = ({
   title,
   subtitle,
   value,
-  onChange
+  onChange,
+  maxVal
 }) => {
   const onAdd = useCallback(() => {
-    onChange(value + 1);
+    if (maxVal && value < maxVal)
+      onChange(value + 1);
   }, [onChange, value]);
 
   const onReduce = useCallback(() => {

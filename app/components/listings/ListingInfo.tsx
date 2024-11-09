@@ -22,10 +22,8 @@ interface ListingInfoProps {
   listingApproved: boolean;
   currentUser: SafeUser | null | undefined;
   user: SafeUser;
-  description: string;
+  bio: string;
   experience: number;
-  maxDays: number;
-  minDays: number;
   category: string[] | undefined;
   locationValue: string;
   locationCoords: string[];
@@ -38,10 +36,8 @@ const ListingInfo: React.FC<ListingInfoProps> = ({
   listingApproved,
   currentUser,
   user,
-  description,
+  bio,
   experience,
-  maxDays,
-  minDays,
   category,
   locationValue,
   locationCoords,
@@ -112,13 +108,11 @@ const ListingInfo: React.FC<ListingInfoProps> = ({
 
         <div className='flex flex-row items-center gap-4 font-light text-neutral-500'>
           <div>{experience}/yrs experiance</div>
-          <div>{maxDays}/day maximum</div>
-          <div>{minDays}/day minimum</div>
         </div>
       </div>
 
       <hr />
-      <div className='text-lg font-light text-neutral-500'>{description}</div>
+      <div className='text-lg font-light text-neutral-500'>{bio}</div>
       <hr />
       <Map position={coordinates} />
       <hr />

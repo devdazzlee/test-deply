@@ -24,7 +24,7 @@ enum STEPS {
   LOCATION = 1,
   INFO = 2,
   IMAGES = 3,
-  DESCRIPTION = 4,
+  BIO = 4,
   PRICE = 5
 }
 
@@ -49,20 +49,18 @@ const RentModal = () => {
       location: null,
       locationCoords: [],
       experience: 1,
-      maxDays: 1,
-      minDays: 1,
       imageSrc: [],
       price: 1,
       title: "",
-      description: ""
+      bio: ""
     }
   });
 
   const category = watch("category");
   const location = watch("location");
   const experience = watch("experience");
-  const maxDays = watch("maxDays");
-  const minDays = watch("minDays");
+  const title = watch("title");
+
   const locationCoords = watch("locationCoords");
 
   const Map = useMemo(
@@ -87,6 +85,9 @@ const RentModal = () => {
   // }, [locationCoords, location]);
 
   const onBack = () => {
+    if (step === STEPS.PRICE) {
+      setValue("title", title);
+    }
     setStep(value => value - 1);
   };
 
@@ -246,28 +247,16 @@ const RentModal = () => {
       <div className='flex flex-col gap-8'>
         <Heading
           title='Share some basic information about your work'
-          subtitle='Description can help potential clients?'
+          subtitle='Bio can help potential clients?'
         />
         <Counter
           title='Experience'
           subtitle='How many years of experience do you have?'
           value={experience}
+          maxVal={50}
           onChange={value => setCustomValue("experience", value)}
         />
-        <hr />
-        <Counter
-          title='Maximum'
-          subtitle='How many maximum days your work is available for? Set 0 for no maximum'
-          value={maxDays}
-          onChange={value => setCustomValue("maxDays", value)}
-        />
-        <hr />
-        <Counter
-          title='Minimum'
-          subtitle='How many minimum days your work is available for? Set 0 for no minimum'
-          value={minDays}
-          onChange={value => setCustomValue("minDays", value)}
-        />
+
       </div>
     );
   }
@@ -284,7 +273,7 @@ const RentModal = () => {
     );
   }
 
-  if (step == STEPS.DESCRIPTION) {
+  if (step == STEPS.BIO) {
     bodyContent = (
       <div className='flex flex-col gap-8'>
         <Heading
@@ -301,8 +290,8 @@ const RentModal = () => {
         />
         <hr />
         <Input
-          id='description'
-          label='Description'
+          id='bio'
+          label='Bio'
           disabled={isLoading}
           register={register}
           errors={errors}
@@ -324,9 +313,11 @@ const RentModal = () => {
           label='Price'
           formatPrice
           type='number'
+          min={"0"}
           disabled={isLoading}
           register={register}
           errors={errors}
+          pattern={/^\d*\.?\d+$/}
           required
         />
       </div>
@@ -336,13 +327,18 @@ const RentModal = () => {
   return (
     <Modal
       isOpen={rentModal.isOpen}
-      onClose={rentModal.onClose}
+      onClose={() => {
+        rentModal.onClose();
+        setStep(0)
+        reset()
+      }}
       onSubmit={handleSubmit(onSubmit)}
       actionLabel={actionLabel}
       secondaryActionLabel={secondaryActionLabel}
       secondaryAction={step == STEPS.CATEGORY ? undefined : onBack}
-      title='Shutter giude your creativity!'
+      title='Shutter guide your creativity!'
       body={bodyContent}
+      onNextDisabled={((step == STEPS.CATEGORY && category.length == 0) || (step == STEPS.LOCATION && location === null)) ? true : false}
     />
   );
 };

@@ -50,7 +50,7 @@ class Email {
             <p style="margin-top: 8px; line-height: 1.75; color: #4b5563;">
                 Verify your account to get started on <span style="font-weight: 600;">Shutter Guide</span>.
             </p>
-            <a style="padding: 8px 24px; margin-top: 16px; font-size: 0.875rem; font-weight: 500; color: #ffffff; background-color: #202125; border-radius: 0.375rem; text-decoration: none; display: inline-block;" href="${process.env.NEXT_PUBLIC_BASE_URL}/api/verify/${token}">
+            <a style="padding: 8px 24px; margin-top: 16px; font-size: 0.875rem; font-weight: 500; color: #ffffff; background-color: #202125; border-radius: 0.375rem; text-decoration: none; display: inline-block;" href="${process.env.NEXT_PUBLIC_BASE_URL}/api/verify/${this.to}/${token}">
                 Verify Account
             </a>
             <p style="margin-top: 32px; color: #4b5563;">

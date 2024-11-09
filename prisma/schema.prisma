@@ -65,13 +65,11 @@ model Account {
 model Listing {
   id                  String   @id @default(auto()) @map("_id") @db.ObjectId
   title               String
-  description         String
+  bio                 String
   imageSrc            String[]
   createdAt           DateTime @default(now())
   category            String[]
   experience          Int
-  maxDays             Int
-  minDays             Int
   locationValue       String
   locationCoordinates String[]
   userId              String   @db.ObjectId

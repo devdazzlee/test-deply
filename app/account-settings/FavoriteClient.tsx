@@ -1,4 +1,5 @@
-import { Suspense } from "react";
+'use client'
+import { Suspense, useEffect } from "react";
 import Container from "../components/Container";
 import Heading from "../components/Heading";
 import ListingCard from "../components/listings/ListingCard";
@@ -16,13 +17,18 @@ const FavoriteClient: React.FC<FavoriteClientProps> = ({
   listings,
   currentUser
 }) => {
+  useEffect(() => {
+    if (window.location.hash === "#favorites") {
+      document.getElementById("favorites-section")?.scrollIntoView({ behavior: "smooth" });
+    }
+  }, []);
   if (listings.length == 0) {
     return (
       <Suspense>
         <ClientOnly>
           <div className='mx-6 md:mx-16 text-2xl flex items-center gap-2 font-bold py-6'>
             <PiUserListFill />
-            <h1>Your Favourites</h1>
+            <h1>Your Favorites</h1>
           </div>
           <EmptyState
             title='No favorites found'

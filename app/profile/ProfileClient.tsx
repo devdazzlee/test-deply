@@ -11,10 +11,11 @@ import {
   IconTrash
 } from "@tabler/icons-react";
 import clsx from "clsx";
+import { Range } from "react-date-range";
 
 import { Button, Textarea } from "@nextui-org/react";
 import { Input, InputProps } from "@nextui-org/react";
-import { useCallback, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { arrayMoveImmutable } from "array-move";
 import SortableList, { SortableItem } from "react-easy-sort";
 import type { CurrentUser } from "../actions/getCurrentUser";
@@ -22,6 +23,7 @@ import Image from "next/image";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import ImageUpload from "../components/inputs/ImageUpload";
+import Calendar from "../components/inputs/Calendar";
 
 function PasswordInput(props: InputProps) {
   const [isVisible, setIsVisible] = useState(false);
@@ -61,17 +63,56 @@ export default function ProfileClient({
   currentUser: CurrentUser;
   listings: any;
 }) {
+  const router = useRouter()
   const [loading, setIsLoading] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  const [dateRange, setDateRange] = useState<Range>({
+    startDate: new Date(),
+    endDate: new Date(),
+    key: "selection"
+  });
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+
+    if (file) {
+      setSelectedFile(file);
+      uploadImage(file);
+    }
+  };
+
+  const uploadImage = (file: File) => {
+    setIsLoading(true)
+    const formData = new FormData();
+    formData.append('file', file);
+
+
+    axios.patch(`/api/user/${currentUser.id}/avatar`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    }).then(() => {
+      router.refresh()
+    }).catch((error) => {
+      toast.error('Error uploading image:');
+    }).finally(() => {
+      setIsLoading(false)
+    });
+  }
+
+
   return (
     <>
       {/* Cover photo */}
       <div className='bg-[#ECECEE] h-40 -mt-10'></div>
 
       {/* Profile photo + name */}
-      <div className='flex mb-16'>
+      <div className='flex md:flex-row flex-col mb-16'>
         <div
           className={clsx(
-            "w-36 h-36 rounded-full bg-blue-500 shadow-xl -my-12 ml-10",
+            "md:w-36 md:h-36 lg:mb-0 mb-4 w-24 h-24 rounded-full bg-blue-500 shadow-xl -my-12 ml-10",
             "overflow-hidden relative group",
             "border-white border-3"
           )}
@@ -79,21 +120,32 @@ export default function ProfileClient({
           <Image
             width={200}
             height={200}
-            // src='/images/profile-image.jpg'
             alt='profile picture'
             src={currentUser.image || "/images/placeholder.jpg"}
             className='w-full max-w-full h-full max-h-full object-cover'
           />
 
           <button
+            onClick={() => fileInputRef.current?.click()}
             className={clsx(
               "group-hover:opacity-100 opacity-0 transition-opacity",
               "bg-black/70 text-white absolute inset-0",
               "flex items-center justify-center gap-x-2 font-bold text-sm"
             )}
+            disabled={loading}
           >
             <IconPhotoFilled size={18} /> Change
           </button>
+
+          {/* Hidden file input */}
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            style={{ display: 'none' }}
+            onChange={handleFileChange}
+            disabled={loading}
+          />
         </div>
 
         <div className='pt-5 pl-4'>
@@ -105,7 +157,7 @@ export default function ProfileClient({
 
 
       {/* Bio */}
-      <section className='mx-6 md:mx-16 flex max-md:flex-col md:items-start gap-x-12 gap-y-6 border-b-2 py-6'>
+      < section className='mx-6 md:mx-16 flex max-md:flex-col md:items-start gap-x-12 gap-y-6 border-b-2 py-6' >
         <div className='md:min-w-56 wl:min-w-96'>
           <h4 className='font-semibold'>Bio</h4>
           <p className='text-sm text-gray-600'>Tell us about yourself</p>
@@ -125,10 +177,10 @@ export default function ProfileClient({
             }}
           />
         </div>
-      </section>
+      </section >
 
       {/* Social links */}
-      <section className='mx-6 md:mx-16 flex max-md:flex-col md:items-start gap-x-12 gap-y-6 border-b-2 py-6'>
+      < section className='mx-6 md:mx-16 flex max-md:flex-col md:items-start gap-x-12 gap-y-6 border-b-2 py-6' >
         <div className='md:min-w-56 wl:min-w-96'>
           <h4 className='font-semibold'>Social links</h4>
           <p className='text-sm text-gray-600'>
@@ -173,9 +225,29 @@ export default function ProfileClient({
               mainWrapper: "flex-1"
             }}
           />
-        </div>
-      </section>
 
+
+        </div>
+      </section >
+
+      <section className='mx-6 md:mx-16 py-6'>
+        <h2 className='font-semibold text-xl'>Set yourself as unavailable</h2>
+        <div className='lg:hidden xs:block'>
+          <Calendar
+            months={1}
+            value={dateRange}
+            onChange={value => setDateRange(value.selection)}
+          />
+        </div>
+        <div className='hidden lg:block'>
+          <Calendar
+            months={2}
+            value={dateRange}
+            onChange={value => setDateRange(value.selection)}
+          />
+        </div>
+
+      </section>
 
       <section className='mx-6 md:mx-16 py-6'>
         <Button
@@ -378,8 +450,4 @@ function PhotoSection({ listing, loading, setIsLoading }: PhotoSectionProps) {
     </div>
   );
 }
-
-
-
-
 

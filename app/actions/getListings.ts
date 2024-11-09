@@ -3,8 +3,6 @@ import prisma from "@/app/libs/prismadb";
 export interface IListingsParams {
   userId?: string;
   experience?: number;
-  maxDays?: number;
-  minDays?: number;
   averageRating?: number;
   startDate?: string;
   endDate?: string;
@@ -21,8 +19,6 @@ export default async function getListings(
     const {
       userId,
       experience,
-      maxDays,
-      minDays,
       averageRating,
       startDate,
       endDate,
@@ -45,23 +41,13 @@ export default async function getListings(
       };
     }
 
-    if (maxDays) {
-      query.maxDays = {
-        gte: +maxDays
-      };
-    }
-
     if (experience) {
       query.experience = {
         gte: +experience
       };
     }
 
-    if (minDays) {
-      query.minDays = {
-        gte: +minDays
-      };
-    }
+
     if (averageRating) {
       query.averageRating = {
         gte: +averageRating
