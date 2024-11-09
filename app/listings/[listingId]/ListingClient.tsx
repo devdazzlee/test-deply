@@ -75,6 +75,8 @@ const ListingClient: React.FC<ListingClientProps> = ({
     setIsLoading(true);
 
     try {
+
+
       const response = await axios.post("/api/reservations", {
         totalPrice,
         startDate: dateRange.startDate,
@@ -92,8 +94,12 @@ const ListingClient: React.FC<ListingClientProps> = ({
       } else {
         throw new Error("Stripe initialisation failed");
       }
-    } catch (error) {
-      toast.error("Something went wrong. Please try again.");
+    } catch (error: any) {
+
+
+      toast.error(
+        error?.response?.data?.error || "Something went wrong"
+      );
     } finally {
       setIsLoading(false);
     }

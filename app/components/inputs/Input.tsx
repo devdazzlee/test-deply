@@ -45,7 +45,8 @@ const Input: React.FC<InputProps> = ({
           required,
           pattern: pattern
             ? { value: pattern, message: "Invalid format" }
-            : undefined
+            : undefined,
+          validate: (value) => value.trim() !== "" || "This field cannot be empty or only spaces"
         })}
         placeholder=" "
         type={type}

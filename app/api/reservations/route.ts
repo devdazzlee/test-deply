@@ -17,6 +17,7 @@ export async function POST(request: Request) {
 
   const body = await request.json();
   const { listingId, startDate, endDate, totalPrice } = body;
+  console.log(body);
 
   if (!listingId || !startDate || !endDate || !totalPrice) {
     return NextResponse.error();
@@ -36,6 +37,7 @@ export async function POST(request: Request) {
   const creator = listing.user;
 
   if (!creator.stripeAccountId) {
+    console.log(creator);
     return NextResponse.json({ error: 'Creator does not have a Stripe account.' }, { status: 400 });
   }
 

@@ -43,7 +43,7 @@ const Search = () => {
 
   const guestLabel = useMemo(() => {
     if (experience) {
-      return `${experience} experiance`;
+      return `${experience} experience`;
     }
 
     return "Add filter";
@@ -55,7 +55,7 @@ const Search = () => {
       onClick={searchModal.onOpen}
     >
       <div className='flex flex-row items-center justify-between'>
-        <div className='text-sm font-semibold px-6'>{locationLabel}</div>
+        <div className='text-sm font-semibold px-6 flex'>{locationLabel}</div>
         <div className='hidden sm:block text-sm font-semibold px-6 border-x-[1px] flex-1 text-center'>
           {durationLabel}
         </div>

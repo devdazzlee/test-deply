@@ -3,7 +3,7 @@ import getFavoriteListings from "../actions/getFavoriteListings";
 import ClientOnly from "../components/ClientOnly";
 import EmptyState from "../components/EmptyState";
 import FavoriteClient from "./FavoriteClient";
-import { Suspense } from "react";
+import { Suspense, useEffect } from "react";
 import SettingsClient from "./SettingsClient";
 import getListings from "../actions/getListings";
 
@@ -26,7 +26,9 @@ const AccountSettingsPage = async () => {
         <Suspense>
             <ClientOnly>
                 <SettingsClient listings={listings} currentUser={currentUser} />
-                <FavoriteClient listings={favouriteListings} currentUser={currentUser} />
+                <div id="favorites-section">
+                    <FavoriteClient listings={favouriteListings} currentUser={currentUser} />
+                </div>
             </ClientOnly>
         </Suspense>
     );

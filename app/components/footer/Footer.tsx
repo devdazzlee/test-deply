@@ -31,7 +31,7 @@ const Footer: React.FC<FooterProps> = ({ currentUser }) => {
                     </Link>
                   </li>
                   <li>
-                    <Link href='/account-settings' className='hover:underline'>
+                    <Link href='/account-settings#favorites' className='hover:underline'>
                       Favorites
                     </Link>
                   </li>
@@ -85,7 +85,7 @@ const Footer: React.FC<FooterProps> = ({ currentUser }) => {
               . All Rights Reserved.
             </span>
 
-            <div className='text-sm text-gray-500 sm:text-center '>
+            {/* <div className='text-sm text-gray-500 sm:text-center '>
               <Link href='/' className='cursor-pointer hover:underline'>
                 Sitemap
               </Link>
@@ -94,7 +94,7 @@ const Footer: React.FC<FooterProps> = ({ currentUser }) => {
               <Link href='/' className='cursor-pointer hover:underline'>
                 $ USD
               </Link>
-            </div>
+            </div> */}
           </div>
           <div className='flex mt-4 sm:justify-center sm:mt-0'>
             <Link href='#' className='text-gray-500 hover:text-gray-900 '>

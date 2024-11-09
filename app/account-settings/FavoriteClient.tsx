@@ -1,4 +1,5 @@
-import { Suspense } from "react";
+'use client'
+import { Suspense, useEffect } from "react";
 import Container from "../components/Container";
 import Heading from "../components/Heading";
 import ListingCard from "../components/listings/ListingCard";
@@ -16,6 +17,11 @@ const FavoriteClient: React.FC<FavoriteClientProps> = ({
   listings,
   currentUser
 }) => {
+  useEffect(() => {
+    if (window.location.hash === "#favorites") {
+      document.getElementById("favorites-section")?.scrollIntoView({ behavior: "smooth" });
+    }
+  }, []);
   if (listings.length == 0) {
     return (
       <Suspense>

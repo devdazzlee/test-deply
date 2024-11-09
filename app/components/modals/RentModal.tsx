@@ -253,6 +253,7 @@ const RentModal = () => {
           title='Experience'
           subtitle='How many years of experience do you have?'
           value={experience}
+          maxVal={50}
           onChange={value => setCustomValue("experience", value)}
         />
 
@@ -337,6 +338,7 @@ const RentModal = () => {
       secondaryAction={step == STEPS.CATEGORY ? undefined : onBack}
       title='Shutter guide your creativity!'
       body={bodyContent}
+      onNextDisabled={((step == STEPS.CATEGORY && category.length == 0) || (step == STEPS.LOCATION && location === null)) ? true : false}
     />
   );
 };
