@@ -83,6 +83,7 @@ model Listing {
   comments     Comment[]
 }
 
+
 // updated reservations table
 model Reservation {
   id                    String   @id @default(auto()) @map("_id") @db.ObjectId

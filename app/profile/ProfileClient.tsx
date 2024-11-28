@@ -5,6 +5,7 @@ import axios from "axios";
 import {
   IconAlertTriangle,
   IconCircleDashedCheck,
+  IconEdit,
   IconEyeClosed,
   IconEyeFilled,
   IconPhotoFilled,
@@ -58,14 +59,15 @@ function PasswordInput(props: InputProps) {
 
 export default function ProfileClient({
   currentUser,
-  listings
+  listings: initialListings = [],
 }: {
   currentUser: CurrentUser;
-  listings: any;
+  listings: Listing[]; // Define a proper type
 }) {
   const router = useRouter()
   const [loading, setIsLoading] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [listings, setListings] = useState<Listing[]>(initialListings);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const [dateRange, setDateRange] = useState<Range>({
@@ -89,7 +91,7 @@ export default function ProfileClient({
     }
   };
 
-  
+
   const uploadImage = async (file: File) => {
     setIsLoading(true);
 
@@ -119,8 +121,64 @@ export default function ProfileClient({
     }
   };
 
-  console.log("listings ,,,,,," , listings)
-  
+  console.log("listings ,,,,,,", listings)
+  const handleDeleteListing = async (id: string) => {
+    if (!id) return;
+    setIsLoading(true);
+
+    try {
+      await axios.delete(`/api/listings/${id}`);
+      toast.success("Listing deleted!");
+      router.refresh(); // Refresh to fetch updated listings
+    } catch (error) {
+      toast.error("Failed to delete listing.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleUpdateListing = async (id: string, updatedTitle: string) => {
+    if (!id || !updatedTitle.trim()) {
+      toast.error("Invalid listing ID or title.");
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      const patchUrl = `/api/listings/${id}/edittitle/title`;
+      console.log(`Sending PATCH request to ${patchUrl}`); // Debugging
+
+      const response = await axios.patch(patchUrl, {
+        title: updatedTitle,
+      });
+
+      if (response.status === 200) {
+        toast.success("Listing title updated!");
+
+        // Update the local state to reflect the change
+        setListings((prev) =>
+          prev.map((listing) =>
+            listing.id === id ? { ...listing, title: updatedTitle } : listing
+          )
+        );
+      }
+    } catch (error: any) {
+      console.error("Error updating listing:", error);
+      // Display specific error message if available
+      if (error.response && error.response.data && error.response.data.error) {
+        toast.error(error.response.data.error);
+      } else {
+        toast.error("Failed to update listing title.");
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+
+
+
 
   return (
     <>
@@ -158,12 +216,12 @@ export default function ProfileClient({
 
           {/* Hidden file input */}
           <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept="image/*"
-                    style={{ display: "none" }}
-                    onChange={handleFileChange}
-                    disabled={loading}            
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            style={{ display: "none" }}
+            onChange={handleFileChange}
+            disabled={loading}
           />
         </div>
 
@@ -283,11 +341,35 @@ export default function ProfileClient({
         <h4 className='font-semibold'>Your listings</h4>
         <p className='text-sm text-gray-600'>Drag to move photos around</p>
 
-        {listings.map((listing: any) =>
-          <div key={listing.id}>
-            <PhotoSection listing={listing} loading={loading} setIsLoading={setIsLoading} />
+        {listings.map((listing: any) => (
+          <div key={listing.id} className="border-b p-4">
+            <h1 className="font-semibold text-lg">{listing.title}</h1>
+            <div className="flex gap-4 items-center">
+              <Image
+                src={listing.imageSrc[0] || "/images/placeholder.jpg"}
+                alt={listing.title}
+                width={100}
+                height={100}
+                className="object-cover rounded"
+              />
+              <Button
+                color="danger"
+                variant="solid"
+                onClick={() => handleDeleteListing(listing.id)} // Function to handle deletion
+              >
+                <IconTrash size={18} />
+                Delete
+              </Button>
+
+              <EditableListing
+                key={listing.id}
+                listing={listing}
+                onUpdate={(updatedTitle: string) => handleUpdateListing(listing.id, updatedTitle)}
+              />
+
+            </div>
           </div>
-        )}
+        ))}
       </section>
     </>
   );
@@ -469,4 +551,70 @@ function PhotoSection({ listing, loading, setIsLoading }: PhotoSectionProps) {
     </div>
   );
 }
+
+function EditableListing({
+  listing,
+  onUpdate,
+}: {
+  listing: { id: string; title: string; imageSrc: string[] };
+  onUpdate: (updatedTitle: string) => void;
+}) {
+  const [isEditing, setIsEditing] = useState(false);
+  const [title, setTitle] = useState(listing.title);
+  const [isSaving, setIsSaving] = useState(false);
+
+  const handleSave = async () => {
+    setIsSaving(true);
+
+    try {
+      await onUpdate(title); // Update title through the parent handler
+      setIsEditing(false); // Exit editing mode
+    } catch (error) {
+      toast.error("Failed to update title.");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  return (
+    <div className="flex flex-col gap-2">
+      {isEditing ? (
+        <div className="flex items-center gap-2">
+          <Input
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder="Enter a new title"
+            disabled={isSaving}
+          />
+          <Button
+            onClick={handleSave}
+            color="success"
+            isLoading={isSaving}
+            disabled={isSaving || title.trim() === ""}
+          >
+            Save
+          </Button>
+        </div>
+      ) : (
+        <div className="flex items-center justify-between"> 
+                    <Button
+  onClick={() => setIsEditing(true)}
+  variant="light"
+  size="sm"
+  startContent={<IconEdit size={16} />}
+  aria-label={`Edit title for ${listing.title}`}
+ color="success"
+
+>
+  Edit
+</Button>
+
+
+        </div>
+      )}
+    </div>
+  );
+}
+
+
 
