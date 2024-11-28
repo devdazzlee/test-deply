@@ -16,6 +16,7 @@ import SlidingScale from "../inputs/SlidingScale";
 import Stars from "../inputs/Stars";
 import { SlCalender } from "react-icons/sl";
 import ContentType from "../inputs/ContentType";
+import MilesSelect, { MilesSelectValue } from "../inputs/MilesSelect";
 
 enum STEPS {
   LOCATION = 0,
@@ -28,54 +29,19 @@ const SearchModal = () => {
   const params = useSearchParams();
   const searchModal = useSearchModal();
 
+  const [miles, setMiles] = useState<MilesSelectValue | null>(null); // State for selected miles
   const [country, setCountry] = useState<CountrySelectValue>();
   const [location, setLocation] = useState<CitySelectValue>();
   const [category, setCategory] = useState<string[]>([]);
   const [step, setStep] = useState(STEPS.LOCATION);
   const [experience, setExperience] = useState(1);
   const [averageRating, setAverageRating] = useState(3);
-  // const [bathroomCount, setBathroomCount] = useState(1);
   const [dateRange, setDateRange] = useState<Range>({
     startDate: new Date(),
     endDate: new Date(),
     key: "selection"
   });
   const [calenderOption, setCalenderOption] = useState<string>("Dates");
-
-  // const [stayOption, setStayOption] = useState<"Weekend" | "Week" | "Month">(
-  //   "Weekend"
-  // );
-
-  // const [months, setMonths] = useState<string[]>([]);
-  // const [selectedMonths, setSelectedMonths] = useState<string[]>([]);
-
-  // useEffect(() => {
-  //   const currentDate = new Date();
-  //   const generatedMonths = [];
-  //   for (let i = 0; i < 12; i++) {
-  //     const date = new Date(
-  //       currentDate.getFullYear(),
-  //       currentDate.getMonth() + i,
-  //       1
-  //     );
-  //     generatedMonths.push(
-  //       date.toLocaleString("default", { month: "long", year: "numeric" })
-  //     );
-  //   }
-  //   setMonths(generatedMonths);
-  // }, []);
-
-  // const handleMonthClick = (month: string) => {
-  //   setSelectedMonths(prevSelectedMonths => {
-  //     if (prevSelectedMonths.includes(month)) {
-  //       return prevSelectedMonths.filter(
-  //         selectedMonth => selectedMonth !== month
-  //       );
-  //     } else {
-  //       return [...prevSelectedMonths, month];
-  //     }
-  //   });
-  // };
 
   const handleSelectCat = (selectedCategory: string) => {
     const index = category.includes(selectedCategory);
@@ -90,15 +56,7 @@ const SearchModal = () => {
       setCategory(newCategories);
     }
   };
-  // const scroll = (width: any) => {
-  //   const container = document.getElementById("monthsContainer");
-  //   if (container) {
-  //     container.scrollBy({
-  //       left: width,
-  //       behavior: "smooth"
-  //     });
-  //   }
-  // };
+
   const Map = useMemo(
     () =>
       dynamic(() => import("../GoogleMaps"), {
@@ -116,62 +74,65 @@ const SearchModal = () => {
   }, []);
 
   const onSubmit = useCallback(async () => {
+
+console.log("miles?.value >>>" , miles?.value )
     if (step != STEPS.INFO) {
       return onNext();
     }
-
+  
     let currentQuery = {};
-
+  
     if (params) {
       currentQuery = qs.parse(params.toString());
     }
-
+  
     const updatedQuery: any = {
       ...currentQuery,
       locationValue: location?.value,
+      miles: miles?.value, // Include miles range in query
       experience,
       averageRating,
     };
-
-    if (category.length)
-      updatedQuery.category = category.join(",")
-
+  
+    if (category.length) updatedQuery.category = category.join(",");
+  
     if (calenderOption === "Dates") {
       if (dateRange.startDate) {
         updatedQuery.startDate = formatISO(dateRange.startDate);
       }
-
+  
       if (dateRange.endDate) {
         updatedQuery.endDate = formatISO(dateRange.endDate);
       }
     }
     console.log(updatedQuery);
-
-
+  
     const url = qs.stringifyUrl(
       {
         url: "/",
-        query: updatedQuery
+        query: updatedQuery,
       },
       { skipNull: true }
     );
-
+  
     setStep(STEPS.LOCATION);
     searchModal.onClose();
-
+  
     router.push(url);
   }, [
     step,
     searchModal,
     location,
+    miles,
     router,
     experience,
     averageRating,
     dateRange,
     onNext,
     params,
-    category
+    category,
   ]);
+  
   const experienceLabels = [
     "1+ years",
     "3+ years",
@@ -197,31 +158,31 @@ const SearchModal = () => {
   }, [step]);
 
   let bodyContent = (
-    <div className='flex flex-col gap-8'>
-      <Heading
-        title='Where are you based?'
-        subtitle='Find creators near you!'
-      />
+    <div className="flex flex-col gap-8">
+      <Heading title="Where are you based?" subtitle="Find creators near you!" />
       <CountrySelect
         value={country}
-        onChange={value => {
-          setCountry(value as CountrySelectValue);
-        }}
+        onChange={(value) => setCountry(value as CountrySelectValue)}
       />
       {country && (
         <CitySelect
           value={location}
           countryCode={country.value}
-          onChange={value => {
-            setLocation(value as CitySelectValue);
-          }}
+          onChange={(value) => setLocation(value as CitySelectValue)}
         />
       )}
-
+      {location && (
+        <MilesSelect
+          value={miles || undefined} 
+          onChange={(value) => setMiles(value)} // Update state when a miles option is selected
+        />
+      )}
+  
       <hr />
-      <Map position={location?.latlng} />
+      <Map position={location?.latlng} miles={miles?.value} />
     </div>
   );
+     
 
   if (step == STEPS.DATE) {
     bodyContent = (
@@ -267,105 +228,7 @@ const SearchModal = () => {
             </div>
           </>
         ) : (
-          <>
-            {/* <h2 className='text-xl font-semibold text-center'>
-              Stay for a {stayOption}
-            </h2>
-            <div className='flex justify-center w-fit p-2 rounded-full bg-neutral-100 items-center gap-2 self-center'>
-              <button
-                className={`font-semibold py-1 px-2 rounded-full ${stayOption === "Weekend" ? "bg-white" : ""
-                  }`}
-                onClick={() => setStayOption("Weekend")}
-              >
-                Weekend
-              </button>
-              <button
-                className={`font-semibold py-1 px-2 rounded-full ${stayOption === "Week" ? "bg-white" : ""
-                  }`}
-                onClick={() => setStayOption("Week")}
-              >
-                Week
-              </button>
-              <button
-                className={`font-semibold py-1 px-2 rounded-full ${stayOption === "Month" ? "bg-white" : ""
-                  }`}
-                onClick={() => setStayOption("Month")}
-              >
-                Month
-              </button>
-            </div>
-
-            <div className='flex w-full items-center'>
-              <button
-                onClick={() => scroll(-200)}
-                type='button'
-                className='text-black border shadow-sm  bg-white font-medium rounded-full text-sm p-2 h-fit text-center  items-center mr-4  hover:shadow-md'
-              >
-                <svg
-                  className='w-4 h-4 rotate-180'
-                  aria-hidden='true'
-                  xmlns='http://www.w3.org/2000/svg'
-                  fill='none'
-                  viewBox='0 0 14 10'
-                >
-                  <path
-                    stroke='currentColor'
-                    strokeLinecap='round'
-                    strokeLinejoin='round'
-                    strokeWidth='2'
-                    d='M1 5h12m0 0L9 1m4 4L9 9'
-                  />
-                </svg>
-              </button>
-              <div
-                id='monthsContainer'
-                className='flex  no-scrollbar overflow-x-auto gap-3 py-1'
-              >
-                {months.map((month, index) => (
-                  <button
-                    key={index}
-                    className={`flex flex-col p-4 border rounded-lg shadow hover:shadow-md min-w-24 h-32 justify-center items-center
-                                                ${selectedMonths.includes(month)
-                        ? "border border-gray-700"
-                        : ""
-                      }`}
-                    onClick={() => handleMonthClick(month)}
-                  >
-                    <SlCalender />
-
-                    <div className='text-md'>{month.split(" ")[0]}</div>
-                    <div className='text-sm text-gray-500'>
-                      {month.split(" ")[1]}
-                    </div>
-                  </button>
-                ))}
-              </div>
-              <button
-                onClick={() => scroll(200)}
-                type='button'
-                className='text-black border shadow-sm  bg-white font-medium rounded-full text-sm p-2 h-fit text-center items-center ml-4  hover:shadow-md'
-              >
-                <svg
-                  className='w-4 h-4'
-                  aria-hidden='true'
-                  xmlns='http://www.w3.org/2000/svg'
-                  fill='none'
-                  viewBox='0 0 14 10'
-                >
-                  <path
-                    stroke='currentColor'
-                    strokeLinecap='round'
-                    strokeLinejoin='round'
-                    strokeWidth='2'
-                    d='M1 5h12m0 0L9 1m4 4L9 9'
-                  />
-                </svg>
-              </button>
-            </div> */}
-
-
-            {/* <h1>Flexible</h1> */}
-          </>
+         <></>
         )}
       </div>
     );

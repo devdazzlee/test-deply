@@ -78,30 +78,49 @@ export default function ProfileClient({
     const file = event.target.files?.[0];
 
     if (file) {
-      setSelectedFile(file);
+      if (!file.type.startsWith("image/")) {
+        toast.error("Invalid file. Please upload an image.");
+        return;
+      }
+
       uploadImage(file);
+    } else {
+      toast.error("No file selected.");
     }
   };
 
-  const uploadImage = (file: File) => {
-    setIsLoading(true)
-    const formData = new FormData();
-    formData.append('file', file);
+  
+  const uploadImage = async (file: File) => {
+    setIsLoading(true);
 
+    try {
+      console.log(
+        "Uploading file:",
+        file.name,
+        file.type,
+        file.size
+      ); // Debugging
 
-    axios.patch(`/api/user/${currentUser.id}/avatar`, formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    }).then(() => {
-      router.refresh()
-    }).catch((error) => {
-      toast.error('Error uploading image:');
-    }).finally(() => {
-      setIsLoading(false)
-    });
-  }
+      const arrayBuffer = await file.arrayBuffer();
 
+      await axios.patch(`/api/user/${currentUser.id}/avatar`, arrayBuffer, {
+        headers: {
+          "Content-Type": file.type,
+        },
+      });
+
+      router.refresh();
+      toast.success("Profile picture updated!");
+    } catch (error) {
+      console.error("Upload error:", error);
+      toast.error("Failed to upload image.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  console.log("listings ,,,,,," , listings)
+  
 
   return (
     <>
@@ -139,12 +158,12 @@ export default function ProfileClient({
 
           {/* Hidden file input */}
           <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            style={{ display: 'none' }}
-            onChange={handleFileChange}
-            disabled={loading}
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    style={{ display: "none" }}
+                    onChange={handleFileChange}
+                    disabled={loading}            
           />
         </div>
 

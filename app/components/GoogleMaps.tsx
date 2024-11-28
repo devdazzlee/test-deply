@@ -4,10 +4,11 @@ import { APIProvider, Map } from "@vis.gl/react-google-maps";
 import { Circle } from "./GoogleMaps/Circle";
 
 interface GoogleMapsProps {
-  position?: string[];
+  position?: string[]; // Latitude and longitude
+  miles?: number; // Radius in miles
 }
 
-export default function GoogleMaps({ position }: GoogleMapsProps) {
+export default function GoogleMaps({ position, miles }: GoogleMapsProps) {
   const marker = position
     ? { lat: Number(position[0]), lng: Number(position[1]) }
     : null;
@@ -21,7 +22,7 @@ export default function GoogleMaps({ position }: GoogleMapsProps) {
 
   return (
     <APIProvider apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API!}>
-      <div className='h-[35vh] w-full'>
+      <div className="h-[35vh] w-full">
         <Map
           defaultZoom={8}
           minZoom={marker ? 7 : 4}
@@ -30,7 +31,12 @@ export default function GoogleMaps({ position }: GoogleMapsProps) {
           {...(marker && { center: marker })}
           mapId={process.env.NEXT_PUBLIC_GOOGLE_MAP_ID}
         >
-          {marker && <Circle center={marker} />}
+          {marker && (
+            <>
+              {/* Render the marker */}
+              <Circle center={marker} radius={(miles || 0) * 1609.34} />
+            </>
+          )}
         </Map>
       </div>
     </APIProvider>
