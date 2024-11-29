@@ -75,6 +75,8 @@ export async function PATCH(request: NextRequest) {
 
     if (typeof bio === 'string' && bio !== currentUser.bio) {
       updateData.bio = bio;
+    } else if (bio === null) {
+      updateData.bio = ""; // Default value to handle null case
     }
 
     if (typeof facebook === 'string' && facebook !== currentUser.facebook) {
