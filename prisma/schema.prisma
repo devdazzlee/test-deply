@@ -17,6 +17,11 @@ model User {
   id                String    @id @default(auto()) @map("_id") @db.ObjectId
   name              String?
   email             String?   @unique
+  town              String?   
+  bio               String?   @default("No bio available")
+  facebook          String?
+  instagram         String?
+  linkedin          String?
   emailVerified     DateTime?
   verificationToken String?
   image             String?
@@ -65,11 +70,12 @@ model Account {
 model Listing {
   id                  String   @id @default(auto()) @map("_id") @db.ObjectId
   title               String
-  bio                 String
+  bio                 String? @default("No bio available")
+  available           Boolean  @default(true) 
   imageSrc            String[]
   createdAt           DateTime @default(now())
   category            String[]
-  experience          Int
+  experience          Int?
   locationValue       String
   locationCoordinates String[]
   userId              String   @db.ObjectId

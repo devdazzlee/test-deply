@@ -241,7 +241,7 @@ const ListingCard: React.FC<ListingCardProps> = ({
   // useEffect(() => {
   //   setSwiperLoaded(true); // This ensures Swiper is only rendered after the component has mounted on the client side
   // }, []);
-
+console.log("data >>>>>>>>>" , data)
   return (
     <Link
       href={`/listings/${data.id}`}
@@ -297,6 +297,13 @@ const ListingCard: React.FC<ListingCardProps> = ({
         </div>
 
         <div className='font-light text-sm flex flex-wrap flex-row-reverse gap-x-2 text-neutral-500'>
+           <div
+        className={`px-3 py-1 rounded-full text-xs font-semibold ${
+          data.available ? "bg-green-100 text-green-600" : "bg-red-100 text-red-600"
+        }`}
+      >
+        {data.available ? "Available" : "Unavailable"}
+      </div>
           {reservationDate ||
             (Array.isArray(data.category) &&
               (data.category.length === 24 ? <div>All Categories</div> :
@@ -304,6 +311,8 @@ const ListingCard: React.FC<ListingCardProps> = ({
                   .slice(0, 3)
                   .map((item, index) => <div key={index}>{item}</div>)))}
         </div>
+        
+
         {type === "approval" && (
           <>
             <Button
